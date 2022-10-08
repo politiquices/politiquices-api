@@ -423,8 +423,6 @@ def get_person_info(wiki_id):
     """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
-    print(results)
-
     name = None
     image_url = None
     parties = []
@@ -440,7 +438,7 @@ def get_person_info(wiki_id):
         if "political_party" in e:
             party_image_url = no_image
 
-            # add 'PS' logo since it's on on wikidata
+            # add 'PS' logo since it's not on Wikidata
             if e["political_party"]["value"] == "http://www.wikidata.org/entity/Q847263":
                 party_image_url = ps_logo
 
@@ -1081,7 +1079,8 @@ def get_entities_without_image():
 
 
 def get_timeline_personalities(wiki_ids: List[str]):
-    values = ' '.join(wiki_ids)
+
+    values = ' '.join(['wd:'+wiki_id for wiki_id in wiki_ids])
 
     query = f"""
         PREFIX politiquices: <http://www.politiquices.pt/>
