@@ -4,7 +4,11 @@ import loguru
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from cache import all_parties_info, wiki_id_info_all
+from cache import (
+    all_entities_info,
+    all_parties_info,
+    wiki_id_info_all
+)
 from sparql_queries import (
     get_person_info,
     get_person_relationships,
@@ -59,6 +63,11 @@ async def read_item(
 @app.get("/parties/")
 async def read_item():
     return all_parties_info
+
+
+@app.get("/personalities/")
+async def read_item():
+    return all_entities_info
 
 
 @app.get("/timeline/")
