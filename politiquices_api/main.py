@@ -8,7 +8,6 @@ rel_types = ["ent1_opposes_ent2", "ent1_supports_ent2", "ent2_opposes_ent1", "en
 wiki_id_regex = r'^Q\d+$'
 rel_type_regex = r"(?=("+'|'.join(rel_types)+r"))"
 
-
 app = FastAPI()
 
 
