@@ -4,16 +4,13 @@ import loguru
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from cache import (
-    all_entities_info,
-    all_parties_info,
-    wiki_id_info_all
-)
+from cache import all_entities_info, all_parties_info, wiki_id_info_all
 from sparql_queries import (
     get_person_info,
     get_person_relationships,
     get_relationship_between_two_persons,
-    get_timeline_personalities,
+    get_timeline_personalities, get_personalities_by_education, get_personalities_by_occupation,
+    get_personalities_by_public_office, get_personalities_by_legislature, get_persons_affiliated_with_party,
 )
 
 start_year = 1994
@@ -62,7 +59,7 @@ async def read_item(
 
 @app.get("/parties/")
 async def read_item():
-    return all_parties_info
+    return [party for party in all_parties_info if party["country"] == "Portugal"]
 
 
 @app.get("/personalities/")
@@ -71,18 +68,44 @@ async def read_item():
 
 
 @app.get("/timeline/")
-async def read_items(q: Union[List[str], None] = Query(default=None)):
+async def read_items(
+    q: Union[List[str], None] = Query(default=None),
+    selected: bool = Query(default=None),
+    sentiment: bool = Query(default=None),
+):
     query_items = {"q": q}
-
-    print(query_items["q"])
-
-    results = get_timeline_personalities(query_items["q"])
+    results = get_timeline_personalities(query_items["q"], selected, sentiment)
 
     # add images
     for entry in results:
-        ent1_id = entry['ent1']['value'].split("/")[-1]
-        ent2_id = entry['ent2']['value'].split("/")[-1]
-        entry['ent1_img'] = wiki_id_info_all[ent1_id]
-        entry['ent2_img'] = wiki_id_info_all[ent2_id]
+        ent1_id = entry["ent1"]["value"].split("/")[-1]
+        ent2_id = entry["ent2"]["value"].split("/")[-1]
+        entry["ent1_img"] = wiki_id_info_all[ent1_id]
+        entry["ent2_img"] = wiki_id_info_all[ent2_id]
 
     return results
+
+
+@app.get("/personalities/educated_at/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_personalities_by_education(wiki_id)
+
+
+@app.get("/personalities/occupation/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_personalities_by_occupation(wiki_id)
+
+
+@app.get("/personalities/public_office/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_personalities_by_public_office(wiki_id)
+
+
+@app.get("/personalities/legislature/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_personalities_by_legislature(wiki_id)
+
+
+@app.get("/personalities/party/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_persons_affiliated_with_party(wiki_id)

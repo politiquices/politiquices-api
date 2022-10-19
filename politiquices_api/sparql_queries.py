@@ -4,7 +4,7 @@ from functools import lru_cache
 from typing import List
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from data_models import OfficePosition, Person, PoliticalParty
+from data_models import Element, Person, PoliticalParty
 from config import (
     live_wikidata,
     no_image,
@@ -400,8 +400,7 @@ def get_wiki_id_affiliated_with_party(political_party: str):
 # Personality Information
 def get_person_info(wiki_id):
     query = f"""
-        SELECT ?name ?office ?office_label ?image_url ?political_party_logo 
-                ?political_party ?political_party_label 
+        SELECT ?name ?office ?office_label ?image_url ?political_party_logo ?political_party ?political_party_label 
         WHERE {{
             wd:{wiki_id} rdfs:label ?name
             FILTER(LANG(?name)="pt") .
@@ -455,7 +454,7 @@ def get_person_info(wiki_id):
 
         # office positions
         if "office_label" in e:
-            office_position = OfficePosition(position=e["office_label"]["value"])
+            office_position = Element(wiki_id=e["office"]["value"], label=e["office_label"]["value"])
             if office_position not in offices:
                 offices.append(office_position)
 
@@ -474,7 +473,7 @@ def get_person_info(wiki_id):
 
 def get_person_detailed_info(wiki_id):
     occupation_query = f"""
-        SELECT DISTINCT ?occupation_label
+        SELECT DISTINCT ?occupation ?occupation_label
         WHERE {{
           wd:{wiki_id} p:P106 ?occupationStmnt .
           ?occupationStmnt ps:P106 ?occupation .
@@ -483,7 +482,7 @@ def get_person_detailed_info(wiki_id):
         """
 
     education_query = f"""
-        SELECT DISTINCT ?educatedAt_label
+        SELECT DISTINCT ?educatedAt ?educatedAt_label
         WHERE {{
             wd:{wiki_id} p:P69 ?educatedAtStmnt .
             ?educatedAtStmnt ps:P69 ?educatedAt .
@@ -492,7 +491,7 @@ def get_person_detailed_info(wiki_id):
         """
 
     positions_query = f"""
-        SELECT DISTINCT ?position_label
+        SELECT DISTINCT ?position ?position_label
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
             ?positionStmnt ps:P39 ?position .
@@ -501,17 +500,18 @@ def get_person_detailed_info(wiki_id):
         """
 
     results = query_sparql(PREFIXES + "\n" + occupation_query, "wikidata")
-    occupations = [
-        x["occupation_label"]["value"]
-        for x in results["results"]["bindings"]
-        if x["occupation_label"]["value"] != "político"
-    ]
+    occupations = []
+    for x in results["results"]["bindings"]:
+        if x["occupation_label"]["value"] == "político":
+            continue
+        occupations.append(Element(x["occupation"]["value"], x["occupation_label"]["value"]))
 
     results = query_sparql(PREFIXES + "\n" + education_query, "wikidata")
-    education = [x["educatedAt_label"]["value"] for x in results["results"]["bindings"]]
+    education = [Element(x["educatedAt"]["value"], x["educatedAt_label"]["value"])
+                 for x in results["results"]["bindings"]]
 
     results = query_sparql(PREFIXES + "\n" + positions_query, "wikidata")
-    positions = [x["position_label"]["value"] for x in results["results"]["bindings"]]
+    positions = [(x["position"]["value"], x["position_label"]["value"]) for x in results["results"]["bindings"]]
 
     return {"education": education, "occupation": occupations, "position": positions}
 
@@ -1078,9 +1078,11 @@ def get_entities_without_image():
     return entities
 
 
-def get_timeline_personalities(wiki_ids: List[str]):
+def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool):
+    values = ' '.join(['wd:' + wiki_id for wiki_id in wiki_ids])
 
-    values = ' '.join(['wd:'+wiki_id for wiki_id in wiki_ids])
+    date_start = None
+    date_ent = None
 
     query = f"""
         PREFIX politiquices: <http://www.politiquices.pt/>
@@ -1111,8 +1113,91 @@ def get_timeline_personalities(wiki_ids: List[str]):
         }}
         ORDER BY DESC(?date)
         """
-
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
+
+    if only_among_selected and len(wiki_ids) > 1:
+        # only consider triples where both 'ent1' and 'ent2' are part of wiki_ids
+        new_bindings = []
+        for r in result['results']['bindings']:
+            ent1 = r['ent1']['value'].split("/")[-1]
+            ent2 = r['ent2']['value'].split("/")[-1]
+            if len({ent1, ent2}.intersection(set(wiki_ids))) != 2:
+                continue
+            new_bindings.append(r)
+        result['results']['bindings'] = new_bindings
+
+    if only_sentiment:
+        new_bindings = []
+        for r in result['results']['bindings']:
+            if r['rel_type']['value'] == 'other':
+                continue
+            new_bindings.append(r)
+        result['results']['bindings'] = new_bindings
+
+    return result['results']['bindings']
+
+
+def get_personalities_by_education(institution_wiki_id: str):
+    query = f"""
+    SELECT ?ent1 ?ent1_name ?educatedAt_label
+    WHERE {{
+        ?ent1 wdt:P31 wd:Q5;
+              rdfs:label ?ent1_name;
+              p:P69 ?educatedAtStmnt.
+        ?educatedAtStmnt ps:P69 wd:{institution_wiki_id} .
+        wd:{institution_wiki_id} rdfs:label ?educatedAt_label FILTER(LANG(?educatedAt_label) = "pt").
+        FILTER(LANG(?ent1_name) = "pt")
+      }}
+    """
+    result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    return result['results']['bindings']
+
+
+def get_personalities_by_occupation(occupation_wiki_id: str):
+    query = f"""
+    SELECT ?ent1 ?ent1_name ?profissao
+    WHERE {{
+        ?ent1 wdt:P31 wd:Q5;
+              rdfs:label ?ent1_name;
+              p:P106 ?occupationStmnt .
+        ?occupationStmnt ps:P106 wd:{occupation_wiki_id} .
+        wd:{occupation_wiki_id} rdfs:label ?profissao FILTER(LANG(?profissao) = "pt").
+        FILTER(LANG(?ent1_name) = "pt")
+    }}
+    """
+    result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    return result['results']['bindings']
+
+
+def get_personalities_by_public_office(public_office: str):
+    query = f"""
+    SELECT ?ent1 ?ent1_name ?public_office_label
+    WHERE {{
+        ?ent1 wdt:P31 wd:Q5;
+              rdfs:label ?ent1_name;
+              p:P39 ?positionStmnt .
+        ?positionStmnt ps:P39 wd:{public_office} .
+        wd:{public_office} rdfs:label ?public_office_label FILTER(LANG(?public_office_label) = "pt").
+        FILTER(LANG(?ent1_name) = "pt")
+    }}
+    """
+    result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    return result['results']['bindings']
+
+
+def get_personalities_by_legislature(legislature: str):
+    query = f"""
+    SELECT DISTINCT ?person ?personLabel ?legislature_label 
+    WHERE {{
+        ?person wdt:P31 wd:Q5;
+          wdt:P27 wd:Q45;
+          p:P39 ?officeStmnt;
+          rdfs:label ?personLabel . FILTER(LANG(?personLabel) = "pt")
+    ?officeStmnt pq:P2937 wd:{legislature}.
+    wd:{legislature} rdfs:label ?legislature_label . FILTER(LANG(?legislature_label) = "pt")
+    }} 
+    """
+    result = query_sparql(PREFIXES + "\n" + query, "wikidata")
     return result['results']['bindings']
 
 
@@ -1127,3 +1212,5 @@ def query_sparql(query, endpoint):
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     return results
+
+

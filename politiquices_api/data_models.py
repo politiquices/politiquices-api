@@ -3,8 +3,9 @@ from dataclasses import dataclass
 
 
 @dataclass
-class OfficePosition:
-    position: str
+class Element:
+    wiki_id: str
+    label: str
 
 
 @dataclass
