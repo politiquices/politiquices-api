@@ -400,7 +400,7 @@ def get_wiki_id_affiliated_with_party(political_party: str):
 # Personality Information
 def get_person_info(wiki_id):
     query = f"""
-        SELECT ?name ?office ?office_label ?image_url ?political_party_logo ?political_party ?political_party_label 
+        SELECT ?name ?office ?office_label ?cabinet ?cabinet_label ?image_url ?political_party_logo ?political_party ?political_party_label 
         WHERE {{
             wd:{wiki_id} rdfs:label ?name
             FILTER(LANG(?name)="pt") .
@@ -418,6 +418,11 @@ def get_person_info(wiki_id):
                     FILTER(LANG(?political_party_label)="pt").
                 OPTIONAL {{ ?political_party wdt:P154 ?political_party_logo. }}
             }}
+            OPTIONAL {{
+              ?officeStmnt ps:P39 ?office.
+              ?officeStmnt pq:P5054 ?cabinet. 
+              ?cabinet rdfs:label ?cabinet_label . FILTER(LANG(?cabinet_label) = "pt").
+            }}
         }}
     """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
@@ -426,7 +431,9 @@ def get_person_info(wiki_id):
     image_url = None
     parties = []
     offices = []
+    legislatures = []
     for e in results["results"]["bindings"]:
+
         if not name:
             name = e["name"]["value"]
 
@@ -452,11 +459,18 @@ def get_person_info(wiki_id):
             if party not in parties:
                 parties.append(party)
 
+        # ToDo: can be removed, its retrieved in get_person_detailed_info()
         # office positions
         if "office_label" in e:
             office_position = Element(wiki_id=e["office"]["value"], label=e["office_label"]["value"])
             if office_position not in offices:
                 offices.append(office_position)
+
+        # legislatures
+        if "cabinet_label" in e:
+            cabinet = Element(wiki_id=e["cabinet"]["value"], label=e["cabinet_label"]["value"])
+            if cabinet not in legislatures:
+                legislatures.append(cabinet)
 
     results = get_person_detailed_info(wiki_id)
 
@@ -468,6 +482,7 @@ def get_person_info(wiki_id):
         positions=results["position"],
         education=results["education"],
         occupations=results["occupation"],
+        legislatures=legislatures
     )
 
 
@@ -511,7 +526,7 @@ def get_person_detailed_info(wiki_id):
                  for x in results["results"]["bindings"]]
 
     results = query_sparql(PREFIXES + "\n" + positions_query, "wikidata")
-    positions = [(x["position"]["value"], x["position_label"]["value"]) for x in results["results"]["bindings"]]
+    positions = [Element(x["position"]["value"], x["position_label"]["value"]) for x in results["results"]["bindings"]]
 
     return {"education": education, "occupation": occupations, "position": positions}
 

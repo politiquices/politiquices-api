@@ -23,6 +23,7 @@ class Person:
     nr_articles: Optional[int] = None
     image_url: Optional[str] = None
     parties: Optional[List[PoliticalParty]] = None
-    positions: Optional[List[str]] = None
-    education: Optional[List[str]] = None
-    occupations: Optional[List[str]] = None
+    positions: Optional[List[Element]] = None
+    education: Optional[List[Element]] = None
+    occupations: Optional[List[Element]] = None
+    legislatures: Optional[List[Element]] = None
