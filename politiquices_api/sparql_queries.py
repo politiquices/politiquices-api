@@ -190,7 +190,7 @@ def get_persons_wiki_id_name_image_url():
             VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
             ?item wdt:P31 ?valid_instances.
             ?item rdfs:label ?label . FILTER(LANG(?label) = "pt")  
-            OPTIONAL {{ ?item wdt:P18 ?image_url. }}           
+            OPTIONAL {{ ?item wdt:P18 ?image_url. }}
         }}
         ORDER BY ?label
         """
@@ -1154,49 +1154,97 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
 
 def get_personalities_by_education(institution_wiki_id: str):
     query = f"""
-    SELECT ?ent1 ?ent1_name ?educatedAt_label
+    SELECT ?ent1 ?ent1_name
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               rdfs:label ?ent1_name;
               p:P69 ?educatedAtStmnt.
         ?educatedAtStmnt ps:P69 wd:{institution_wiki_id} .
-        wd:{institution_wiki_id} rdfs:label ?educatedAt_label FILTER(LANG(?educatedAt_label) = "pt").
+        OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
         FILTER(LANG(?ent1_name) = "pt")
       }}
+    GROUP BY ?ent1 ?ent1_name
+    ORDER BY ASC(?ent1_name)
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
+    for r in result['results']['bindings']:
+        if 'images_url' not in r:
+            r['image_url'] = dict()
+            r['image_url']['type'] = 'uri'
+            r['image_url']['value'] = no_image
+        else:
+            if images := r['images_url']['value'].split(","):
+                r['image_url'] = r.pop('images_url')
+                r['image_url']['value'] = images[0]
+            else:
+                r['image_url'] = r.pop('images_url')
+
     return result['results']['bindings']
 
 
 def get_personalities_by_occupation(occupation_wiki_id: str):
     query = f"""
-    SELECT ?ent1 ?ent1_name ?profissao
+    SELECT ?ent1 ?ent1_name
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               rdfs:label ?ent1_name;
               p:P106 ?occupationStmnt .
         ?occupationStmnt ps:P106 wd:{occupation_wiki_id} .
-        wd:{occupation_wiki_id} rdfs:label ?profissao FILTER(LANG(?profissao) = "pt").
+        OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
         FILTER(LANG(?ent1_name) = "pt")
     }}
+    GROUP BY ?ent1 ?ent1_name
+    ORDER BY ASC(?ent1_name)
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
+    for r in result['results']['bindings']:
+        if 'images_url' not in r:
+            r['image_url'] = dict()
+            r['image_url']['type'] = 'uri'
+            r['image_url']['value'] = no_image
+        else:
+            if images := r['images_url']['value'].split(","):
+                r['image_url'] = r.pop('images_url')
+                r['image_url']['value'] = images[0]
+            else:
+                r['image_url'] = r.pop('images_url')
+
     return result['results']['bindings']
 
 
 def get_personalities_by_public_office(public_office: str):
     query = f"""
-    SELECT ?ent1 ?ent1_name ?public_office_label
+    SELECT ?ent1 ?ent1_name
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               rdfs:label ?ent1_name;
               p:P39 ?positionStmnt .
         ?positionStmnt ps:P39 wd:{public_office} .
-        wd:{public_office} rdfs:label ?public_office_label FILTER(LANG(?public_office_label) = "pt").
+        OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
         FILTER(LANG(?ent1_name) = "pt")
     }}
+    GROUP BY ?ent1 ?ent1_name
+    ORDER BY ASC(?ent1_name)
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
+    for r in result['results']['bindings']:
+        if 'images_url' not in r:
+            r['image_url'] = dict()
+            r['image_url']['type'] = 'uri'
+            r['image_url']['value'] = no_image
+        else:
+            if images := r['images_url']['value'].split(","):
+                r['image_url'] = r.pop('images_url')
+                r['image_url']['value'] = images[0]
+            else:
+                r['image_url'] = r.pop('images_url')
+
     return result['results']['bindings']
 
 
