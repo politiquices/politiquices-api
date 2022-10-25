@@ -1,7 +1,5 @@
 from typing import List, Union
 
-import loguru
-
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from cache import all_entities_info, all_parties_info, wiki_id_info_all
@@ -9,8 +7,13 @@ from sparql_queries import (
     get_person_info,
     get_person_relationships,
     get_relationship_between_two_persons,
-    get_timeline_personalities, get_personalities_by_education, get_personalities_by_occupation,
-    get_personalities_by_public_office, get_personalities_by_legislature, get_persons_affiliated_with_party,
+    get_timeline_personalities,
+    get_personalities_by_education,
+    get_personalities_by_occupation,
+    get_personalities_by_public_office,
+    get_personalities_by_assembly,
+    get_personalities_by_government,
+    get_personalities_by_party
 )
 
 start_year = 1994
@@ -101,11 +104,17 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     return get_personalities_by_public_office(wiki_id)
 
 
-@app.get("/personalities/legislature/{wiki_id}")
+@app.get("/personalities/government/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_personalities_by_legislature(wiki_id)
+    return get_personalities_by_government(wiki_id)
+
+
+@app.get("/personalities/assembly/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_personalities_by_assembly(wiki_id)
 
 
 @app.get("/personalities/party/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_persons_affiliated_with_party(wiki_id)
+    # return get_persons_affiliated_with_party(wiki_id)
+    return get_personalities_by_party(wiki_id)

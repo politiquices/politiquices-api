@@ -176,8 +176,7 @@ def get_persons_articles_freq():
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     top_freq = [
-        {"person": x["person"]["value"], "freq": x["n_artigos"]["value"]}
-        for x in results["results"]["bindings"]
+        {"person": x["person"]["value"], "freq": x["n_artigos"]["value"]} for x in results["results"]["bindings"]
     ]
     return top_freq
 
@@ -286,10 +285,7 @@ def get_total_nr_articles_for_each_person():
         ORDER BY DESC (?count)
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    return {
-        e["person"]["value"].split("/")[-1]: int(e["count"]["value"])
-        for e in results["results"]["bindings"]
-    }
+    return {e["person"]["value"].split("/")[-1]: int(e["count"]["value"]) for e in results["results"]["bindings"]}
 
 
 def get_nr_relationships_as_subject(relationship: str):
@@ -309,8 +305,7 @@ def get_nr_relationships_as_subject(relationship: str):
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     return [
-        (x["person_a"]["value"].split("/")[-1], int(x["nr_articles"]["value"]))
-        for x in results["results"]["bindings"]
+        (x["person_a"]["value"].split("/")[-1], int(x["nr_articles"]["value"])) for x in results["results"]["bindings"]
     ]
 
 
@@ -331,62 +326,11 @@ def get_nr_relationships_as_target(relationship: str):
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     return [
-        (x["person_a"]["value"].split("/")[-1], int(x["nr_articles"]["value"]))
-        for x in results["results"]["bindings"]
+        (x["person_a"]["value"].split("/")[-1], int(x["nr_articles"]["value"])) for x in results["results"]["bindings"]
     ]
 
 
 # Political Parties
-def get_persons_affiliated_with_party(political_party: str):
-    query = f"""
-        SELECT DISTINCT ?partyLabel ?political_party_logo ?person ?personLabel ?image_url {{
-          ?person wdt:P31 wd:Q5.
-          SERVICE <{wikidata_endpoint}> {{
-              wd:{political_party} rdfs:label ?partyLabel FILTER(LANG(?partyLabel) = "pt") .
-              OPTIONAL {{ wd:{political_party} wdt:P154 ?political_party_logo. }}
-              ?person wdt:P102 wd:{political_party} .
-              ?person rdfs:label ?personLabel FILTER(LANG(?personLabel) = "pt") .
-              OPTIONAL {{ ?person wdt:P18 ?image_url. }}
-
-          }}
-        }} 
-        ORDER BY ?personLabel
-        """
-    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    persons = []
-    party_name = None
-    party_logo = None
-    # add 'PS' logo since it's not on wikidata
-    if political_party == "Q847263":
-        party_logo = ps_logo
-    seen = set()
-    for x in results["results"]["bindings"]:
-        wiki_id = x["personLabel"]["value"]
-        if wiki_id in seen:
-            continue
-
-        if not party_name:
-            party_name = x["partyLabel"]["value"]
-
-        if not party_logo:
-            if "political_party_logo" in x:
-                party_logo = x["political_party_logo"]["value"]
-            else:
-                party_logo = no_image
-
-        image = x["image_url"]["value"] if "image_url" in x else no_image
-        persons.append(
-            Person(
-                name=wiki_id,
-                wiki_id=x["person"]["value"].split("/")[-1],
-                image_url=image,
-            )
-        )
-        seen.add(wiki_id)
-
-    return persons, party_name, party_logo
-
-
 def get_wiki_id_affiliated_with_party(political_party: str):
     query = f"""
         SELECT DISTINCT ?wiki_id {{
@@ -431,7 +375,8 @@ def get_person_info(wiki_id):
     image_url = None
     parties = []
     offices = []
-    legislatures = []
+    governments = []
+    assemblies = []
     for e in results["results"]["bindings"]:
 
         if not name:
@@ -453,24 +398,11 @@ def get_person_info(wiki_id):
                 name=e["political_party_label"]["value"],
                 image_url=make_https(e["political_party_logo"]["value"])
                 if "political_party_logo" in e
-                   and e["political_party"]["value"] != "http://www.wikidata.org/entity/Q847263"
+                and e["political_party"]["value"] != "http://www.wikidata.org/entity/Q847263"
                 else party_image_url,
             )
             if party not in parties:
                 parties.append(party)
-
-        # ToDo: can be removed, its retrieved in get_person_detailed_info()
-        # office positions
-        if "office_label" in e:
-            office_position = Element(wiki_id=e["office"]["value"], label=e["office_label"]["value"])
-            if office_position not in offices:
-                offices.append(office_position)
-
-        # legislatures
-        if "cabinet_label" in e:
-            cabinet = Element(wiki_id=e["cabinet"]["value"], label=e["cabinet_label"]["value"])
-            if cabinet not in legislatures:
-                legislatures.append(cabinet)
 
     results = get_person_detailed_info(wiki_id)
 
@@ -482,7 +414,8 @@ def get_person_info(wiki_id):
         positions=results["position"],
         education=results["education"],
         occupations=results["occupation"],
-        legislatures=legislatures
+        governments=results["government"],
+        assemblies=results["assembly"],
     )
 
 
@@ -514,6 +447,22 @@ def get_person_detailed_info(wiki_id):
         }}
         """
 
+    governments_query = f"""
+        SELECT DISTINCT ?government ?government_label
+        WHERE {{
+            wd:{wiki_id} p:P39 ?positionStmnt .
+            ?positionStmnt pq:P5054 ?government. 
+            ?government rdfs:label ?government_label . FILTER(LANG(?government_label) = "pt").
+        }}"""
+
+    assemblies_query = f"""
+        SELECT DISTINCT ?parliamentary_term ?parliamentary_term_label
+        WHERE {{
+            wd:{wiki_id} p:P39 ?positionStmnt .
+            ?positionStmnt pq:P2937 ?parliamentary_term. 
+            ?parliamentary_term rdfs:label ?parliamentary_term_label . FILTER(LANG(?parliamentary_term_label) = "pt").
+        }}"""
+
     results = query_sparql(PREFIXES + "\n" + occupation_query, "wikidata")
     occupations = []
     for x in results["results"]["bindings"]:
@@ -522,13 +471,32 @@ def get_person_detailed_info(wiki_id):
         occupations.append(Element(x["occupation"]["value"], x["occupation_label"]["value"]))
 
     results = query_sparql(PREFIXES + "\n" + education_query, "wikidata")
-    education = [Element(x["educatedAt"]["value"], x["educatedAt_label"]["value"])
-                 for x in results["results"]["bindings"]]
+    education = [
+        Element(x["educatedAt"]["value"], x["educatedAt_label"]["value"]) for x in results["results"]["bindings"]
+    ]
 
     results = query_sparql(PREFIXES + "\n" + positions_query, "wikidata")
     positions = [Element(x["position"]["value"], x["position_label"]["value"]) for x in results["results"]["bindings"]]
 
-    return {"education": education, "occupation": occupations, "position": positions}
+    results = query_sparql(PREFIXES + "\n" + governments_query, "wikidata")
+    governments = [
+        Element(x["government"]["value"], x["government_label"]["value"]) for x in results["results"]["bindings"]
+    ]
+
+    results = query_sparql(PREFIXES + "\n" + assemblies_query, "wikidata")
+
+    assemblies = [
+        Element(x["parliamentary_term"]["value"], x["parliamentary_term_label"]["value"])
+        for x in results["results"]["bindings"]
+    ]
+
+    return {
+        "education": education,
+        "occupation": occupations,
+        "position": positions,
+        "government": governments,
+        "assembly": assemblies,
+    }
 
 
 # Person relationships
@@ -1086,15 +1054,13 @@ def get_entities_without_image():
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     entities = []
     for x in result["results"]["bindings"]:
-        entities.append(
-            {"wikidata_id": x["item"]["value"].split("/")[-1], "label": x["label"]["value"]}
-        )
+        entities.append({"wikidata_id": x["item"]["value"].split("/")[-1], "label": x["label"]["value"]})
 
     return entities
 
 
 def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool):
-    values = ' '.join(['wd:' + wiki_id for wiki_id in wiki_ids])
+    values = " ".join(["wd:" + wiki_id for wiki_id in wiki_ids])
 
     date_start = None
     date_ent = None
@@ -1133,23 +1099,23 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
     if only_among_selected and len(wiki_ids) > 1:
         # only consider triples where both 'ent1' and 'ent2' are part of wiki_ids
         new_bindings = []
-        for r in result['results']['bindings']:
-            ent1 = r['ent1']['value'].split("/")[-1]
-            ent2 = r['ent2']['value'].split("/")[-1]
+        for r in result["results"]["bindings"]:
+            ent1 = r["ent1"]["value"].split("/")[-1]
+            ent2 = r["ent2"]["value"].split("/")[-1]
             if len({ent1, ent2}.intersection(set(wiki_ids))) != 2:
                 continue
             new_bindings.append(r)
-        result['results']['bindings'] = new_bindings
+        result["results"]["bindings"] = new_bindings
 
     if only_sentiment:
         new_bindings = []
-        for r in result['results']['bindings']:
-            if r['rel_type']['value'] == 'other':
+        for r in result["results"]["bindings"]:
+            if r["rel_type"]["value"] == "other":
                 continue
             new_bindings.append(r)
-        result['results']['bindings'] = new_bindings
+        result["results"]["bindings"] = new_bindings
 
-    return result['results']['bindings']
+    return result["results"]["bindings"]
 
 
 def get_personalities_by_education(institution_wiki_id: str):
@@ -1169,19 +1135,19 @@ def get_personalities_by_education(institution_wiki_id: str):
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
-    for r in result['results']['bindings']:
-        if 'images_url' not in r:
-            r['image_url'] = dict()
-            r['image_url']['type'] = 'uri'
-            r['image_url']['value'] = no_image
+    for r in result["results"]["bindings"]:
+        if "images_url" not in r:
+            r["image_url"] = dict()
+            r["image_url"]["type"] = "uri"
+            r["image_url"]["value"] = no_image
         else:
-            if images := r['images_url']['value'].split(","):
-                r['image_url'] = r.pop('images_url')
-                r['image_url']['value'] = images[0]
+            if images := r["images_url"]["value"].split(","):
+                r["image_url"] = r.pop("images_url")
+                r["image_url"]["value"] = images[0]
             else:
-                r['image_url'] = r.pop('images_url')
+                r["image_url"] = r.pop("images_url")
 
-    return result['results']['bindings']
+    return result["results"]["bindings"]
 
 
 def get_personalities_by_occupation(occupation_wiki_id: str):
@@ -1201,19 +1167,19 @@ def get_personalities_by_occupation(occupation_wiki_id: str):
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
-    for r in result['results']['bindings']:
-        if 'images_url' not in r:
-            r['image_url'] = dict()
-            r['image_url']['type'] = 'uri'
-            r['image_url']['value'] = no_image
+    for r in result["results"]["bindings"]:
+        if "images_url" not in r:
+            r["image_url"] = dict()
+            r["image_url"]["type"] = "uri"
+            r["image_url"]["value"] = no_image
         else:
-            if images := r['images_url']['value'].split(","):
-                r['image_url'] = r.pop('images_url')
-                r['image_url']['value'] = images[0]
+            if images := r["images_url"]["value"].split(","):
+                r["image_url"] = r.pop("images_url")
+                r["image_url"]["value"] = images[0]
             else:
-                r['image_url'] = r.pop('images_url')
+                r["image_url"] = r.pop("images_url")
 
-    return result['results']['bindings']
+    return result["results"]["bindings"]
 
 
 def get_personalities_by_public_office(public_office: str):
@@ -1233,35 +1199,119 @@ def get_personalities_by_public_office(public_office: str):
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
-    for r in result['results']['bindings']:
-        if 'images_url' not in r:
-            r['image_url'] = dict()
-            r['image_url']['type'] = 'uri'
-            r['image_url']['value'] = no_image
+    for r in result["results"]["bindings"]:
+        if "images_url" not in r:
+            r["image_url"] = dict()
+            r["image_url"]["type"] = "uri"
+            r["image_url"]["value"] = no_image
         else:
-            if images := r['images_url']['value'].split(","):
-                r['image_url'] = r.pop('images_url')
-                r['image_url']['value'] = images[0]
+            if images := r["images_url"]["value"].split(","):
+                r["image_url"] = r.pop("images_url")
+                r["image_url"]["value"] = images[0]
             else:
-                r['image_url'] = r.pop('images_url')
+                r["image_url"] = r.pop("images_url")
 
-    return result['results']['bindings']
+    return result["results"]["bindings"]
 
 
-def get_personalities_by_legislature(legislature: str):
+def get_personalities_by_assembly(parliamentary_term: str):
+    # get all other members in politiquices of part of the same assembly/parliament
+    # example of an assembly/parliament in WikiData: https://www.wikidata.org/wiki/Q71014092
     query = f"""
-    SELECT DISTINCT ?person ?personLabel ?legislature_label 
+    SELECT DISTINCT ?ent1 ?ent1_name
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url) 
     WHERE {{
-        ?person wdt:P31 wd:Q5;
-          wdt:P27 wd:Q45;
-          p:P39 ?officeStmnt;
-          rdfs:label ?personLabel . FILTER(LANG(?personLabel) = "pt")
-    ?officeStmnt pq:P2937 wd:{legislature}.
-    wd:{legislature} rdfs:label ?legislature_label . FILTER(LANG(?legislature_label) = "pt")
-    }} 
+        ?ent1 wdt:P31 wd:Q5;
+              wdt:P27 wd:Q45;
+              p:P39 ?officeStmnt;
+              rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "pt")
+        ?officeStmnt pq:P2937 wd:{parliamentary_term}.
+        OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
+    }}
+    GROUP BY ?ent1 ?ent1_name
+    ORDER BY ASC(?ent1_name) 
+    """
+
+    result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
+    for r in result["results"]["bindings"]:
+        if "images_url" not in r:
+            r["image_url"] = dict()
+            r["image_url"]["type"] = "uri"
+            r["image_url"]["value"] = no_image
+        else:
+            if images := r["images_url"]["value"].split(","):
+                r["image_url"] = r.pop("images_url")
+                r["image_url"]["value"] = images[0]
+            else:
+                r["image_url"] = r.pop("images_url")
+
+    return result["results"]["bindings"]
+
+
+def get_personalities_by_government(legislature: str):
+    # get all other members of a government in politiquices part of the same government
+    # example of a government in WikiData: https://www.wikidata.org/wiki/Q71014092
+    query = f"""
+    SELECT DISTINCT ?ent1 ?ent1_name
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
+    WHERE {{
+        ?ent1 wdt:P31 wd:Q5;
+                wdt:P27 wd:Q45;
+                p:P39 ?officeStmnt;
+                rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "pt")
+        ?officeStmnt pq:P5054 wd:{legislature}.
+        OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
+    }}
+    GROUP BY ?ent1 ?ent1_name
+    ORDER BY ASC(?ent1_name)
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
-    return result['results']['bindings']
+
+    for r in result["results"]["bindings"]:
+        if "images_url" not in r:
+            r["image_url"] = dict()
+            r["image_url"]["type"] = "uri"
+            r["image_url"]["value"] = no_image
+        else:
+            if images := r["images_url"]["value"].split(","):
+                r["image_url"] = r.pop("images_url")
+                r["image_url"]["value"] = images[0]
+            else:
+                r["image_url"] = r.pop("images_url")
+
+    return result["results"]["bindings"]
+
+
+def get_personalities_by_party(political_party: str):
+    query = f"""
+    SELECT DISTINCT ?ent1 ?ent1_name
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
+    WHERE {{
+        ?ent1 wdt:P31 wd:Q5;
+              wdt:P102 wd:{political_party};
+              rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "pt")
+        OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
+    }}
+    GROUP BY ?ent1 ?ent1_name
+    ORDER BY ASC(?ent1_name)
+    """
+
+    result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
+    for r in result["results"]["bindings"]:
+        if "images_url" not in r:
+            r["image_url"] = dict()
+            r["image_url"]["type"] = "uri"
+            r["image_url"]["value"] = no_image
+        else:
+            if images := r["images_url"]["value"].split(","):
+                r["image_url"] = r.pop("images_url")
+                r["image_url"]["value"] = images[0]
+            else:
+                r["image_url"] = r.pop("images_url")
+
+    return result["results"]["bindings"]
 
 
 def query_sparql(query, endpoint):
@@ -1275,5 +1325,3 @@ def query_sparql(query, endpoint):
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     return results
-
-

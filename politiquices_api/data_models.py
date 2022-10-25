@@ -26,4 +26,5 @@ class Person:
     positions: Optional[List[Element]] = None
     education: Optional[List[Element]] = None
     occupations: Optional[List[Element]] = None
-    legislatures: Optional[List[Element]] = None
+    governments: Optional[List[Element]] = None
+    assemblies: Optional[List[Element]] = None
