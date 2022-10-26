@@ -6,14 +6,14 @@ from cache import all_entities_info, all_parties_info, wiki_id_info_all
 from sparql_queries import (
     get_person_info,
     get_person_relationships,
+    get_personalities_by_assembly,
+    get_personalities_by_education,
+    get_personalities_by_government,
+    get_personalities_by_occupation,
+    get_personalities_by_party,
+    get_personalities_by_public_office,
     get_relationship_between_two_persons,
     get_timeline_personalities,
-    get_personalities_by_education,
-    get_personalities_by_occupation,
-    get_personalities_by_public_office,
-    get_personalities_by_assembly,
-    get_personalities_by_government,
-    get_personalities_by_party
 )
 
 start_year = 1994

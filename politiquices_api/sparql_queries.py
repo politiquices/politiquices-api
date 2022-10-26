@@ -183,39 +183,26 @@ def get_persons_articles_freq():
 
 def get_persons_wiki_id_name_image_url():
     # wd:Q5 -> all human beings
-    # wd:Q15904441 -> for Dailai Lama, he's not a human being, it's a position/spiritual leader
+    # wd:Q15904441 -> Dailai Lama, he's not a human being, it's a position/spiritual leader
     query = f"""
-        SELECT DISTINCT ?item ?label ?image_url {{
+        SELECT ?wiki_id ?label ?image_url {{
             VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
-            ?item wdt:P31 ?valid_instances.
-            ?item rdfs:label ?label . FILTER(LANG(?label) = "pt")  
+            ?wiki_id wdt:P31 ?valid_instances.
+            ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "pt")  
             OPTIONAL {{ ?item wdt:P18 ?image_url. }}
         }}
-        ORDER BY ?label
         """
-
-    persons = set()
-    items_as_dict = dict()
-
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    results = dict()
     for e in result["results"]["bindings"]:
-
-        # this is just avoid duplicate entities, same entity with two labels
-        if e["item"]["value"] in persons:
-            continue
-
-        # make a dict
-        items_as_dict[e["item"]["value"].split("/")[-1]] = {
-            "wikidata_url": make_https(e["item"]["value"]),
-            "wiki_id": e["item"]["value"].split("/")[-1],
+        wiki_id = e["item"]["value"].split("/")[-1]
+        results[wiki_id] = {
+            "wiki_id": wiki_id,
             "name": e["label"]["value"],
             "image_url": make_https(e["image_url"]["value"]) if "image_url" in e else no_image,
         }
 
-        # add to already processed persons
-        persons.add(e["item"]["value"])
-
-    return items_as_dict
+    return results
 
 
 def get_all_parties_and_members_with_relationships():
@@ -344,28 +331,17 @@ def get_wiki_id_affiliated_with_party(political_party: str):
 # Personality Information
 def get_person_info(wiki_id):
     query = f"""
-        SELECT ?name ?office ?office_label ?cabinet ?cabinet_label ?image_url ?political_party_logo ?political_party ?political_party_label 
+        SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label 
         WHERE {{
             wd:{wiki_id} rdfs:label ?name
             FILTER(LANG(?name)="pt") .
             OPTIONAL {{ wd:{wiki_id} wdt:P18 ?image_url. }}
-            OPTIONAL {{
-                wd:{wiki_id} p:P39 ?officeStmnt.
-                ?officeStmnt ps:P39 ?office.
-                ?office rdfs:label ?office_label 
-                    FILTER(LANG(?office_label)="pt")
-            }}
             OPTIONAL {{
                 wd:{wiki_id} p:P102 ?political_partyStmnt.
                 ?political_partyStmnt ps:P102 ?political_party.
                 ?political_party rdfs:label ?political_party_label 
                     FILTER(LANG(?political_party_label)="pt").
                 OPTIONAL {{ ?political_party wdt:P154 ?political_party_logo. }}
-            }}
-            OPTIONAL {{
-              ?officeStmnt ps:P39 ?office.
-              ?officeStmnt pq:P5054 ?cabinet. 
-              ?cabinet rdfs:label ?cabinet_label . FILTER(LANG(?cabinet_label) = "pt").
             }}
         }}
     """
@@ -374,18 +350,11 @@ def get_person_info(wiki_id):
     name = None
     image_url = None
     parties = []
-    offices = []
-    governments = []
-    assemblies = []
     for e in results["results"]["bindings"]:
-
         if not name:
             name = e["name"]["value"]
-
         if not image_url:
             image_url = e["image_url"]["value"] if "image_url" in e else no_image
-
-        # political parties
         if "political_party" in e:
             party_image_url = no_image
 
@@ -1057,6 +1026,9 @@ def get_entities_without_image():
         entities.append({"wikidata_id": x["item"]["value"].split("/")[-1], "label": x["label"]["value"]})
 
     return entities
+
+
+# new website
 
 
 def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool):

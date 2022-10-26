@@ -20,7 +20,6 @@ class Person:
     # pylint: disable=R0902
     wiki_id: str
     name: Optional[str] = None
-    nr_articles: Optional[int] = None
     image_url: Optional[str] = None
     parties: Optional[List[PoliticalParty]] = None
     positions: Optional[List[Element]] = None
