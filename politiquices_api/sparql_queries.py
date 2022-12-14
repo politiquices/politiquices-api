@@ -195,7 +195,7 @@ def get_persons_wiki_id_name_image_url():
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
     results = dict()
     for e in result["results"]["bindings"]:
-        wiki_id = e["item"]["value"].split("/")[-1]
+        wiki_id = e["wiki_id"]["value"].split("/")[-1]
         results[wiki_id] = {
             "wiki_id": wiki_id,
             "name": e["label"]["value"],

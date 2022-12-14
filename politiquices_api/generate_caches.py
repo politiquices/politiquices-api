@@ -27,9 +27,9 @@ def get_entities():
     per_with_articles = get_total_nr_articles_for_each_person()
     per_info = defaultdict(dict)
 
-    for wiki_id, nr_articles in per_with_articles.items():
+    for wiki_id, nr_articles in per_with_articles.items()
         per_info[wiki_id]["nr_articles"] = nr_articles
-        per_info[wiki_id]["wikidata_url"] = all_per[wiki_id]["wikidata_url"]
+        # per_info[wiki_id]["wikidata_url"] = all_per[wiki_id]["wikidata_url"]
         per_info[wiki_id]["wiki_id"] = all_per[wiki_id]["wiki_id"]
         per_info[wiki_id]["name"] = all_per[wiki_id]["name"]
         per_info[wiki_id]["image_url"] = all_per[wiki_id]["image_url"]
