@@ -14,6 +14,9 @@ from config import (
 )
 from utils import make_https, invert_relationship
 
+LANG = 'en'
+
+
 POLITIQUICES_PREFIXES = """
     PREFIX politiquices: <http://www.politiquices.pt/>
     PREFIX      rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -188,7 +191,7 @@ def get_persons_wiki_id_name_image_url():
         SELECT ?wiki_id ?label ?image_url {{
             VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
             ?wiki_id wdt:P31 ?valid_instances.
-            ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "pt")  
+            ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "{LANG}")  
             OPTIONAL {{ ?item wdt:P18 ?image_url. }}
         }}
         """
@@ -215,11 +218,11 @@ def get_all_parties_and_members_with_relationships():
                         (COUNT(?person) as ?nr_personalities)
         WHERE {{
             ?person wdt:P102 ?political_party .    
-            ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "pt")
+            ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "{LANG}")
             OPTIONAL {{ ?political_party wdt:P154 ?party_logo. }}
             OPTIONAL {{ 
                 ?political_party wdt:P17 ?party_country. 
-                ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "pt")
+                ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
                 }}
             SERVICE <{politiquices_endpoint}> {{
                 SELECT DISTINCT ?person 
@@ -334,13 +337,13 @@ def get_person_info(wiki_id):
         SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label 
         WHERE {{
             wd:{wiki_id} rdfs:label ?name
-            FILTER(LANG(?name)="pt") .
+            FILTER(LANG(?name)="{LANG}") .
             OPTIONAL {{ wd:{wiki_id} wdt:P18 ?image_url. }}
             OPTIONAL {{
                 wd:{wiki_id} p:P102 ?political_partyStmnt.
                 ?political_partyStmnt ps:P102 ?political_party.
                 ?political_party rdfs:label ?political_party_label 
-                    FILTER(LANG(?political_party_label)="pt").
+                    FILTER(LANG(?political_party_label)="{LANG}").
                 OPTIONAL {{ ?political_party wdt:P154 ?political_party_logo. }}
             }}
         }}
@@ -394,7 +397,7 @@ def get_person_detailed_info(wiki_id):
         WHERE {{
           wd:{wiki_id} p:P106 ?occupationStmnt .
           ?occupationStmnt ps:P106 ?occupation .
-          ?occupation rdfs:label ?occupation_label FILTER(LANG(?occupation_label) = "pt").
+          ?occupation rdfs:label ?occupation_label FILTER(LANG(?occupation_label) = "{LANG}").
         }}
         """
 
@@ -403,7 +406,7 @@ def get_person_detailed_info(wiki_id):
         WHERE {{
             wd:{wiki_id} p:P69 ?educatedAtStmnt .
             ?educatedAtStmnt ps:P69 ?educatedAt .
-            ?educatedAt rdfs:label ?educatedAt_label FILTER(LANG(?educatedAt_label) = "pt").
+            ?educatedAt rdfs:label ?educatedAt_label FILTER(LANG(?educatedAt_label) = "{LANG}").
             }}
         """
 
@@ -412,7 +415,7 @@ def get_person_detailed_info(wiki_id):
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
             ?positionStmnt ps:P39 ?position .
-            ?position rdfs:label ?position_label FILTER(LANG(?position_label) = "pt").
+            ?position rdfs:label ?position_label FILTER(LANG(?position_label) = "{LANG}").
         }}
         """
 
@@ -421,7 +424,7 @@ def get_person_detailed_info(wiki_id):
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
             ?positionStmnt pq:P5054 ?government. 
-            ?government rdfs:label ?government_label . FILTER(LANG(?government_label) = "pt").
+            ?government rdfs:label ?government_label . FILTER(LANG(?government_label) = "{LANG}").
         }}"""
 
     assemblies_query = f"""
@@ -429,7 +432,7 @@ def get_person_detailed_info(wiki_id):
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
             ?positionStmnt pq:P2937 ?parliamentary_term. 
-            ?parliamentary_term rdfs:label ?parliamentary_term_label . FILTER(LANG(?parliamentary_term_label) = "pt").
+            ?parliamentary_term rdfs:label ?parliamentary_term_label . FILTER(LANG(?parliamentary_term_label) = "{LANG}").
         }}"""
 
     results = query_sparql(PREFIXES + "\n" + occupation_query, "wikidata")
@@ -832,7 +835,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
             SERVICE <{wikidata_endpoint}> {{
                 ?ent1 wdt:P102 wd:{party};
                       rdfs:label ?personLabel.
-                FILTER(LANG(?personLabel) = "pt")                
+                FILTER(LANG(?personLabel) = "{LANG}")                
             }}
         }}
         ORDER BY DESC(?date) ASC(?score)
@@ -901,7 +904,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
 
             SERVICE <{wikidata_endpoint}> {{
                 ?ent2 wdt:P102 wd:{party};
-                      rdfs:label ?personLabel. FILTER(LANG(?personLabel) = "pt")                
+                      rdfs:label ?personLabel. FILTER(LANG(?personLabel) = "{LANG}")                
             }}
         }}
         ORDER BY DESC(?date) ASC(?score)
@@ -1014,7 +1017,7 @@ def get_entities_without_image():
             ?item wdt:P31 wd:Q5.
                 SERVICE <{live_wikidata}> {{
                 ?item rdfs:label ?label .
-                FILTER(LANG(?label) = "pt")
+                FILTER(LANG(?label) = "{LANG}")
                 FILTER NOT EXISTS {{ ?item wdt:P18 ?image_url. }}
           }}
           }}
@@ -1100,7 +1103,7 @@ def get_personalities_by_education(institution_wiki_id: str):
               p:P69 ?educatedAtStmnt.
         ?educatedAtStmnt ps:P69 wd:{institution_wiki_id} .
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
-        FILTER(LANG(?ent1_name) = "pt")
+        FILTER(LANG(?ent1_name) = "{LANG}")
       }}
     GROUP BY ?ent1 ?ent1_name
     ORDER BY ASC(?ent1_name)
@@ -1132,7 +1135,7 @@ def get_personalities_by_occupation(occupation_wiki_id: str):
               p:P106 ?occupationStmnt .
         ?occupationStmnt ps:P106 wd:{occupation_wiki_id} .
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
-        FILTER(LANG(?ent1_name) = "pt")
+        FILTER(LANG(?ent1_name) = "{LANG}")
     }}
     GROUP BY ?ent1 ?ent1_name
     ORDER BY ASC(?ent1_name)
@@ -1164,7 +1167,7 @@ def get_personalities_by_public_office(public_office: str):
               p:P39 ?positionStmnt .
         ?positionStmnt ps:P39 wd:{public_office} .
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
-        FILTER(LANG(?ent1_name) = "pt")
+        FILTER(LANG(?ent1_name) = "{LANG}")
     }}
     GROUP BY ?ent1 ?ent1_name
     ORDER BY ASC(?ent1_name)
@@ -1196,7 +1199,7 @@ def get_personalities_by_assembly(parliamentary_term: str):
         ?ent1 wdt:P31 wd:Q5;
               wdt:P27 wd:Q45;
               p:P39 ?officeStmnt;
-              rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "pt")
+              rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "{LANG}")
         ?officeStmnt pq:P2937 wd:{parliamentary_term}.
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
     }}
@@ -1231,7 +1234,7 @@ def get_personalities_by_government(legislature: str):
         ?ent1 wdt:P31 wd:Q5;
                 wdt:P27 wd:Q45;
                 p:P39 ?officeStmnt;
-                rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "pt")
+                rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "{LANG}")
         ?officeStmnt pq:P5054 wd:{legislature}.
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
     }}
@@ -1262,7 +1265,7 @@ def get_personalities_by_party(political_party: str):
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               wdt:P102 wd:{political_party};
-              rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "pt")
+              rdfs:label ?ent1_name . FILTER(LANG(?ent1_name) = "{LANG}")
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
     }}
     GROUP BY ?ent1 ?ent1_name

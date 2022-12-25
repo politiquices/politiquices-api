@@ -79,8 +79,6 @@ async def read_items(
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
 
-    print(len(results))
-
     # add images
     for entry in results:
         ent1_id = entry["ent1"]["value"].split("/")[-1]
