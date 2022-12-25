@@ -33,6 +33,7 @@ WIKIDATA_PREFIXES = """
     PREFIX         p: <http://www.wikidata.org/prop/>
     PREFIX        ps: <http://www.wikidata.org/prop/statement/>
     PREFIX        pq: <http://www.wikidata.org/prop/qualifier/>
+    PREFIX      rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     """
 
 PREFIXES = POLITIQUICES_PREFIXES + WIKIDATA_PREFIXES
@@ -192,12 +193,13 @@ def get_persons_wiki_id_name_image_url():
             VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
             ?wiki_id wdt:P31 ?valid_instances.
             ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "{LANG}")  
-            OPTIONAL {{ ?item wdt:P18 ?image_url. }}
+            OPTIONAL {{ ?wiki_id wdt:P18 ?image_url. }}
         }}
         """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
     results = dict()
     for e in result["results"]["bindings"]:
+        print(e)
         wiki_id = e["wiki_id"]["value"].split("/")[-1]
         results[wiki_id] = {
             "wiki_id": wiki_id,

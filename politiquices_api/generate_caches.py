@@ -1,6 +1,7 @@
 import json
 from collections import defaultdict
 
+from politiquices_api.politiquices_api.config import static_data
 from sparql_queries import (
     get_all_parties_and_members_with_relationships,
     get_nr_relationships_as_subject,
@@ -14,7 +15,7 @@ from sparql_queries import (
 
 def get_entities():
     """
-    First get for each personality in the wikidata graph:
+    Get for each personality in the wikidata graph:
       - name
       - image url
       - wikidata url
@@ -27,9 +28,8 @@ def get_entities():
     per_with_articles = get_total_nr_articles_for_each_person()
     per_info = defaultdict(dict)
 
-    for wiki_id, nr_articles in per_with_articles.items()
+    for wiki_id, nr_articles in per_with_articles.items():
         per_info[wiki_id]["nr_articles"] = nr_articles
-        # per_info[wiki_id]["wikidata_url"] = all_per[wiki_id]["wikidata_url"]
         per_info[wiki_id]["wiki_id"] = all_per[wiki_id]["wiki_id"]
         per_info[wiki_id]["name"] = all_per[wiki_id]["name"]
         per_info[wiki_id]["image_url"] = all_per[wiki_id]["image_url"]
@@ -51,6 +51,7 @@ def personalities_json_cache():
 
     # 'all_entities_info.json' - display in 'Personalidades'
     all_per, per_data = get_entities()
+
     print(f"{len(per_data)} entities card info (name + image + nr articles)")
     print(f"{len(all_per)} all entities on Wikidata subset")
     with open(static_data + "all_entities_info.json", "w") as f_out:
@@ -66,20 +67,6 @@ def personalities_json_cache():
     ]
     with open(static_data + "persons.json", "wt") as f_out:
         json.dump(persons, f_out, indent=True)
-
-    # 'wiki_id_info.json'
-    wiki_id = {}
-    for x in per_data:
-        wiki_id[x["wiki_id"]] = {
-            "name": x["name"],
-            "image_url": x["image_url"],
-            "nr_articles": x["nr_articles"],
-        }
-        if shorter_name := shorter_names.get(x["wiki_id"], None):
-            wiki_id[x["wiki_id"]].update({"shorter_name": shorter_name})
-
-    with open(static_data + "wiki_id_info.json", "w") as f_out:
-        json.dump(wiki_id, f_out, indent=4)
 
     # 'wiki_id_info_all.json'
     wiki_id = {}
@@ -186,6 +173,16 @@ def persons_relationships_counts_by_type():
 
 
 def main():
+    """
+    'all_entities_info.json'  ordered list of all personalities, with all info, sorted by number of articles
+                              shown in section 'Personalidades'
+
+    'persons.json'            ordered list of all personalities, with (name,wiki_id), sorted by name
+                              used in the selection box
+
+    'wiki_id_info_all.json'   dictionary whose key is wiki_id and value is the name of the personality + image url
+                              used when getting names + pictures for relationships, in timeline
+    """
 
     print("\nCaching and pre-computing static stuff from SPARQL engine :-)")
 
