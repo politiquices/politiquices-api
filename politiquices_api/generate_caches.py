@@ -110,7 +110,7 @@ def parties_json_cache(all_politiquices_persons):
          "image_url": x["party_logo"]
          }
         for x in sorted(parties_data, key=lambda x: x["party_label"])
-        if x["country"] == "Portugal"
+        # if x["country"] == "Portugal"
     ]
     with open(static_data + "parties.json", "w") as f_out:
         json.dump(parties, f_out, indent=4)
@@ -243,6 +243,9 @@ def main():
 
     # get images and resize them
     get_images()
+
+    # ToDo: resize images automatically
+    # mogrify -resize 250x250^ -gravity center -extent 250x250 *.*
 
 
 if __name__ == "__main__":

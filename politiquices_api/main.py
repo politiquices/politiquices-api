@@ -43,7 +43,13 @@ async def root():
 
 @app.get("/personality/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_person_info(wiki_id)
+    person = get_person_info(wiki_id)
+    f_name = f"{person.wiki_id}.{person.image_url.split('.')[-1]}"
+    person.image_url = f"/assets/images/personalities_small/{f_name}"
+    for party in person.parties:
+        f_name = f"{party.wiki_id}.{party.image_url.split('.')[-1]}"
+        party.image_url = f"/assets/images/parties/{f_name}"
+    return person
 
 
 @app.get("/personality/relationships/{wiki_id}")
@@ -67,6 +73,9 @@ async def read_item():
 
 @app.get("/personalities/")
 async def read_item():
+    for x in all_entities_info:
+        f_name = f"{x['wiki_id']}.{x['image_url'].split('.')[-1]}"
+        x['local_image'] = f"/assets/images/personalities_small/{f_name}"
     return all_entities_info
 
 
