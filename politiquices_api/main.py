@@ -2,7 +2,7 @@ from typing import List, Union
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from cache import all_entities_info, all_parties_info, wiki_id_info_all
+from cache import all_entities_info, all_parties_info, wiki_id_info_all, persons
 from sparql_queries import (
     get_person_info,
     get_person_relationships,
@@ -68,6 +68,11 @@ async def read_item():
 @app.get("/personalities/")
 async def read_item():
     return all_entities_info
+
+
+@app.get("/persons/")
+async def read_item():
+    return persons
 
 
 @app.get("/timeline/")
