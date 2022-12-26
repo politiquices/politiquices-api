@@ -60,7 +60,7 @@ def personalities_json_cache() -> Tuple[Set[str], Dict[str,Any]]:
 
     # persons.json - cache for search box
     persons = [
-        {"name": x["name"], "wiki_id": x["wiki_id"]}
+        {"label": x["name"], "value": x["wiki_id"]}
         for x in sorted(per_data, key=lambda x: x["name"])
     ]
     with open(static_data + "persons.json", "wt") as f_out:
@@ -74,7 +74,7 @@ def personalities_json_cache() -> Tuple[Set[str], Dict[str,Any]]:
     with open(static_data + "wiki_id_info_all.json", "w") as f_out:
         json.dump(wiki_id, f_out, indent=4)
 
-    return set([x["wiki_id"] for x in persons]), wiki_id
+    return set([x["value"] for x in persons]), wiki_id
 
 
 def parties_json_cache(all_politiquices_persons):
@@ -205,11 +205,9 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
 
 
 def get_images():
-    """
     with open("json/wiki_id_info_all.json") as f_in:
         wiki_id_info_all = json.load(f_in)
     save_images_from_url(wiki_id_info_all, base_out="images/personalities")
-    """
 
     with open("json/parties.json") as f_in:
         parties = json.load(f_in)

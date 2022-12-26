@@ -262,12 +262,11 @@ def get_all_parties_and_members_with_relationships():
 
 
 def get_total_nr_articles_for_each_person():
-    # NOTE: 'other' relationships are discarded
     query = """
         SELECT ?person (COUNT(*) as ?count)
         WHERE {
           VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1' 
-                              'ent1_supports_ent2' 'ent2_supports_ent1'}
+                              'ent1_supports_ent2' 'ent2_supports_ent1' 'other'}
             ?person wdt:P31 wd:Q5 ;
             {?rel politiquices:ent1 ?person} UNION {?rel politiquices:ent2 ?person} .
             ?rel politiquices:type ?rel_values .
