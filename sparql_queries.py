@@ -227,7 +227,8 @@ def get_all_parties_and_members_with_relationships():
                 WHERE {{
                     VALUES ?rel_values {{
                             'ent1_opposes_ent2' 'ent2_opposes_ent1' 
-                            'ent1_supports_ent2' 'ent2_supports_ent1 other'
+                            'ent1_supports_ent2' 'ent2_supports_ent1'
+                            'other'
                     }}
                     ?person wdt:P31 wd:Q5 .
                     {{ ?rel politiquices:ent1 ?person }} UNION {{?rel politiquices:ent2 ?person}} .

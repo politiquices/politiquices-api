@@ -1,7 +1,7 @@
 import json
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 from pathlib import Path
-from typing import Tuple, Set, Dict, Any, List
+from typing import Tuple, Set, Dict, Any
 
 import requests
 from nlp_extraction.utils.utils import just_sleep
@@ -77,6 +77,10 @@ def parties_json_cache(all_politiquices_persons):
 
     # 'all_parties_info.json' - display in 'Partidos'
     parties_data = get_all_parties_and_members_with_relationships()
+
+    for x in parties_data:
+        print(x['country'], '\t', x['party_label'], '\t',  x['party_logo'])
+
     sort_order = {"Portugal": 0, None: 3}
     parties_data.sort(key=lambda parties_data: sort_order.get(parties_data["country"], 2))
     print(f"{len(parties_data)} parties info (image + nr affiliated w/ relationships")

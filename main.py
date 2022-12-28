@@ -2,7 +2,7 @@ from typing import List, Union
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from cache import all_entities_info, all_parties_info, wiki_id_info_all, persons
+from cache import all_entities_info, all_parties_info, persons
 from sparql_queries import (
     get_person_info,
     get_person_relationships,
@@ -73,10 +73,19 @@ async def read_item():
 
 @app.get("/personalities/")
 async def read_item():
-    for x in all_entities_info:
-        f_name = f"{x['wiki_id']}.{x['image_url'].split('.')[-1]}"
-        x['local_image'] = f"/assets/images/personalities_small/{f_name}"
-    return all_entities_info
+    personalities = []
+    for k, v in all_entities_info.items():
+        f_name = f"{k}.{v['image_url'].split('.')[-1]}"
+        v["local_image"] = f"/assets/images/personalities_small/{f_name}"
+        personalities.append(
+            {
+                "label": v["name"],
+                "nr_articles": v["nr_articles"],
+                "local_image": f"/assets/images/personalities_small/{f_name}",
+                "wiki_id": k,
+            }
+        )
+    return personalities
 
 
 @app.get("/persons/")
@@ -97,8 +106,8 @@ async def read_items(
     for entry in results:
         ent1_id = entry["ent1"]["value"].split("/")[-1]
         ent2_id = entry["ent2"]["value"].split("/")[-1]
-        entry["ent1_img"] = wiki_id_info_all[ent1_id]
-        entry["ent2_img"] = wiki_id_info_all[ent2_id]
+        entry["ent1_img"] = all_entities_info[ent1_id]
+        entry["ent2_img"] = all_entities_info[ent2_id]
 
     return results
 
