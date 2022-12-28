@@ -1,21 +1,20 @@
 import sys
 from collections import defaultdict
 from functools import lru_cache
-from typing import List
+from typing import List, Dict, Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
-from data_models import Element, Person, PoliticalParty
-from config import (
+from politiquices_api.config import (
     live_wikidata,
     no_image,
     politiquices_endpoint,
     ps_logo,
     wikidata_endpoint,
 )
-from utils import make_https, invert_relationship
+from politiquices_api.data_models import Element, Person, PoliticalParty
+from politiquices_api.utils import make_https, invert_relationship
 
 LANG = 'en'
-
 
 POLITIQUICES_PREFIXES = """
     PREFIX politiquices: <http://www.politiquices.pt/>
@@ -185,7 +184,7 @@ def get_persons_articles_freq():
     return top_freq
 
 
-def get_persons_wiki_id_name_image_url():
+def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
     # wd:Q5 -> all human beings
     # wd:Q15904441 -> Dailai Lama, he's not a human being, it's a position/spiritual leader
     query = f"""
@@ -210,10 +209,8 @@ def get_persons_wiki_id_name_image_url():
 
 
 def get_all_parties_and_members_with_relationships():
-    """
-    Get a list of all the parties and the count of members with at least 1 relationship that is
-    not 'other'
-    """
+    """Get a list of all the parties and the count of members"""
+
     query = f"""
         SELECT DISTINCT ?political_party ?party_label ?party_logo ?country_label 
                         (COUNT(?person) as ?nr_personalities)
@@ -230,7 +227,7 @@ def get_all_parties_and_members_with_relationships():
                 WHERE {{
                     VALUES ?rel_values {{
                             'ent1_opposes_ent2' 'ent2_opposes_ent1' 
-                            'ent1_supports_ent2' 'ent2_supports_ent1'
+                            'ent1_supports_ent2' 'ent2_supports_ent1 other'
                     }}
                     ?person wdt:P31 wd:Q5 .
                     {{ ?rel politiquices:ent1 ?person }} UNION {{?rel politiquices:ent2 ?person}} .
@@ -242,6 +239,7 @@ def get_all_parties_and_members_with_relationships():
         ORDER BY DESC(?nr_personalities)
         """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
     political_parties = []
     for x in results["results"]["bindings"]:
         party_logo = x["party_logo"]["value"] if "party_logo" in x else no_image
@@ -261,7 +259,7 @@ def get_all_parties_and_members_with_relationships():
     return political_parties
 
 
-def get_total_nr_articles_for_each_person():
+def get_total_nr_articles_for_each_person() -> Dict[str, int]:
     query = """
         SELECT ?person (COUNT(*) as ?count)
         WHERE {
@@ -572,7 +570,10 @@ def get_person_relationships(wiki_id):
                 focus_ent = e["ent2_str"]["value"].split("/")[-1]
 
         else:
-            raise Exception(e["rel_type"]["value"] + " not known")
+            print(e)
+            continue
+            # ToDo: re-activate this Exception
+            # raise Exception(e["rel_type"]["value"] + " not known")
 
         relations[rel_type].append(
             {
@@ -1191,7 +1192,7 @@ def get_personalities_by_public_office(public_office: str):
 
 def get_personalities_by_assembly(parliamentary_term: str):
     # get all other members in politiquices of part of the same assembly/parliament
-    # example of an assembly/parliament in WikiData: https://www.wikidata.org/wiki/Q71014092
+    # example of an assembly/parliament in Wikidata: https://www.wikidata.org/wiki/Q71014092
     query = f"""
     SELECT DISTINCT ?ent1 ?ent1_name
     (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url) 

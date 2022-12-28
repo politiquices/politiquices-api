@@ -1,80 +1,60 @@
 import json
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from pathlib import Path
-from typing import Tuple, Set, Dict, Any
+from typing import Tuple, Set, Dict, Any, List
 
 import requests
-from config import static_data
 from nlp_extraction.utils.utils import just_sleep
-from sparql_queries import (
+from politiquices_api.config import static_data
+from politiquices_api.sparql_queries import (
     get_all_parties_and_members_with_relationships,
     get_nr_relationships_as_subject,
     get_nr_relationships_as_target,
     get_persons_co_occurrences_counts,
     get_persons_wiki_id_name_image_url,
     get_total_nr_articles_for_each_person,
-    get_wiki_id_affiliated_with_party
+    get_wiki_id_affiliated_with_party,
 )
 
 
-def get_entities():
-    """
-    Get for each personality in the wikidata graph:
-      - name
-      - image url
-      - wikidata url
-      - wikidata id
+def get_entities() -> Dict[str, Any]:
+    """Get for each personality in the wikidata graph: name, image url, wikidata id, nr_articles"""
 
-    Second, get all persons in politiquices graph with non 'other' articles/relationships,
-    return all the info only for those with articles
-    """
-    all_per = get_persons_wiki_id_name_image_url()
-    per_with_articles = get_total_nr_articles_for_each_person()
-    per_info = defaultdict(dict)
+    all_wikidata_per = get_persons_wiki_id_name_image_url()
+    per_articles = get_total_nr_articles_for_each_person()
+    all_politiquices_per = defaultdict(dict)  # as of Python version 3.7, dictionaries are ordered
+    for wiki_id, nr_articles in per_articles.items():
+        all_politiquices_per[wiki_id]["nr_articles"] = nr_articles
+        all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
+        # ToDo: rewrite image url here
+        all_politiquices_per[wiki_id]["image_url"] = all_wikidata_per[wiki_id]["image_url"]
 
-    for wiki_id, nr_articles in per_with_articles.items():
-        per_info[wiki_id]["nr_articles"] = nr_articles
-        per_info[wiki_id]["wiki_id"] = all_per[wiki_id]["wiki_id"]
-        per_info[wiki_id]["name"] = all_per[wiki_id]["name"]
-        per_info[wiki_id]["image_url"] = all_per[wiki_id]["image_url"]
-
-    return all_per, sorted(list(per_info.values()), key=lambda x: x["nr_articles"], reverse=True)
+    return all_politiquices_per
 
 
-def personalities_json_cache() -> Tuple[Set[str], Dict[str,Any]]:
+def personalities_json_cache() -> Tuple[Set[str], Dict[str, Any]]:
     """
     Generates JSONs from SPARQL queries:
-        'all_entities_info.json': list of {name, image_url, nr_articles} sorted by nr_articles
-        'persons.json': a sorted list by name of tuples (person_name, wiki_id)
-        'wiki_id_info.json': mapping from wiki_id -> person_info
+        'all_entities_info.json':  mapping from wiki_id -> {name, image_url, nr_articles}, sorted by nr_articles
+        'persons.json':  a sorted list by name of tuples (person_name, wiki_id)
+
+        'wiki_id_info.json' -> delete -> use all_entities_info.json
     """
 
-    all_per, per_data = get_entities()
-    print(f"{len(per_data)} entities card info (name + image + nr articles)")
-    print(f"{len(all_per)} all entities on Wikidata subset")
+    all_politiquices_per = get_entities()
+    print(f"{len(all_politiquices_per)} personalities")
     with open(static_data + "all_entities_info.json", "w") as f_out:
-        json.dump(per_data, f_out, indent=4)
-
-    with open(static_data + "shorter_names_mapping.json", "r") as f_out:
-        shorter_names = json.loads(f_out.read())
+        json.dump(all_politiquices_per, f_out, indent=4)
 
     # persons.json - cache for search box
     persons = [
-        {"label": x["name"], "value": x["wiki_id"]}
-        for x in sorted(per_data, key=lambda x: x["name"])
+        {"label": x[1]["name"], "value": x[0]}
+        for x in sorted(all_politiquices_per.items(), key=lambda x: x[1]["name"])
     ]
     with open(static_data + "persons.json", "wt") as f_out:
         json.dump(persons, f_out, indent=True)
 
-    # wiki_id_info_all.json - used in relationships
-    wiki_id = {}
-    for k, v in all_per.items():
-        wiki_id[k] = {"name": v["name"], "image_url": v["image_url"]}
-
-    with open(static_data + "wiki_id_info_all.json", "w") as f_out:
-        json.dump(wiki_id, f_out, indent=4)
-
-    return set([x["value"] for x in persons]), wiki_id
+    return set([x["value"] for x in persons]), all_politiquices_per
 
 
 def parties_json_cache(all_politiquices_persons):
@@ -98,17 +78,18 @@ def parties_json_cache(all_politiquices_persons):
     # 'all_parties_info.json' - display in 'Partidos'
     parties_data = get_all_parties_and_members_with_relationships()
     sort_order = {"Portugal": 0, None: 3}
-    parties_data.sort(key=lambda parties_data: sort_order.get(parties_data['country'], 2))
+    parties_data.sort(key=lambda parties_data: sort_order.get(parties_data["country"], 2))
     print(f"{len(parties_data)} parties info (image + nr affiliated w/ relationships")
     with open(static_data + "all_parties_info.json", "w") as f_out:
         json.dump(parties_data, f_out, indent=4)
 
     # 'parties.json cache' - search box, filtering only for political parties from Portugal (Q45)
     parties = [
-        {"name": parties_mapping.get(x["party_label"], x["party_label"]),
-         "wiki_id": x["wiki_id"],
-         "image_url": x["party_logo"]
-         }
+        {
+            "name": parties_mapping.get(x["party_label"], x["party_label"]),
+            "wiki_id": x["wiki_id"],
+            "image_url": x["party_logo"],
+        }
         for x in sorted(parties_data, key=lambda x: x["party_label"])
         # if x["country"] == "Portugal"
     ]
@@ -176,14 +157,14 @@ def persons_relationships_counts_by_type():
 
 def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
-                      'Chrome/39.0.2171.95 Safari/537.36'
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/39.0.2171.95 Safari/537.36"
     }
 
     for wiki_id, info in wiki_id_info.items():
-        if not info['image_url'].startswith('http'):
+        if not info["image_url"].startswith("http"):
             continue
-        url = info['image_url']
+        url = info["image_url"]
         print(wiki_id, end="...")
         extension = url.split(".")[-1]
         f_name = f"{wiki_id}.{extension}"
@@ -205,28 +186,17 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
 
 
 def get_images():
-    with open("json/wiki_id_info_all.json") as f_in:
+    with open("json/all_entities_info.json") as f_in:
         wiki_id_info_all = json.load(f_in)
     save_images_from_url(wiki_id_info_all, base_out="images/personalities")
 
     with open("json/parties.json") as f_in:
         parties = json.load(f_in)
-    transformed = {entry['wiki_id']: {'image_url': entry['image_url']} for entry in parties}
+    transformed = {entry["wiki_id"]: {"image_url": entry["image_url"]} for entry in parties}
     save_images_from_url(transformed, base_out="images/parties")
 
 
 def main():
-    """
-    'all_entities_info.json'  ordered list of all personalities, with all info, sorted by number of articles
-                              shown in section 'Personalidades'
-
-    'persons.json'            ordered list of all personalities, with (name,wiki_id), sorted by name
-                              used in the selection box
-
-    'wiki_id_info_all.json'   dictionary whose key is wiki_id and value is the name of the personality + image url
-                              used when getting names + pictures for relationships, in timeline
-    """
-
     print("\nCaching and pre-computing static stuff from SPARQL engine :-)")
 
     # get all personalities cache
