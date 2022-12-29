@@ -222,13 +222,13 @@ def get_all_parties_and_members_with_relationships():
                 ?political_party wdt:P17 ?party_country. 
                 ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "en")
             }}
-        SERVICE <http://0.0.0.0:3030/politiquices/query> {{
-            SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}     
+            SERVICE <http://0.0.0.0:3030/politiquices/query> {{
+                SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}     
+            }}
         }}
-    }}
-    GROUP BY ?political_party ?party_label ?party_logo ?country_label 
-    ORDER BY DESC(?nr_personalities)
-    """
+        GROUP BY ?political_party ?party_label ?party_logo ?country_label 
+        ORDER BY DESC(?nr_personalities)
+        """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
     political_parties = []
@@ -1279,6 +1279,23 @@ def get_personalities_by_party(political_party: str):
                 r["image_url"] = r.pop("images_url")
 
     return result["results"]["bindings"]
+
+
+def get_all_parties_images():
+    query = """
+        SELECT ?party ?logo
+        WHERE {
+            ?party wdt:P31 wd:Q7278 .
+            OPTIONAL { ?party wdt:P154 ?logo. }
+        }"""
+
+    results = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    transformed = {
+        r['party']['value'].split("/")[-1]: {"image_url": r['logo']['value']}
+        for r in results['results']['bindings']
+        if 'logo' in r
+    }
+    return transformed
 
 
 def query_sparql(query, endpoint):

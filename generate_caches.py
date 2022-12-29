@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 from pathlib import Path
-from typing import Tuple, Set, Dict, Any
+from typing import Dict, Any
 
 import requests
 from nlp_extraction.utils.utils import just_sleep
@@ -13,7 +13,7 @@ from politiquices_api.sparql_queries import (
     get_persons_co_occurrences_counts,
     get_persons_wiki_id_name_image_url,
     get_total_nr_articles_for_each_person,
-    get_wiki_id_affiliated_with_party,
+    get_all_parties_images
 )
 
 
@@ -148,7 +148,6 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/39.0.2171.95 Safari/537.36"
     }
-
     for wiki_id, info in wiki_id_info.items():
         if not info["image_url"].startswith("http"):
             continue
@@ -174,13 +173,13 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
 
 
 def get_images():
+    """Download images for all personalities and parties in the Wikidata sub-graph"""
+
     with open("json/all_entities_info.json") as f_in:
         wiki_id_info_all = json.load(f_in)
     save_images_from_url(wiki_id_info_all, base_out="assets/images/personalities")
 
-    with open("json/parties.json") as f_in:
-        parties = json.load(f_in)
-    transformed = {entry["wiki_id"]: {"image_url": entry["image_url"]} for entry in parties}
+    transformed = get_all_parties_images()
     save_images_from_url(transformed, base_out="assets/images/parties")
 
 
@@ -204,7 +203,9 @@ def main():
 
     # ToDo: resize images automatically
     # mogrify -resize 250x250^ -gravity center -extent 250x250 *.*
-    # ToDo: copy to politiquices-app directory
+
+    # ToDo: copy images to politiquices-app directory
+    # cp -v assets/images/parties/* ../politiquices-app/public/assets/images/parties/
 
 
 if __name__ == "__main__":
