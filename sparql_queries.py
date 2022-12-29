@@ -1024,8 +1024,6 @@ def get_entities_without_image():
 
 
 # new website
-
-
 def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool):
     values = " ".join(["wd:" + wiki_id for wiki_id in wiki_ids])
 

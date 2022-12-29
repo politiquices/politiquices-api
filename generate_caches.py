@@ -22,14 +22,17 @@ def get_entities() -> Dict[str, Any]:
 
     all_wikidata_per = get_persons_wiki_id_name_image_url()
     per_articles = get_total_nr_articles_for_each_person()
-    all_politiquices_per = defaultdict(dict)  # as of Python version 3.7, dictionaries are ordered
-    for wiki_id, nr_articles in per_articles.items():
-        all_politiquices_per[wiki_id]["nr_articles"] = nr_articles
+    all_politiquices_per = defaultdict(dict)
+    for wiki_id in all_wikidata_per.keys():
+        all_politiquices_per[wiki_id]["nr_articles"] = per_articles.get(wiki_id, 0)
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
         f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
         all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
 
-    return all_politiquices_per
+    sortedy_by_nr_articles = {entry[0]: entry[1] for entry in
+                              sorted(all_politiquices_per.items(), key=lambda x: x[1]['nr_articles'], reverse=True)}
+
+    return sortedy_by_nr_articles
 
 
 def personalities_json_cache() -> Dict[str, Any]:
@@ -185,25 +188,13 @@ def get_images():
 
 def main():
     print("\nCaching and pre-computing static stuff from SPARQL engine :-)")
-
-    # get all personalities cache
     all_politiquices_per = personalities_json_cache()
-
-    # parties cache
     parties_json_cache()
-
-    # entities co-occurrences cache
     entities_top_co_occurrences(all_politiquices_per)
-
-    # unique number of relationships for each person
     persons_relationships_counts_by_type()
-
-    # get images and resize them
     get_images()
-
     # ToDo: resize images automatically
     # mogrify -resize 250x250^ -gravity center -extent 250x250 *.*
-
     # ToDo: copy images to politiquices-app directory
     # cp -v assets/images/parties/* ../politiquices-app/public/assets/images/parties/
 
