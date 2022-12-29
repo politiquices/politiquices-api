@@ -36,6 +36,19 @@ app.add_middleware(
 )
 
 
+def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
+    base_url = "/assets/images/"
+
+    if 'no_picture.jpg' in org_url:
+        return org_url
+
+    if ent_type == 'person':
+        base_url += 'personalities_small'
+    f_name = f"{wiki_id}.{org_url.split('.')[-1]}"
+
+    return f"{base_url}/{f_name}"
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -44,8 +57,7 @@ async def root():
 @app.get("/personality/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     person = get_person_info(wiki_id)
-    f_name = f"{person.wiki_id}.{person.image_url.split('.')[-1]}"
-    person.image_url = f"/assets/images/personalities_small/{f_name}"
+    person.image_url = local_image(person.wiki_id, person.image_url, ent_type='person')
     for party in person.parties:
         if 'no_picture' in party.image_url:
             continue
@@ -119,25 +131,49 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 @app.get("/personalities/occupation/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_personalities_by_occupation(wiki_id)
+    results = get_personalities_by_occupation(wiki_id)
+    for r in results:
+        wiki_id = r['ent1']['value'].split("/")[-1]
+        org_url = r['image_url']['value']
+        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+    return results
 
 
 @app.get("/personalities/public_office/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_personalities_by_public_office(wiki_id)
+    results = get_personalities_by_public_office(wiki_id)
+    for r in results:
+        wiki_id = r['ent1']['value'].split("/")[-1]
+        org_url = r['image_url']['value']
+        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+    return results
 
 
 @app.get("/personalities/government/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_personalities_by_government(wiki_id)
+    results = get_personalities_by_government(wiki_id)
+    for r in results:
+        wiki_id = r['ent1']['value'].split("/")[-1]
+        org_url = r['image_url']['value']
+        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+    return results
 
 
 @app.get("/personalities/assembly/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_personalities_by_assembly(wiki_id)
+    results = get_personalities_by_assembly(wiki_id)
+    for r in results:
+        wiki_id = r['ent1']['value'].split("/")[-1]
+        org_url = r['image_url']['value']
+        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+    return results
 
 
 @app.get("/personalities/party/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    # return get_persons_affiliated_with_party(wiki_id)
-    return get_personalities_by_party(wiki_id)
+    results = get_personalities_by_party(wiki_id)
+    for r in results:
+        wiki_id = r['ent1']['value'].split("/")[-1]
+        org_url = r['image_url']['value']
+        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+    return results
