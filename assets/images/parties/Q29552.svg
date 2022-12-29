@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="86" height="86">
+  <title>US Democratic party logo</title>
+  <circle cx="43" cy="43" r="37.5" fill="#ffffff" stroke="none"/>
+  <circle cx="43" cy="43" r="37.5" fill="none" stroke="#0044c9" stroke-width="11"/>
+  <path fill="#0044c9" d="M28.5 25.5v35H45a17.5 17.5 0 0 0 0-35zm10 8.5h5a9 9 0 0 1 0 18h-5z"/>
+</svg>

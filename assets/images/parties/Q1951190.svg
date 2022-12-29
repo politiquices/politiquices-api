@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="314pt" height="314pt" viewBox="0 0 314 314" preserveAspectRatio="xMidYMid meet" ><rect id="svgEditorBackground" x="0" y="0" width="114" height="114" style="fill:none; stroke: none;"/>
+<metadata>
+Created by potrace 1.16, written by Peter Selinger 2001-2019
+</metadata>
+<g transform="matrix(0.258735 0 0 -0.258735 9.89798 265.675)" fill="#000000" stroke="none">
+
+
+
+
+
+</g>
+<circle id="e1_circle" cx="57.00022506713867" cy="56.85588073730469" style="fill: black; stroke-width: 1px;" r="44.4733" transform="matrix(2.58735 0 0 2.58735 9.89798 -29.2827)"/><g id="g_e2_svg" transform="matrix(6.97715 0 0 6.97715 -131.365 -315.947)"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="41.886" height="41.886" viewBox="0 0 114 114" preserveAspectRatio="xMidYMid meet" id="e2_svg" x="20.22757911682129" y="41.093719482421875"><rect id="svgEditorBackground" x="0" y="0" width="114" height="114" style="fill: none; stroke: none;"/><defs id="svgEditorDefs"><pattern height="10" id="hatch-black-45" patternTransform="rotate(45) scale(0.4)" patternUnits="userSpaceOnUse" viewBox="0 0 10 10" width="10" x="0" y="0"><line style="stroke:black;stroke-width:1px;" x1="0" x2="10" y1="5" y2="5"/></pattern><filter filterUnits="objectBoundingBox" height="200%" id="dropshadow" width="200%"><feGaussianBlur in="SourceAlpha" result="shadow" stdDeviation="5"/><feOffset dx="10" dy="10" in="shadow" result="shadowoffset"/><feFlood flood-color="rgba(0,0,0,0.6)"/><feComposite in2="shadowoffset" operator="in"/><feMerge result="dropshadowresult"><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient gradientUnits="objectBoundingBox" id="lgrd2-fire" spreadMethod="pad" x1="0%" x2="100%" y1="0%" y2="0%"><stop offset="0%" style="stop-color:rgb(255,255,0);stop-opacity:1"/><stop offset="100%" style="stop-color:rgb(255,0,0);stop-opacity:1"/></linearGradient><style type="text/css">
+#svgEditorPolygonDefs{stroke-miterlimit:1;stroke:black;fill:none;}
+
+#e3_circle{stroke-miterlimit:1;stroke:#FFFFFF;fill:#FFFFFF;}
+
+#e4_circle:hover{}
+#svgEditorPolygonDefs:hover{fill:none;}
+.e1_circle{stroke:none;}
+
+#e5_circle:hover{fill:none;}
+</style></defs>
+<metadata>
+Created by potrace 1.16, written by Peter Selinger 2001-2019
+</metadata>
+<g transform="matrix(0.1 0 0 -0.1 0 114)" fill="#000000" stroke="none">
+
+<path d="M585,951c-22,-10,-46,-25,-54,-35c-12,-15,-11,-20,11,-44c41,-45,64,-84,77,-133c13,-47,11,-150,-3,-181c-7,-16,-2,-18,36,-18c160,0,262,138,208,282c-45,121,-167,178,-275,129Z" style="fill: rgb(255, 255, 255);" id="e2_circle"/>
+<path d="M322,855c-55,-24,-100,-64,-116,-106c-29,-73,-16,-161,29,-199c15,-12,18,-12,26,3c6,9,35,29,66,44c77,36,182,43,236,15l37,-20l1,22c4,87,-14,151,-54,195c-51,55,-155,76,-225,46Z" style="fill:#01C700;" id="e2_circle"/>
+<path d="M880,601c0,-20,-69,-62,-126,-77c-58,-15,-145,-15,-191,1c-22,7,-23,5,-23,-39c0,-109,99,-206,210,-206c131,0,237,131,200,246c-17,53,-70,109,-70,75Z" style="fill:#01C700;"/>
+<path d="M396,590c-34,-11,-91,-63,-113,-104c-26,-49,-22,-134,9,-186c34,-59,53,-75,113,-95c60,-21,123,-14,165,17c30,21,30,22,11,42c-60,66,-89,213,-57,290c9,21,16,40,16,42c0,8,-115,2,-144,-6Z" style="fill:#01C700;" id="Circle1" transform="Circle1"/>
+</g>
+<circle id="e3_circle" cx="57.681900024414055" cy="57.67086410522461" style="stroke-width: 1px; fill-opacity: 1; stroke-linecap: butt; stroke-linejoin: round;" r="1.8068"/></svg></g><text style="fill:#01C700;font-family:Arial;font-size:25px;stroke-width:1;stroke:#01C700;" x="31.666667938232422" y="107.09088134765625" id="e3_texte" transform="matrix(3.0164 0 0 3.0164 -15.0295 -27.622)">MpD</text></svg>
