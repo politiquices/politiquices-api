@@ -47,6 +47,8 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     f_name = f"{person.wiki_id}.{person.image_url.split('.')[-1]}"
     person.image_url = f"/assets/images/personalities_small/{f_name}"
     for party in person.parties:
+        if 'no_picture' in party.image_url:
+            continue
         f_name = f"{party.wiki_id}.{party.image_url.split('.')[-1]}"
         party.image_url = f"/assets/images/parties/{f_name}"
     return person
@@ -75,13 +77,11 @@ async def read_item():
 async def read_item():
     personalities = []
     for k, v in all_entities_info.items():
-        f_name = f"{k}.{v['image_url'].split('.')[-1]}"
-        v["local_image"] = f"/assets/images/personalities_small/{f_name}"
         personalities.append(
             {
                 "label": v["name"],
                 "nr_articles": v["nr_articles"],
-                "local_image": f"/assets/images/personalities_small/{f_name}",
+                "local_image": v["image_url"],
                 "wiki_id": k,
             }
         )

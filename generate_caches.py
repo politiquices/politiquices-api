@@ -26,8 +26,8 @@ def get_entities() -> Dict[str, Any]:
     for wiki_id, nr_articles in per_articles.items():
         all_politiquices_per[wiki_id]["nr_articles"] = nr_articles
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
-        # ToDo: rewrite image url here
-        all_politiquices_per[wiki_id]["image_url"] = all_wikidata_per[wiki_id]["image_url"]
+        f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
+        all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
 
     return all_politiquices_per
 
@@ -78,7 +78,7 @@ def parties_json_cache():
 
     sort_order = {"Portugal": 0, None: 3}
     parties_data.sort(key=lambda parties_data: sort_order.get(parties_data["country"], 2))
-    print(f"{len(parties_data)} parties info (image + nr affiliated w/ relationships")
+    print(f"{len(parties_data)} parties")
     with open(static_data + "all_parties_info.json", "w") as f_out:
         json.dump(parties_data, f_out, indent=4)
 
@@ -204,6 +204,7 @@ def main():
 
     # ToDo: resize images automatically
     # mogrify -resize 250x250^ -gravity center -extent 250x250 *.*
+    # ToDo: copy to politiquices-app directory
 
 
 if __name__ == "__main__":
