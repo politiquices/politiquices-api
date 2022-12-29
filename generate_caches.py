@@ -73,7 +73,7 @@ def parties_json_cache():
         "Partido da Terra": "MPT - Partido da Terra",
     }
 
-    # 'all_parties_info.json' - display in 'Partidos'
+    # 'all_parties_info.json'
     parties_data = get_all_parties_and_members_with_relationships()
 
     sort_order = {"Portugal": 0, None: 3}
@@ -176,12 +176,12 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
 def get_images():
     with open("json/all_entities_info.json") as f_in:
         wiki_id_info_all = json.load(f_in)
-    save_images_from_url(wiki_id_info_all, base_out="images/personalities")
+    save_images_from_url(wiki_id_info_all, base_out="assets/images/personalities")
 
     with open("json/parties.json") as f_in:
         parties = json.load(f_in)
     transformed = {entry["wiki_id"]: {"image_url": entry["image_url"]} for entry in parties}
-    save_images_from_url(transformed, base_out="images/parties")
+    save_images_from_url(transformed, base_out="assets/images/parties")
 
 
 def main():
