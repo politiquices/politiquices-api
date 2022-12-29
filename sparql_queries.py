@@ -212,33 +212,23 @@ def get_all_parties_and_members_with_relationships():
     """Get a list of all the parties and the count of members"""
 
     query = f"""
-        SELECT DISTINCT ?political_party ?party_label ?party_logo ?country_label 
-                        (COUNT(?person) as ?nr_personalities)
+        SELECT DISTINCT ?political_party ?party_label ?party_logo ?country_label (COUNT(?person) as ?nr_personalities)
         WHERE {{
-            ?person wdt:P102 ?political_party .    
-            ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "{LANG}")
+            ?person p:P102 ?political_partyStmnt.
+            ?political_partyStmnt ps:P102 ?political_party.
+            ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "en")  
             OPTIONAL {{ ?political_party wdt:P154 ?party_logo. }}
             OPTIONAL {{ 
                 ?political_party wdt:P17 ?party_country. 
-                ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
-                }}
-            SERVICE <{politiquices_endpoint}> {{
-                SELECT DISTINCT ?person 
-                WHERE {{
-                    VALUES ?rel_values {{
-                            'ent1_opposes_ent2' 'ent2_opposes_ent1' 
-                            'ent1_supports_ent2' 'ent2_supports_ent1'
-                            'other'
-                    }}
-                    ?person wdt:P31 wd:Q5 .
-                    {{ ?rel politiquices:ent1 ?person }} UNION {{?rel politiquices:ent2 ?person}} .
-                    ?rel politiquices:type ?rel_values .
-                }}
+                ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "en")
             }}
-         }}
-        GROUP BY ?political_party ?party_label ?party_logo ?country_label 
-        ORDER BY DESC(?nr_personalities)
-        """
+        SERVICE <http://0.0.0.0:3030/politiquices/query> {{
+            SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}     
+        }}
+    }}
+    GROUP BY ?political_party ?party_label ?party_logo ?country_label 
+    ORDER BY DESC(?nr_personalities)
+    """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
     political_parties = []

@@ -32,13 +32,11 @@ def get_entities() -> Dict[str, Any]:
     return all_politiquices_per
 
 
-def personalities_json_cache() -> Tuple[Set[str], Dict[str, Any]]:
+def personalities_json_cache() -> Dict[str, Any]:
     """
     Generates JSONs from SPARQL queries:
         'all_entities_info.json':  mapping from wiki_id -> {name, image_url, nr_articles}, sorted by nr_articles
         'persons.json':  a sorted list by name of tuples (person_name, wiki_id)
-
-        'wiki_id_info.json' -> delete -> use all_entities_info.json
     """
 
     all_politiquices_per = get_entities()
@@ -46,7 +44,7 @@ def personalities_json_cache() -> Tuple[Set[str], Dict[str, Any]]:
     with open(static_data + "all_entities_info.json", "w") as f_out:
         json.dump(all_politiquices_per, f_out, indent=4)
 
-    # persons.json - cache for search box
+    # persons.json - person names sorted alphabetically
     persons = [
         {"label": x[1]["name"], "value": x[0]}
         for x in sorted(all_politiquices_per.items(), key=lambda x: x[1]["name"])
@@ -54,10 +52,10 @@ def personalities_json_cache() -> Tuple[Set[str], Dict[str, Any]]:
     with open(static_data + "persons.json", "wt") as f_out:
         json.dump(persons, f_out, indent=True)
 
-    return set([x["value"] for x in persons]), all_politiquices_per
+    return all_politiquices_per
 
 
-def parties_json_cache(all_politiquices_persons):
+def parties_json_cache():
 
     # rename parties names to include short-forms, nice to have in autocomplete
     parties_mapping = {
@@ -78,9 +76,6 @@ def parties_json_cache(all_politiquices_persons):
     # 'all_parties_info.json' - display in 'Partidos'
     parties_data = get_all_parties_and_members_with_relationships()
 
-    for x in parties_data:
-        print(x['country'], '\t', x['party_label'], '\t',  x['party_logo'])
-
     sort_order = {"Portugal": 0, None: 3}
     parties_data.sort(key=lambda parties_data: sort_order.get(parties_data["country"], 2))
     print(f"{len(parties_data)} parties info (image + nr affiliated w/ relationships")
@@ -95,30 +90,19 @@ def parties_json_cache(all_politiquices_persons):
             "image_url": x["party_logo"],
         }
         for x in sorted(parties_data, key=lambda x: x["party_label"])
-        # if x["country"] == "Portugal"
     ]
     with open(static_data + "parties.json", "w") as f_out:
         json.dump(parties, f_out, indent=4)
 
-    # 'party_members.json' - shows members of each party, only those with at least 1 relationship
-    party_members = defaultdict(list)
-    for party in parties_data:
-        # intersection between all wiki_id associated with a party and only those mention int rels
-        wiki_ids = get_wiki_id_affiliated_with_party(party["wiki_id"])
-        wiki_ids_in_politiquices = list(set(wiki_ids).intersection(all_politiquices_persons))
-        party_members[party["wiki_id"]] = wiki_ids_in_politiquices
-    with open(static_data + "party_members.json", "w") as f_out:
-        json.dump(party_members, f_out, indent=4)
 
-
-def entities_top_co_occurrences(wiki_id):
+def entities_top_co_occurrences(all_politiquices_per):
     raw_counts = get_persons_co_occurrences_counts()
     co_occurrences = []
     for x in raw_counts:
         co_occurrences.append(
             {
-                "person_a": wiki_id[x["person_a"].split("/")[-1]],
-                "person_b": wiki_id[x["person_b"].split("/")[-1]],
+                "person_a": all_politiquices_per[x["person_a"].split("/")[-1]],
+                "person_b": all_politiquices_per[x["person_b"].split("/")[-1]],
                 "nr_occurrences": x["n_artigos"],
             }
         )
@@ -204,13 +188,13 @@ def main():
     print("\nCaching and pre-computing static stuff from SPARQL engine :-)")
 
     # get all personalities cache
-    all_politiquices_persons, wiki_id = personalities_json_cache()
+    all_politiquices_per = personalities_json_cache()
 
     # parties cache
-    parties_json_cache(all_politiquices_persons)
+    parties_json_cache()
 
     # entities co-occurrences cache
-    entities_top_co_occurrences(wiki_id)
+    entities_top_co_occurrences(all_politiquices_per)
 
     # unique number of relationships for each person
     persons_relationships_counts_by_type()

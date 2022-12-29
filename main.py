@@ -68,7 +68,7 @@ async def read_item(
 
 @app.get("/parties/")
 async def read_item():
-    return [party for party in all_parties_info if party["country"] == "Portugal"]
+    return [party for party in all_parties_info]
 
 
 @app.get("/personalities/")
