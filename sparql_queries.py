@@ -1296,6 +1296,22 @@ def get_all_parties_images():
     return transformed
 
 
+def get_all_persons_images():
+    query = """
+        SELECT ?person ?image_url
+        WHERE {
+            ?person wdt:P31 wd:Q5 .
+            OPTIONAL { ?person wdt:P18 ?image_url. }
+        }"""
+    results = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    transformed = {
+        r['person']['value'].split("/")[-1]: {"image_url": r['image_url']['value']}
+        for r in results['results']['bindings']
+        if 'image_url' in r
+    }
+    return transformed
+
+
 def query_sparql(query, endpoint):
     if endpoint == "wikidata":
         endpoint_url = wikidata_endpoint

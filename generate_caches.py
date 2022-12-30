@@ -13,7 +13,7 @@ from politiquices_api.sparql_queries import (
     get_persons_co_occurrences_counts,
     get_persons_wiki_id_name_image_url,
     get_total_nr_articles_for_each_person,
-    get_all_parties_images
+    get_all_parties_images, get_all_persons_images
 )
 
 
@@ -51,6 +51,7 @@ def personalities_json_cache() -> Dict[str, Any]:
     persons = [
         {"label": x[1]["name"], "value": x[0]}
         for x in sorted(all_politiquices_per.items(), key=lambda x: x[1]["name"])
+        if x[1]['nr_articles'] > 0
     ]
     with open(static_data + "persons.json", "wt") as f_out:
         json.dump(persons, f_out, indent=True)
@@ -177,26 +178,22 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
 
 def get_images():
     """Download images for all personalities and parties in the Wikidata sub-graph"""
+    print("\nPersonalities")
+    transformed = get_all_persons_images()
+    save_images_from_url(transformed, base_out="assets/images/personalities")
 
-    with open("json/all_entities_info.json") as f_in:
-        wiki_id_info_all = json.load(f_in)
-    save_images_from_url(wiki_id_info_all, base_out="assets/images/personalities")
-
+    print("\nParties")
     transformed = get_all_parties_images()
     save_images_from_url(transformed, base_out="assets/images/parties")
 
 
 def main():
-    print("\nCaching and pre-computing static stuff from SPARQL engine :-)")
+    print("\nCaching and pre-computing static information")
     all_politiquices_per = personalities_json_cache()
     parties_json_cache()
     entities_top_co_occurrences(all_politiquices_per)
     persons_relationships_counts_by_type()
     get_images()
-    # ToDo: resize images automatically
-    # mogrify -resize 250x250^ -gravity center -extent 250x250 *.*
-    # ToDo: copy images to politiquices-app directory
-    # cp -v assets/images/parties/* ../politiquices-app/public/assets/images/parties/
 
 
 if __name__ == "__main__":

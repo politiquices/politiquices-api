@@ -126,7 +126,12 @@ async def read_items(
 
 @app.get("/personalities/educated_at/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
-    return get_personalities_by_education(wiki_id)
+    results = get_personalities_by_education(wiki_id)
+    for r in results:
+        wiki_id = r['ent1']['value'].split("/")[-1]
+        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
+        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+    return results
 
 
 @app.get("/personalities/occupation/{wiki_id}")
@@ -134,8 +139,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
     for r in results:
         wiki_id = r['ent1']['value'].split("/")[-1]
-        org_url = r['image_url']['value']
-        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
         r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
     return results
 
@@ -145,8 +149,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
     for r in results:
         wiki_id = r['ent1']['value'].split("/")[-1]
-        org_url = r['image_url']['value']
-        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
         r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
     return results
 
@@ -156,8 +159,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
     for r in results:
         wiki_id = r['ent1']['value'].split("/")[-1]
-        org_url = r['image_url']['value']
-        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
         r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
     return results
 
@@ -167,8 +169,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     for r in results:
         wiki_id = r['ent1']['value'].split("/")[-1]
-        org_url = r['image_url']['value']
-        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
         r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
     return results
 
@@ -178,7 +179,6 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
     for r in results:
         wiki_id = r['ent1']['value'].split("/")[-1]
-        org_url = r['image_url']['value']
-        r['image_url']['value'] = local_image(wiki_id, org_url, ent_type='person')
+        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
         r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
     return results
