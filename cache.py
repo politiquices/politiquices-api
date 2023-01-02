@@ -12,6 +12,9 @@ with open("json/party_members.json") as f_in:
 with open("json/persons.json") as f_in:
     persons = json.load(f_in)
 
+with open("json/parties.json") as f_in:
+    parties = json.load(f_in)
+
 with open("json/CHAVE-Publico_94_95.jsonl") as f_in:
     chave_publico = [json.loads(line) for line in f_in]
 

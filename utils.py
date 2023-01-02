@@ -1,5 +1,6 @@
-
 import re
+
+from cache import all_parties_info, all_entities_info
 
 
 def make_https(url):
@@ -16,3 +17,14 @@ def invert_relationship(rel_type):
         raise Exception("this should not happen")
 
     return rel_type_inverted
+
+
+def get_info(wiki_id):
+    """Returns whether the entity is party or person"""
+    for entry in all_parties_info:
+        if entry["wiki_id"] == wiki_id:
+            return "party"
+
+    for entry in all_entities_info.keys():
+        if entry == wiki_id:
+            return "person"

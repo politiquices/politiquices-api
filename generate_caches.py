@@ -13,7 +13,8 @@ from politiquices_api.sparql_queries import (
     get_persons_co_occurrences_counts,
     get_persons_wiki_id_name_image_url,
     get_total_nr_articles_for_each_person,
-    get_all_parties_images, get_all_persons_images
+    get_all_parties_images,
+    get_all_persons_images,
 )
 
 
@@ -29,8 +30,10 @@ def get_entities() -> Dict[str, Any]:
         f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
         all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
 
-    sortedy_by_nr_articles = {entry[0]: entry[1] for entry in
-                              sorted(all_politiquices_per.items(), key=lambda x: x[1]['nr_articles'], reverse=True)}
+    sortedy_by_nr_articles = {
+        entry[0]: entry[1]
+        for entry in sorted(all_politiquices_per.items(), key=lambda x: x[1]["nr_articles"], reverse=True)
+    }
 
     return sortedy_by_nr_articles
 
@@ -51,7 +54,7 @@ def personalities_json_cache() -> Dict[str, Any]:
     persons = [
         {"label": x[1]["name"], "value": x[0]}
         for x in sorted(all_politiquices_per.items(), key=lambda x: x[1]["name"])
-        if x[1]['nr_articles'] > 0
+        if x[1]["nr_articles"] > 0
     ]
     with open(static_data + "persons.json", "wt") as f_out:
         json.dump(persons, f_out, indent=True)
@@ -79,24 +82,18 @@ def parties_json_cache():
 
     # 'all_parties_info.json'
     parties_data = get_all_parties_and_members_with_relationships()
-
-    sort_order = {"Portugal": 0, None: 3}
-    parties_data.sort(key=lambda parties_data: sort_order.get(parties_data["country"], 2))
     print(f"{len(parties_data)} parties")
     with open(static_data + "all_parties_info.json", "w") as f_out:
-        json.dump(parties_data, f_out, indent=4)
+        json.dump(parties_data, f_out)
 
     # 'parties.json cache' - search box, filtering only for political parties from Portugal (Q45)
     parties = [
-        {
-            "name": parties_mapping.get(x["party_label"], x["party_label"]),
-            "wiki_id": x["wiki_id"],
-            "image_url": x["party_logo"],
-        }
+        {"label": parties_mapping.get(x["party_label"], x["party_label"]), "value": x["wiki_id"]}
         for x in sorted(parties_data, key=lambda x: x["party_label"])
+        if x["country"] == "Portugal"
     ]
     with open(static_data + "parties.json", "w") as f_out:
-        json.dump(parties, f_out, indent=4)
+        json.dump(parties, f_out)
 
 
 def entities_top_co_occurrences(all_politiquices_per):

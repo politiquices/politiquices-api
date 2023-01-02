@@ -2,7 +2,8 @@ from typing import List, Union
 
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from cache import all_entities_info, all_parties_info, persons
+from cache import all_entities_info, all_parties_info, persons, parties
+from utils import get_info
 from sparql_queries import (
     get_person_info,
     get_person_relationships,
@@ -13,7 +14,8 @@ from sparql_queries import (
     get_personalities_by_party,
     get_personalities_by_public_office,
     get_relationship_between_two_persons,
-    get_timeline_personalities,
+    get_timeline_personalities, get_relationship_between_party_and_person, get_relationship_between_person_and_party,
+    get_relationship_between_parties,
 )
 
 start_year = 1994
@@ -105,6 +107,11 @@ async def read_item():
     return persons
 
 
+@app.get("/persons_and_parties/")
+async def read_item():
+    return sorted(persons + parties, key=lambda x: x['label'])
+
+
 @app.get("/timeline/")
 async def read_items(
     q: Union[List[str], None] = Query(default=None),
@@ -122,6 +129,35 @@ async def read_items(
         entry["ent2_img"] = all_entities_info[ent2_id]
 
     return results
+
+
+@app.get("/queries")
+async def queries(
+        ent1: str = Query(default=None, regex=wiki_id_regex),
+        ent2: str = Query(default=None, regex=wiki_id_regex),
+        rel_type: str = Query(default=None),
+        start: str = Query(default=None),
+        end: str = Query(default=None),
+):
+
+    # time interval for the query
+    year_from = start
+    year_to = end
+    rel_type = rel_type
+    e1_type = get_info(ent1)
+    e2_type = get_info(ent2)
+
+    if e1_type == "person" and e2_type == "person":
+        return get_relationship_between_two_persons(ent1, ent2, rel_type, year_from, year_to)
+
+    if e1_type == "party" and e2_type == "person":
+        return get_relationship_between_party_and_person(ent1, ent2, rel_type, year_from, year_to)
+
+    if e1_type == "person" and e2_type == "party":
+        return get_relationship_between_person_and_party(ent1, ent2, rel_type, year_from, year_to)
+
+    if e1_type == "party" and e2_type == "party":
+        return get_relationship_between_parties(ent1, ent2, rel_type, year_from, year_to)
 
 
 @app.get("/personalities/educated_at/{wiki_id}")
