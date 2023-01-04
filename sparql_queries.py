@@ -998,9 +998,6 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
             }
         )
 
-    for x in relationships:
-        print(x)
-
     return relationships
 
 
