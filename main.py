@@ -15,7 +15,7 @@ from sparql_queries import (
     get_personalities_by_public_office,
     get_relationship_between_two_persons,
     get_timeline_personalities, get_relationship_between_party_and_person, get_relationship_between_person_and_party,
-    get_relationship_between_parties,
+    get_relationship_between_parties, get_wiki_id_affiliated_with_party,
 )
 
 start_year = 1994
@@ -157,7 +157,10 @@ async def queries(
         return get_relationship_between_person_and_party(ent1, ent2, rel_type, year_from, year_to)
 
     if e1_type == "party" and e2_type == "party":
-        return get_relationship_between_parties(ent1, ent2, rel_type, year_from, year_to)
+        # get the members for each party
+        party_a = " ".join(["wd:" + x for x in get_wiki_id_affiliated_with_party(ent1)])
+        party_b = " ".join(["wd:" + x for x in get_wiki_id_affiliated_with_party(ent2)])
+        return get_relationship_between_parties(party_a, party_b, rel_type, year_from, year_to)
 
 
 @app.get("/personalities/educated_at/{wiki_id}")

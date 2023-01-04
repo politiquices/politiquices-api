@@ -12,7 +12,7 @@ from politiquices_api.config import (
     wikidata_endpoint,
 )
 from politiquices_api.data_models import Element, Person, PoliticalParty
-from politiquices_api.utils import make_https, invert_relationship
+from politiquices_api.utils import make_https, invert_relationship, _process_rel_type
 
 LANG = 'en'
 
@@ -735,14 +735,7 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
 @lru_cache(maxsize=50)
 def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, start_year, end_year):
 
-    if rel_type in ["ent1_opposes_ent2", "ent1_supports_ent2"]:
-        rel_type_inverted = invert_relationship(rel_type)
-    elif rel_type == 'all_sentiment':
-        rel_type = '.*(opposes|supports).*'
-        rel_type_inverted = rel_type
-    else:
-        rel_type = '.*'
-        rel_type_inverted = rel_type
+    rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
         SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
@@ -770,9 +763,9 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:ent2 ?ent2;
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
-                   politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
+                   
 
-              ?arquivo_doc dc:title ?title ;
+              ?arquivo_doc dc:title ?title ;politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
            }}            
         }}
@@ -796,15 +789,13 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
             }
         )
 
-    for r in results:
-        print(r)
-
     return results
 
 
 @lru_cache(maxsize=50)
 def get_relationship_between_party_and_person(party, person, rel_type, start_year, end_year):
-    rel_type_inverted = invert_relationship(rel_type)
+
+    rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
         SELECT DISTINCT ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?arquivo_doc ?date ?title ?score
@@ -816,8 +807,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                      politiquices:ent2_str ?ent2_str;                 
                      politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
-                     politiquices:type ?rel_type. FILTER((?rel_type)='{rel_type}')
-
+                     politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
                 ?arquivo_doc dc:title ?title;
                              dc:date ?date. FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
              }}
@@ -829,7 +819,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                      politiquices:ent2_str ?ent2_str;                 
                      politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
-                     politiquices:type ?rel_type. FILTER((?rel_type)='{rel_type_inverted}')
+                     politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
                 ?arquivo_doc dc:title ?title;
                              dc:date ?date. FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
@@ -874,7 +864,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
 
 @lru_cache(maxsize=50)
 def get_relationship_between_person_and_party(person, party, relation, start_year, end_year):
-    inverted_relationship = invert_relationship(relation)
+    rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
         SELECT DISTINCT ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?score
@@ -885,9 +875,8 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                      politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
                      politiquices:score ?score;
-                     politiquices:url ?arquivo_doc .
-                ?rel politiquices:type ?rel_type. FILTER((?rel_type)='{relation}')
-
+                     politiquices:url ?arquivo_doc;
+                     politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
                 ?arquivo_doc dc:title ?title;
                              dc:date ?date; FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
             }}
@@ -898,9 +887,8 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                      politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
                      politiquices:score ?score;
-                     politiquices:url ?arquivo_doc .
-                ?rel politiquices:type ?rel_type. FILTER((?rel_type)='{inverted_relationship}')
-
+                     politiquices:url ?arquivo_doc;
+                     politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
                 ?arquivo_doc dc:title ?title;
                              dc:date ?date; FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
             }}
@@ -942,8 +930,8 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
 
 
 @lru_cache(maxsize=50)
-def get_relationship_between_parties(per_party_a, per_party_b, rel_type, start_year, end_year):
-    inverted_rel_type = invert_relationship(rel_type)
+def get_relationship_between_parties(per_party_a, per_party_b, relation, start_year, end_year):
+    rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
     SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?title 
@@ -963,7 +951,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, rel_type, start_y
                 WHERE {{
                      ?rel politiquices:score ?score;
                           politiquices:url ?arquivo_doc;
-                          politiquices:type ?rel_type. FILTER((?rel_type)='{rel_type}')
+                          politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
 
                       ?arquivo_doc dc:title ?title;
                                    dc:date ?date; 
@@ -983,7 +971,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, rel_type, start_y
                 WHERE {{
                       ?rel politiquices:score ?score;
                            politiquices:url ?arquivo_doc;
-                           politiquices:type ?rel_type. FILTER((?rel_type)='{inverted_rel_type}')
+                           politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
                       ?arquivo_doc dc:title ?title;
                                    dc:date ?date; 
@@ -1010,10 +998,13 @@ def get_relationship_between_parties(per_party_a, per_party_b, rel_type, start_y
             }
         )
 
+    for x in relationships:
+        print(x)
+
     return relationships
 
 
-# Other
+# misc. and other
 def get_entities_without_image():
     query = f"""
         SELECT DISTINCT ?item ?label ?image_url {{

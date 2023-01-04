@@ -28,3 +28,15 @@ def get_info(wiki_id):
     for entry in all_entities_info.keys():
         if entry == wiki_id:
             return "person"
+
+
+def _process_rel_type(rel_type):
+    if rel_type in ["ent1_opposes_ent2", "ent1_supports_ent2"]:
+        rel_type_inverted = invert_relationship(rel_type)
+    elif rel_type == 'all_sentiment':
+        rel_type = '.*(opposes|supports).*'
+        rel_type_inverted = rel_type
+    else:
+        rel_type = '.*'
+        rel_type_inverted = rel_type
+    return rel_type, rel_type_inverted
