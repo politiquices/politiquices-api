@@ -4,6 +4,7 @@ from functools import lru_cache
 from typing import List, Dict, Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
+from cache import all_entities_info
 from politiquices_api.config import (
     live_wikidata,
     no_image,
@@ -572,12 +573,25 @@ def get_person_relationships(wiki_id):
                 "title": e["title"]["value"],
                 "score": str(e["score"]["value"])[0:5],
                 "date": e["date"]["value"].split("T")[0],
-                "focus_ent": focus_ent,
-                "other_ent_url": "entity?q=" + other_ent_url,
+                "focus_ent": wiki_id,
+                "focus_ent_img": all_entities_info[wiki_id]['image_url'],
+                "focus_ent_name": focus_ent,
+                "other_ent": other_ent_url,
                 "other_ent_name": other_ent_name,
+                "other_ent_img": all_entities_info[other_ent_url]['image_url'],
                 "rel_type": rel_type,
             }
         )
+
+    all_relationships = []
+    sentiment_only = []
+    for rel_type in relations.keys():
+        all_relationships.extend(relations[rel_type])
+        if rel_type in {'opposes', 'supports'}:
+            sentiment_only.extend(relations[rel_type])
+
+    relations['all'] = sorted(all_relationships, key=lambda x: x['date'], reverse=True)
+    relations['sentiment'] = sorted(sentiment_only, key=lambda x: x['date'], reverse=True)
 
     return relations
 
