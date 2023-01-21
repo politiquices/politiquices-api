@@ -6,19 +6,25 @@ from fastapi.middleware.cors import CORSMiddleware
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
 from utils import get_info, get_chart_labels_min_max
 from sparql_queries import (
+    get_nr_of_persons,
     get_person_info,
     get_person_relationships,
+    get_person_relationships_by_year,
     get_personalities_by_assembly,
     get_personalities_by_education,
     get_personalities_by_government,
     get_personalities_by_occupation,
     get_personalities_by_party,
     get_personalities_by_public_office,
-    get_relationship_between_two_persons,
-    get_timeline_personalities, get_relationship_between_party_and_person, get_relationship_between_person_and_party,
-    get_relationship_between_parties, get_wiki_id_affiliated_with_party, get_person_relationships_by_year,
-    get_nr_of_persons, get_total_nr_of_articles, get_total_articles_by_year_by_relationship_type,
     get_persons_articles_freq,
+    get_relationship_between_parties,
+    get_relationship_between_party_and_person,
+    get_relationship_between_person_and_party,
+    get_relationship_between_two_persons,
+    get_timeline_personalities,
+    get_total_articles_by_year_by_relationship_type,
+    get_total_nr_of_articles,
+    get_wiki_id_affiliated_with_party,
 )
 
 start_year = 1994
@@ -248,6 +254,7 @@ async def read_item():
     all_years = get_chart_labels_min_max()
     values = get_total_articles_by_year_by_relationship_type()
     aggregated_values = defaultdict(lambda: {"opposes": 0, "supports": 0})
+    all_values = []
     for year in all_years:
         if year in values.keys():
             for rel, freq in values[year].items():
@@ -258,6 +265,10 @@ async def read_item():
         else:
             aggregated_values[year]["opposes"] = 0
             aggregated_values[year]["supports"] = 0
+
+    for k, v in aggregated_values.items():
+        v.update({'year': k})
+        all_values.append(v)
 
     # personalities frequency chart
     per_freq_labels = []
@@ -279,8 +290,7 @@ async def read_item():
         "nr_persons": nr_persons,
         "nr_all_no_other_articles": nr_all_no_other_articles,
         "nr_articles_year_labels": all_years,
-        "supports": [aggregated_values[year]["supports"] for year in aggregated_values],
-        "opposes": [aggregated_values[year]["opposes"] for year in aggregated_values],
+        "year_values": all_values,
         "per_freq_labels": per_freq_labels[0:500],
         "per_freq_values": per_freq_values[0:500],
         "per_co_occurrence_labels": co_occurrences_labels[0:500],
