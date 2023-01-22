@@ -180,7 +180,8 @@ def get_persons_articles_freq():
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     top_freq = [
-        {"person": x["person"]["value"], "freq": x["n_artigos"]["value"]} for x in results["results"]["bindings"]
+        {"person": all_entities_info[x["person"]["value"].split("/")[-1]]['name'], "freq": x["n_artigos"]["value"]}
+        for x in results["results"]["bindings"]
     ]
     return top_freq
 

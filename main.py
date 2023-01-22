@@ -249,34 +249,30 @@ async def read_item():
     # total nr of article with and without 'other' relationships
     nr_all_articles, nr_all_no_other_articles = get_total_nr_of_articles()
 
-    # articles per relationship type per year; the sparql query returns results for each rel_type
-    # but we aggregate relationships: 'opposes', 'supports, i.e., discard direction and 'other'
+    # query returns results for each rel_type, but we aggregate by rel_type discarding direction and 'other'
     all_years = get_chart_labels_min_max()
     values = get_total_articles_by_year_by_relationship_type()
-    aggregated_values = defaultdict(lambda: {"opposes": 0, "supports": 0})
+    aggregated_values = defaultdict(lambda: {"oposição": 0, "apoio": 0})
     all_values = []
     for year in all_years:
         if year in values.keys():
             for rel, freq in values[year].items():
                 if "opposes" in rel:
-                    aggregated_values[year]["opposes"] += int(freq)
+                    aggregated_values[year]["oposição"] += int(freq)
                 if "supports" in rel:
-                    aggregated_values[year]["supports"] += int(freq)
+                    aggregated_values[year]["apoio"] += int(freq)
         else:
-            aggregated_values[year]["opposes"] = 0
-            aggregated_values[year]["supports"] = 0
+            aggregated_values[year]["oposição"] = 0
+            aggregated_values[year]["apoio"] = 0
 
     for k, v in aggregated_values.items():
         v.update({'year': k})
         all_values.append(v)
 
     # personalities frequency chart
-    per_freq_labels = []
-    per_freq_values = []
     per_freq = get_persons_articles_freq()
-    for x in per_freq:
-        per_freq_labels.append(all_entities_info[x["person"].split("/")[-1]]["name"])
-        per_freq_values.append(x["freq"])
+    top_500 = per_freq[0:250]
+    top_500.reverse()
 
     # personalities co-occurrence chart
     co_occurrences_labels = []
@@ -289,10 +285,8 @@ async def read_item():
         "nr_parties": nr_parties,
         "nr_persons": nr_persons,
         "nr_all_no_other_articles": nr_all_no_other_articles,
-        "nr_articles_year_labels": all_years,
         "year_values": all_values,
-        "per_freq_labels": per_freq_labels[0:500],
-        "per_freq_values": per_freq_values[0:500],
+        "personality_freq": top_500,
         "per_co_occurrence_labels": co_occurrences_labels[0:500],
         "per_co_occurrence_values": co_occurrences_values[0:500],
     }
