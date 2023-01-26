@@ -574,12 +574,6 @@ def get_person_relationships(wiki_id):
                 "title": e["title"]["value"],
                 "score": str(e["score"]["value"])[0:5],
                 "date": e["date"]["value"].split("T")[0],
-                # "focus_ent": wiki_id,
-                # "focus_ent_img": all_entities_info[wiki_id]['image_url'],
-                # "focus_ent_name": focus_ent,
-                # "other_ent": other_ent_url,
-                # "other_ent_name": other_ent_name,
-                # "other_ent_img": all_entities_info[other_ent_url]['image_url'],
                 "ent1_id": wiki_id,
                 "ent1_img": all_entities_info[wiki_id]["image_url"],
                 "ent1_str": focus_ent,
@@ -806,8 +800,10 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                 "rel_type": x["rel_type"]["value"],
                 "ent1_wiki": wiki_id_one,
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x["ent2"]["value"],
+                "ent2_wiki": wiki_id_two,
                 "ent2_str": x["ent2_str"]["value"],
+                "ent1_img": all_entities_info[wiki_id_one]["image_url"],
+                "ent2_img": all_entities_info[wiki_id_two]["image_url"],
             }
         )
 
@@ -866,10 +862,12 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": x['ent1']['value'],
+                "ent1_wiki": x['ent1']['value'].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x['ent2']['value'],
+                "ent2_wiki": x['ent2']['value'].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
+                "ent1_img": all_entities_info[x['ent1']['value'].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[x['ent2']['value'].split("/")[-1]]["image_url"],
             }
         )
 
@@ -926,10 +924,12 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                 "title": x["title"]["value"],
                 "rel_type": relation,
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": x['ent1']['value'],
+                "ent1_wiki": x['ent1']['value'].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x['ent2']['value'],
+                "ent2_wiki": x['ent2']['value'].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
+                "ent1_img": all_entities_info[x['ent1']['value'].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[x['ent2']['value'].split("/")[-1]]["image_url"],
             }
         )
 
@@ -998,10 +998,12 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": x["person_party_a"]["value"],
+                "ent1_wiki": x["person_party_a"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x["person_party_b"]["value"],
+                "ent2_wiki": x["person_party_b"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
+                "ent1_img": all_entities_info[x['ent1']['value'].split("/")[-1],]["image_url"],
+                "ent2_img": all_entities_info[x['ent2']['value'].split("/")[-1],]["image_url"],
             }
         )
 
