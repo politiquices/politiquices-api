@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 
 
@@ -27,3 +27,4 @@ class Person:
     occupations: Optional[List[Element]] = None
     governments: Optional[List[Element]] = None
     assemblies: Optional[List[Element]] = None
+    relationships_charts: Optional[List[Dict[str, Any]]] = None

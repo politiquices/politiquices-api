@@ -25,6 +25,7 @@ from sparql_queries import (
     get_total_articles_by_year_by_relationship_type,
     get_total_nr_of_articles,
     get_wiki_id_affiliated_with_party,
+    get_top_relationships,
 )
 
 start_year = 1994
@@ -50,11 +51,11 @@ app.add_middleware(
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     base_url = "/assets/images/"
 
-    if 'no_picture.jpg' in org_url:
+    if "no_picture.jpg" in org_url:
         return org_url
 
-    if ent_type == 'person':
-        base_url += 'personalities_small'
+    if ent_type == "person":
+        base_url += "personalities_small"
     f_name = f"{wiki_id}.{org_url.split('.')[-1]}"
 
     return f"{base_url}/{f_name}"
@@ -68,12 +69,60 @@ async def root():
 @app.get("/personality/{wiki_id}")
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     person = get_person_info(wiki_id)
-    person.image_url = local_image(person.wiki_id, person.image_url, ent_type='person')
+    person.image_url = local_image(person.wiki_id, person.image_url, ent_type="person")
     for party in person.parties:
-        if 'no_picture' in party.image_url:
+        if "no_picture" in party.image_url:
             continue
         f_name = f"{party.wiki_id}.{party.image_url.split('.')[-1]}"
         party.image_url = f"/assets/images/parties/{f_name}"
+
+    def year2index(input_year: int):
+        return int(input_year) - start_year
+
+    def index2year(index: int):
+        return index + start_year
+
+    # get all the relationships
+    relationships = get_person_relationships(wiki_id)
+    values = [
+        {"opposes": 0, "supports": 0, "opposed_by": 0, "supported_by": 0} for _ in range(end_year - start_year + 1)
+    ]
+    for k in ["opposes", "supports", "opposed_by", "supported_by"]:
+        for r in relationships[k]:
+            year = r["date"][0:4]
+            if int(year) > 2022:
+                continue
+            values[year2index(year)][k] += 1
+
+    # this is a bit tricky, rels.update returns "None", but also updates rels which we want to add to the list
+    chart_data = [rels for idx, rels in enumerate(values) if not rels.update({"year": index2year(idx)})]
+    person.relationships_charts = chart_data
+
+    # get the top-related entities
+    # person_as_subject, person_as_target = get_top_relationships(wiki_id)
+
+    """
+    who_person_opposes = [
+        {"wiki_id": k, "nr_articles": v, "name": get_short_name(k, wiki_id_info)}
+        for k, v in person_as_subject["who_person_opposes"].items()
+    ]
+
+    top_entities_in_rel_type = {
+        "who_person_opposes": sorted(
+            who_person_opposes, key=lambda x: x["nr_articles"], reverse=True
+        ),
+        "who_person_supports": sorted(
+            who_person_supports, key=lambda x: x["nr_articles"], reverse=True
+        ),
+        "who_opposes_person": sorted(
+            who_opposes_person, key=lambda x: x["nr_articles"], reverse=True
+        ),
+        "who_supports_person": sorted(
+            who_supports_person, key=lambda x: x["nr_articles"], reverse=True
+        ),
+    }
+    """
+
     return person
 
 
@@ -126,7 +175,7 @@ async def read_item():
 
 @app.get("/persons_and_parties/")
 async def read_item():
-    return sorted(persons + parties, key=lambda x: x['label'])
+    return sorted(persons + parties, key=lambda x: x["label"])
 
 
 @app.get("/timeline/")
@@ -137,24 +186,16 @@ async def read_items(
 ):
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
-
-    # add images
-    for entry in results:
-        ent1_id = entry["ent1"]["value"].split("/")[-1]
-        ent2_id = entry["ent2"]["value"].split("/")[-1]
-        entry["ent1_img"] = all_entities_info[ent1_id]
-        entry["ent2_img"] = all_entities_info[ent2_id]
-
     return results
 
 
 @app.get("/queries")
 async def queries(
-        ent1: str = Query(default=None, regex=wiki_id_regex),
-        ent2: str = Query(default=None, regex=wiki_id_regex),
-        rel_type: str = Query(default=None),
-        start: str = Query(default=None),
-        end: str = Query(default=None),
+    ent1: str = Query(default=None, regex=wiki_id_regex),
+    ent2: str = Query(default=None, regex=wiki_id_regex),
+    rel_type: str = Query(default=None),
+    start: str = Query(default=None),
+    end: str = Query(default=None),
 ):
 
     # time interval for the query
@@ -184,9 +225,9 @@ async def queries(
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_education(wiki_id)
     for r in results:
-        wiki_id = r['ent1']['value'].split("/")[-1]
-        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
-        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+        wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
     return results
 
 
@@ -194,9 +235,9 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
     for r in results:
-        wiki_id = r['ent1']['value'].split("/")[-1]
-        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
-        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+        wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
     return results
 
 
@@ -204,9 +245,9 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
     for r in results:
-        wiki_id = r['ent1']['value'].split("/")[-1]
-        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
-        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+        wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
     return results
 
 
@@ -214,9 +255,9 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
     for r in results:
-        wiki_id = r['ent1']['value'].split("/")[-1]
-        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
-        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+        wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
     return results
 
 
@@ -224,9 +265,9 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     for r in results:
-        wiki_id = r['ent1']['value'].split("/")[-1]
-        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
-        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+        wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
     return results
 
 
@@ -234,9 +275,9 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
     for r in results:
-        wiki_id = r['ent1']['value'].split("/")[-1]
-        r['image_url']['value'] = all_entities_info[wiki_id]['image_url']
-        r['nr_articles'] = all_entities_info[wiki_id]['nr_articles']
+        wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
     return results
 
 
@@ -247,7 +288,7 @@ async def read_item():
     nr_parties = len(all_parties_info)
 
     # total nr of article with and without 'other' relationships
-    nr_all_articles, nr_all_no_other_articles = get_total_nr_of_articles()
+    nr_all_articles, nr_all_articles_sentiment = get_total_nr_of_articles()
 
     # query returns results for each rel_type, but we aggregate by rel_type discarding direction and 'other'
     all_years = get_chart_labels_min_max()
@@ -266,7 +307,7 @@ async def read_item():
             aggregated_values[year]["apoio"] = 0
 
     for k, v in aggregated_values.items():
-        v.update({'year': k})
+        v.update({"year": k})
         all_values.append(v)
 
     # personalities frequency chart
@@ -284,7 +325,8 @@ async def read_item():
     return {
         "nr_parties": nr_parties,
         "nr_persons": nr_persons,
-        "nr_all_no_other_articles": nr_all_no_other_articles,
+        "nr_all_articles_sentiment": nr_all_articles_sentiment,
+        "nr_all_articles": nr_all_articles,
         "year_values": all_values,
         "personality_freq": top_500,
         "per_co_occurrence_labels": co_occurrences_labels[0:500],

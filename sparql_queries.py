@@ -15,7 +15,7 @@ from politiquices_api.config import (
 from politiquices_api.data_models import Element, Person, PoliticalParty
 from politiquices_api.utils import make_https, invert_relationship, _process_rel_type
 
-LANG = 'en'
+LANG = "en"
 
 POLITIQUICES_PREFIXES = """
     PREFIX politiquices: <http://www.politiquices.pt/>
@@ -180,7 +180,7 @@ def get_persons_articles_freq():
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     top_freq = [
-        {"person": all_entities_info[x["person"]["value"].split("/")[-1]]['name'], "freq": x["n_artigos"]["value"]}
+        {"person": all_entities_info[x["person"]["value"].split("/")[-1]]["name"], "freq": x["n_artigos"]["value"]}
         for x in results["results"]["bindings"]
     ]
     return top_freq
@@ -563,23 +563,29 @@ def get_person_relationships(wiki_id):
                 focus_ent = e["ent2_str"]["value"].split("/")[-1]
 
         else:
-            print(e)
+            print("unknown rel_type:", e)
             continue
             # ToDo: re-activate this Exception
             # raise Exception(e["rel_type"]["value"] + " not known")
 
         relations[rel_type].append(
             {
-                "url": e["arquivo_doc"]["value"],
+                "arquivo_doc": e["arquivo_doc"]["value"],
                 "title": e["title"]["value"],
                 "score": str(e["score"]["value"])[0:5],
                 "date": e["date"]["value"].split("T")[0],
-                "focus_ent": wiki_id,
-                "focus_ent_img": all_entities_info[wiki_id]['image_url'],
-                "focus_ent_name": focus_ent,
-                "other_ent": other_ent_url,
-                "other_ent_name": other_ent_name,
-                "other_ent_img": all_entities_info[other_ent_url]['image_url'],
+                # "focus_ent": wiki_id,
+                # "focus_ent_img": all_entities_info[wiki_id]['image_url'],
+                # "focus_ent_name": focus_ent,
+                # "other_ent": other_ent_url,
+                # "other_ent_name": other_ent_name,
+                # "other_ent_img": all_entities_info[other_ent_url]['image_url'],
+                "ent1_id": wiki_id,
+                "ent1_img": all_entities_info[wiki_id]["image_url"],
+                "ent1_str": focus_ent,
+                "ent2_id": other_ent_url,
+                "ent2_img": all_entities_info[other_ent_url]["image_url"],
+                "ent2_str": other_ent_name,
                 "rel_type": rel_type,
             }
         )
@@ -588,11 +594,11 @@ def get_person_relationships(wiki_id):
     sentiment_only = []
     for rel_type in relations.keys():
         all_relationships.extend(relations[rel_type])
-        if rel_type in {'opposes', 'supports'}:
+        if rel_type in {"opposes", "supports"}:
             sentiment_only.extend(relations[rel_type])
 
-    relations['all'] = sorted(all_relationships, key=lambda x: x['date'], reverse=True)
-    relations['sentiment'] = sorted(sentiment_only, key=lambda x: x['date'], reverse=True)
+    relations["all"] = sorted(all_relationships, key=lambda x: x["date"], reverse=True)
+    relations["sentiment"] = sorted(sentiment_only, key=lambda x: x["date"], reverse=True)
 
     return relations
 
@@ -765,6 +771,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
                    politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
+              
               ?arquivo_doc dc:title ?title ;
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
            }}
@@ -778,9 +785,9 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:ent2 ?ent2;
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
+                   politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
                    
-
-              ?arquivo_doc dc:title ?title ;politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
+              ?arquivo_doc dc:title ?title ;              
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
            }}            
         }}
@@ -852,14 +859,6 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     results = []
     for x in result["results"]["bindings"]:
-
-        if x["rel_type"]["value"].startswith("ent1"):
-            ent1_wiki = x["ent1"]["value"]
-            ent2_wiki = person
-        elif x["rel_type"]["value"].startswith("ent2"):
-            ent2_wiki = x["ent1"]["value"]
-            ent1_wiki = person
-
         results.append(
             {
                 "url": x["arquivo_doc"]["value"],
@@ -867,9 +866,9 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": ent1_wiki,
+                "ent1_wiki": x['ent1']['value'],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": ent2_wiki,
+                "ent2_wiki": x['ent2']['value'],
                 "ent2_str": x["ent2_str"]["value"],
             }
         )
@@ -882,12 +881,12 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-        SELECT DISTINCT ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?score
+        SELECT DISTINCT ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?score
         WHERE {{
             {{
-                ?rel politiquices:ent1 wd:{person};
-                     politiquices:ent2 ?ent2;
-                     politiquices:ent1_str ?ent1_str;
+                ?rel politiquices:ent2 ?ent2;
+                     politiquices:ent1 ?ent1 . FILTER(?ent1=wd:{person})
+                ?rel politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
                      politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
@@ -898,8 +897,8 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
               UNION
             {{
                 ?rel politiquices:ent1 ?ent2;
-                     politiquices:ent2 wd:{person};
-                     politiquices:ent1_str ?ent1_str;
+                     politiquices:ent2 ?ent1 . FILTER(?ent1=wd:{person})
+                ?rel politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
                      politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
@@ -920,13 +919,6 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     results = []
     for x in result["results"]["bindings"]:
 
-        if x["rel_type"]["value"].startswith("ent1"):
-            ent2_wiki = x["ent2"]["value"]
-            ent1_wiki = person
-        elif x["rel_type"]["value"].startswith("ent2"):
-            ent1_wiki = x["ent2"]["value"]
-            ent2_wiki = person
-
         results.append(
             {
                 "url": x["arquivo_doc"]["value"],
@@ -934,9 +926,9 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                 "title": x["title"]["value"],
                 "rel_type": relation,
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": ent1_wiki,
+                "ent1_wiki": x['ent1']['value'],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": ent2_wiki,
+                "ent2_wiki": x['ent2']['value'],
                 "ent2_str": x["ent2_str"]["value"],
             }
         )
@@ -1094,7 +1086,24 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
             new_bindings.append(r)
         result["results"]["bindings"] = new_bindings
 
-    return result["results"]["bindings"]
+    news = []
+    for e in result["results"]["bindings"]:
+        news.append(
+            {
+                "arquivo_doc": e["arquivo_doc"]["value"],
+                "title": e["title"]["value"],
+                "date": e["date"]["value"].split("T")[0],
+                "ent1_id": e["ent1"]["value"].split("/")[0],
+                "ent1_img": all_entities_info[e["ent1"]["value"].split("/")[-1]]["image_url"],
+                "ent1_str": e["ent1_str"]["value"],
+                "ent2_id": e["ent2"]["value"].split("/")[0],
+                "ent2_img": all_entities_info[e["ent2"]["value"].split("/")[-1]]["image_url"],
+                "ent2_str": e["ent2_str"]["value"],
+                "rel_type": e["rel_type"]["value"],
+            }
+        )
+
+    return news
 
 
 def get_personalities_by_education(institution_wiki_id: str):
@@ -1303,9 +1312,9 @@ def get_all_parties_images():
 
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
     transformed = {
-        r['party']['value'].split("/")[-1]: {"image_url": r['logo']['value']}
-        for r in results['results']['bindings']
-        if 'logo' in r
+        r["party"]["value"].split("/")[-1]: {"image_url": r["logo"]["value"]}
+        for r in results["results"]["bindings"]
+        if "logo" in r
     }
     return transformed
 
@@ -1319,9 +1328,9 @@ def get_all_persons_images():
         }"""
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
     transformed = {
-        r['person']['value'].split("/")[-1]: {"image_url": r['image_url']['value']}
-        for r in results['results']['bindings']
-        if 'image_url' in r
+        r["person"]["value"].split("/")[-1]: {"image_url": r["image_url"]["value"]}
+        for r in results["results"]["bindings"]
+        if "image_url" in r
     }
     return transformed
 
