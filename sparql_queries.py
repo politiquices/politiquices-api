@@ -654,7 +654,61 @@ def get_top_relationships(wiki_id):
         if "supports" in x["rel_type"]["value"]:
             person_as_target["who_supports_person"][other_person] += 1
 
-    return person_as_subject, person_as_target
+    total = sum(person_as_subject["who_person_opposes"].values())
+    who_person_opposes = [
+        {
+            "wiki_id": k,
+            "name": all_entities_info[k]["name"],
+            "image_url": all_entities_info[k]["image_url"],
+            "freq": v,
+            "relative": str(round(v / total * 100, 2))+'%'
+        }
+        for k, v in person_as_subject["who_person_opposes"].items()
+    ]
+
+    total = sum(person_as_subject["who_person_supports"].values())
+    who_person_supports = [
+        {
+            "wiki_id": k,
+            "name": all_entities_info[k]["name"],
+            "image_url": all_entities_info[k]["image_url"],
+            "freq": v,
+            "relative": str(round(v / total * 100, 2))+'%'
+        }
+        for k, v in person_as_subject["who_person_supports"].items()
+    ]
+
+    total = sum(person_as_target["who_opposes_person"].values())
+    who_opposes_person = [
+        {
+            "wiki_id": k,
+            "name": all_entities_info[k]["name"],
+            "image_url": all_entities_info[k]["image_url"],
+            "freq": v,
+            "relative": str(round(v / total * 100, 2))+'%'
+        }
+        for k, v in person_as_target["who_opposes_person"].items()
+    ]
+
+    total = sum(person_as_target["who_supports_person"].values())
+    who_supports_person = [
+        {
+            "wiki_id": k,
+            "name": all_entities_info[k]["name"],
+            "image_url": all_entities_info[k]["image_url"],
+            "freq": v,
+            "relative": str(round(v / total * 100, 2))+'%'
+        }
+        for k, v in person_as_target["who_supports_person"].items()
+    ]
+
+    # see PEP448: https://peps.python.org/pep-0448/
+    return {
+        "who_person_opposes": who_person_opposes[0:10],
+        "who_person_supports": who_person_supports[0:10],
+        "who_opposes_person": who_opposes_person[0:10],
+        "who_supports_person": who_supports_person[0:10],
+    }
 
 
 def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
@@ -793,7 +847,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
     for x in result["results"]["bindings"]:
         results.append(
             {
-                "url": x["arquivo_doc"]["value"],
+                "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "score": x["score"]["value"][0:5],
@@ -862,12 +916,12 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": x['ent1']['value'].split("/")[-1],
+                "ent1_wiki": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x['ent2']['value'].split("/")[-1],
+                "ent2_wiki": x["ent2"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[x['ent1']['value'].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[x['ent2']['value'].split("/")[-1]]["image_url"],
+                "ent1_img": all_entities_info[x["ent1"]["value"].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[x["ent2"]["value"].split("/")[-1]]["image_url"],
             }
         )
 
@@ -924,12 +978,12 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                 "title": x["title"]["value"],
                 "rel_type": relation,
                 "score": x["score"]["value"][0:5],
-                "ent1_wiki": x['ent1']['value'].split("/")[-1],
+                "ent1_wiki": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x['ent2']['value'].split("/")[-1],
+                "ent2_wiki": x["ent2"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[x['ent1']['value'].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[x['ent2']['value'].split("/")[-1]]["image_url"],
+                "ent1_img": all_entities_info[x["ent1"]["value"].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[x["ent2"]["value"].split("/")[-1]]["image_url"],
             }
         )
 
@@ -1002,8 +1056,12 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_wiki": x["person_party_b"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[x['ent1']['value'].split("/")[-1],]["image_url"],
-                "ent2_img": all_entities_info[x['ent2']['value'].split("/")[-1],]["image_url"],
+                "ent1_img": all_entities_info[
+                    x["ent1"]["value"].split("/")[-1],
+                ]["image_url"],
+                "ent2_img": all_entities_info[
+                    x["ent2"]["value"].split("/")[-1],
+                ]["image_url"],
             }
         )
 

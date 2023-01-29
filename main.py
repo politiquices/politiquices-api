@@ -139,11 +139,16 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     return results
 
 
+@app.get("/personality/top_related_personalities/{wiki_id}")
+async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+    return get_top_relationships(wiki_id)
+
+
 @app.get("/relationships/{ent_1}/{rel_type}/{ent_2}")
 async def read_item(
     ent_1: str = Query(None, regex=wiki_id_regex),
-    ent_2: str = Query(None, regex=wiki_id_regex),
     rel_type: str = Query(None, regex=rel_type_regex),
+    ent_2: str = Query(None, regex=wiki_id_regex),
 ):
     return get_relationship_between_two_persons(ent_1, ent_2, rel_type, start_year, end_year)
 
