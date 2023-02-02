@@ -22,11 +22,13 @@ from sparql_queries import (
     get_relationship_between_person_and_party,
     get_relationship_between_two_persons,
     get_timeline_personalities,
+    get_top_relationships,
     get_total_articles_by_year_by_relationship_type,
     get_total_nr_of_articles,
-    get_wiki_id_affiliated_with_party,
-    get_top_relationships,
+    get_wiki_id_affiliated_with_party
 )
+
+from neural_search.qa_neural_search import NeuralSearch
 
 start_year = 1994
 end_year = 2022
@@ -97,31 +99,6 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     # this is a bit tricky, rels.update returns "None", but also updates rels which we want to add to the list
     chart_data = [rels for idx, rels in enumerate(values) if not rels.update({"year": index2year(idx)})]
     person.relationships_charts = chart_data
-
-    # get the top-related entities
-    # person_as_subject, person_as_target = get_top_relationships(wiki_id)
-
-    """
-    who_person_opposes = [
-        {"wiki_id": k, "nr_articles": v, "name": get_short_name(k, wiki_id_info)}
-        for k, v in person_as_subject["who_person_opposes"].items()
-    ]
-
-    top_entities_in_rel_type = {
-        "who_person_opposes": sorted(
-            who_person_opposes, key=lambda x: x["nr_articles"], reverse=True
-        ),
-        "who_person_supports": sorted(
-            who_person_supports, key=lambda x: x["nr_articles"], reverse=True
-        ),
-        "who_opposes_person": sorted(
-            who_opposes_person, key=lambda x: x["nr_articles"], reverse=True
-        ),
-        "who_supports_person": sorted(
-            who_supports_person, key=lambda x: x["nr_articles"], reverse=True
-        ),
-    }
-    """
 
     return person
 
@@ -337,3 +314,10 @@ async def read_item():
         "per_co_occurrence_labels": co_occurrences_labels[0:500],
         "per_co_occurrence_values": co_occurrences_values[0:500],
     }
+
+
+@app.get("/qa/{question}")
+async def read_item(question: str):
+    neural_search = NeuralSearch()
+    answers = neural_search.predict(question)
+    return answers
