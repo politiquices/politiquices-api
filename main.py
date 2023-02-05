@@ -1,6 +1,11 @@
+import base64
+import requests
+import json
+
 from collections import defaultdict
 from typing import List, Union
 
+from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
@@ -36,6 +41,8 @@ rel_types = ["ent1_opposes_ent2", "ent1_supports_ent2", "ent2_opposes_ent1", "en
 
 wiki_id_regex = r"^Q\d+$"
 rel_type_regex = r"(?=(" + "|".join(rel_types) + r"))"
+
+topics = None
 
 app = FastAPI()
 
@@ -321,3 +328,30 @@ async def read_item(question: str):
     neural_search = NeuralSearch()
     answers = neural_search.predict(question)
     return answers
+
+
+@app.get("/topics/{doc_url_encoded}")
+async def read_item(doc_url_encoded: str):
+    url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
+    global topics
+    if topics is None:
+        print("Loading Topics")
+        topics = BERTopic.load('bin/bert_topics_2023-02-05.bin')
+        # ToDo:
+        #   load mapping: URL from RDF -> index on topic_model
+        #   load: 'topic_distr', 'topic_token_distr'
+
+    doc = get_doc_text(url_decoded)
+    text = doc['hits']['hits'][0]['_source']['content']
+    topic_distr, _ = topics.approximate_distribution([text], calculate_tokens=False)
+    print(topic_distr)
+    print()
+    return text
+
+
+def get_doc_text(arquivo_url: str):
+    payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
+    url = "http://127.0.0.1:9202/document/_search"
+    headers = {'Content-Type': 'application/json'}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    return response.json()
