@@ -1,15 +1,16 @@
 import base64
-import requests
 import json
-
 from collections import defaultdict
 from typing import List, Union
 
+import numpy as np
+import requests
 from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from neural_search.qa_neural_search import NeuralSearch
+
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
-from utils import get_info, get_chart_labels_min_max
 from sparql_queries import (
     get_nr_of_persons,
     get_person_info,
@@ -30,10 +31,9 @@ from sparql_queries import (
     get_top_relationships,
     get_total_articles_by_year_by_relationship_type,
     get_total_nr_of_articles,
-    get_wiki_id_affiliated_with_party
+    get_wiki_id_affiliated_with_party,
 )
-
-from neural_search.qa_neural_search import NeuralSearch
+from utils import get_info, get_chart_labels_min_max
 
 start_year = 1994
 end_year = 2022
@@ -43,6 +43,9 @@ wiki_id_regex = r"^Q\d+$"
 rel_type_regex = r"(?=(" + "|".join(rel_types) + r"))"
 
 topics = None
+topic_distr = None
+topic_token_distr = None
+url2index = None
 
 app = FastAPI()
 
@@ -68,6 +71,15 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     f_name = f"{wiki_id}.{org_url.split('.')[-1]}"
 
     return f"{base_url}/{f_name}"
+
+
+def get_doc_text(arquivo_url: str):
+    """Get the full document from ElasticSearch given a URL"""
+    payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
+    url = "http://127.0.0.1:9202/document/_search"
+    headers = {"Content-Type": "application/json"}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    return response.json()
 
 
 @app.get("/")
@@ -330,28 +342,85 @@ async def read_item(question: str):
     return answers
 
 
-@app.get("/topics/{doc_url_encoded}")
+@app.get("/topics/bar/{doc_url_encoded}")
 async def read_item(doc_url_encoded: str):
     url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
     global topics
+    global topic_distr
+    global topic_token_distr
+    global url2index
     if topics is None:
-        print("Loading Topics")
-        topics = BERTopic.load('bin/bert_topics_2023-02-05.bin')
-        # ToDo:
-        #   load mapping: URL from RDF -> index on topic_model
-        #   load: 'topic_distr', 'topic_token_distr'
+        print("Loading Topics Model")
+        topics = BERTopic.load("bin/topics_bert_2023-02-05.bin")
 
-    doc = get_doc_text(url_decoded)
-    text = doc['hits']['hits'][0]['_source']['content']
-    topic_distr, _ = topics.approximate_distribution([text], calculate_tokens=False)
-    print(topic_distr)
-    print()
-    return text
+    if topic_distr is None:
+        print("Loading Topics Distributions")
+        with open(f"bin/topic_distr_2023-02-05.npy", "rb") as f_in:
+            topic_distr = np.load(f_in, allow_pickle=True)
+
+    if topic_token_distr is None:
+        print("Loading Topics Token Distributions")
+        with open(f"bin/topic_token_distr_2023-02-05.npy", "rb") as f_in:
+            topic_token_distr = np.load(f_in, allow_pickle=True)
+
+    if url2index is None:
+        print("Loading URL2Index mappings")
+        with open(f"bin/url2index_2023-02-05.json", "r") as f_in:
+            url2index = json.load(f_in)
+
+    print(f"Getting topics for {url_decoded}")
+    doc_idx = url2index[url_decoded]
+
+    doc_topic_distr = topic_distr[doc_idx]
+    doc_topic_token_distr = topic_token_distr[doc_idx]
+
+    # see also: https://stackoverflow.com/questions/36262748/save-plotly-plot-to-local-file-and-insert-into-html
+    figure = topics.visualize_distribution(
+        doc_topic_distr,
+        min_probability=0.20,
+    )
+    return {"figure": figure.to_dict()}
 
 
-def get_doc_text(arquivo_url: str):
-    payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
-    url = "http://127.0.0.1:9202/document/_search"
-    headers = {'Content-Type': 'application/json'}
-    response = requests.request("GET", url, headers=headers, data=payload)
-    return response.json()
+@app.get("/topics/raw/{doc_url_encoded}")
+async def read_item(doc_url_encoded: str):
+    url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
+    global topics
+    global topic_distr
+    global topic_token_distr
+    global url2index
+    if topics is None:
+        print("Loading Topics Model")
+        topics = BERTopic.load("bin/topics_bert_2023-02-05.bin")
+
+    if topic_distr is None:
+        print("Loading Topics Distributions")
+        with open(f"bin/topic_distr_2023-02-05.npy", "rb") as f_in:
+            topic_distr = np.load(f_in, allow_pickle=True)
+
+    if topic_token_distr is None:
+        print("Loading Topics Token Distributions")
+        with open(f"bin/topic_token_distr_2023-02-05.npy", "rb") as f_in:
+            topic_token_distr = np.load(f_in, allow_pickle=True)
+
+    if url2index is None:
+        print("Loading URL2Index mappings")
+        with open(f"bin/url2index_2023-02-05.json", "r") as f_in:
+            url2index = json.load(f_in)
+
+    with open('../SPARQL-endpoint/entities_names.txt', 'rt') as f_in:
+        all_names = [line.strip() for line in f_in]
+        all_token_names = set([name.lower() for names in all_names for name in names.split()])
+        other = ['hoje', 'sobre', 'primeiro', 'ministro', 'porque', 'feira', 'euros', 'estado', 'política']
+
+    min_probability = 0.10
+
+    print(f"Getting topics for {url_decoded}")
+    doc_idx = url2index[url_decoded]
+
+    topics_n = np.where(topic_distr[doc_idx] > min_probability)
+    all_topics = []
+    for n in topics_n[0]:
+        all_topics.append([word[0] for word in topics.topic_representations_[n] if word[0] not in other and word[0] not in all_token_names])
+
+    return all_topics

@@ -1,0 +1,898 @@
+[
+    {
+        "wiki_id": "Q595575",
+        "party_label": "Partido Social Democrata",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Partido%20Social%20Democrata%20Logo.svg",
+        "country": "Portugal",
+        "nr_personalities": "191"
+    },
+    {
+        "wiki_id": "Q847263",
+        "party_label": "Partido Socialista",
+        "party_logo": "/assets/images/parties/Q847263.png",
+        "country": "Portugal",
+        "nr_personalities": "182"
+    },
+    {
+        "wiki_id": "Q1054298",
+        "party_label": "CDS - Partido Popular",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/CDS%20%E2%80%93%20People%27s%20Party%20logo.svg",
+        "country": "Portugal",
+        "nr_personalities": "55"
+    },
+    {
+        "wiki_id": "Q884840",
+        "party_label": "Bloco de Esquerda",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/LeftBloc.svg",
+        "country": "Portugal",
+        "nr_personalities": "30"
+    },
+    {
+        "wiki_id": "Q769829",
+        "party_label": "Partido Comunista Portugu\u00eas",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Portuguese%20Communist%20Party%20logo.svg",
+        "country": "Portugal",
+        "nr_personalities": "24"
+    },
+    {
+        "wiki_id": "Q327591",
+        "party_label": "pol\u00edtico sem partido",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": null,
+        "nr_personalities": "14"
+    },
+    {
+        "wiki_id": "Q6926764",
+        "party_label": "Movimento de Esquerda Socialista",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Movimento%20de%20Esquerda%20Socialista%20logo%2C%201975.svg",
+        "country": "Portugal",
+        "nr_personalities": "10"
+    },
+    {
+        "wiki_id": "Q29468",
+        "party_label": "Partido Republicano",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/GOP%20logo.svg",
+        "country": "United States of America",
+        "nr_personalities": "10"
+    },
+    {
+        "wiki_id": "Q49762",
+        "party_label": "Uni\u00e3o Democrata-Crist\u00e3",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Cdu-logo.svg",
+        "country": "Germany",
+        "nr_personalities": "4"
+    },
+    {
+        "wiki_id": "Q16947563",
+        "party_label": "LIVRE",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Partido%20LIVRE%20logo.png",
+        "country": "Portugal",
+        "nr_personalities": "4"
+    },
+    {
+        "wiki_id": "Q980864",
+        "party_label": "Partido Renovador Democr\u00e1tico",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "4"
+    },
+    {
+        "wiki_id": "Q1322751",
+        "party_label": "Movimento Democr\u00e1tico Brasileiro",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q173152",
+        "party_label": "Uni\u00e3o por um Movimento Popular",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "France",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q1344670",
+        "party_label": "Partido Popular Social Crist\u00e3o",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20CSV.svg",
+        "country": "Luxembourg",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q504564",
+        "party_label": "Frente de Liberta\u00e7\u00e3o de Mo\u00e7ambique",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/FRELIMO%20Emblem.svg",
+        "country": "Mozambique",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q572998",
+        "party_label": "Coliga\u00e7\u00e3o Democr\u00e1tica Unit\u00e1ria",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PCP-PEV.svg",
+        "country": "Portugal",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q10284314",
+        "party_label": "For\u00e7a de Unidade Popular",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q46122950",
+        "party_label": "Iniciativa Liberal",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Iniciativa%20Liberal%20logo%201.png",
+        "country": "Portugal",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q2054628",
+        "party_label": "Partido Comunista dos Trabalhadores Portugueses",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PCTP-MRPP%20logo.png",
+        "country": "Portugal",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q978086",
+        "party_label": "Partido Ecologista Os Verdes",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q2054840",
+        "party_label": "Pessoas\u2013Animais\u2013Natureza",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q29552",
+        "party_label": "Partido Democrata",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/US%20Democratic%20Party%20Logo.svg",
+        "country": "United States of America",
+        "nr_personalities": "3"
+    },
+    {
+        "wiki_id": "Q208242",
+        "party_label": "Partido Popular Europeu",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/European%20People%27s%20Party.svg",
+        "country": null,
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q28551",
+        "party_label": "Movimento Popular de Liberta\u00e7\u00e3o de Angola",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20MPLA.svg",
+        "country": "Angola",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q2653155",
+        "party_label": "Partido Liberal",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1576143",
+        "party_label": "Partido Trabalhista Brasileiro",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logomarca%20Partido%20Trabalhista%20Brasileiro.png",
+        "country": "Brazil",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q657089",
+        "party_label": "Partido dos Trabalhadores",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PT%20%28Brazil%29%20logo%202021.svg",
+        "country": "Brazil",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q732852",
+        "party_label": "Progressistas",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Progressistas%20logo.png",
+        "country": "Brazil",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1951190",
+        "party_label": "Movimento para a Democracia",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/MpD%20Logo.svg",
+        "country": "Cape Verde",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q776352",
+        "party_label": "Partido Africano para a Independ\u00eancia da Guin\u00e9 e Cabo Verde",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20PAIGC.svg",
+        "country": "Cape Verde",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q371402",
+        "party_label": "Partido Comunista de Cuba",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Cuba",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q641691",
+        "party_label": "Liga dos Comunistas da Iugosl\u00e1via",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem%20of%20the%20SKJ%20%28Cyrillic%29.svg",
+        "country": "Democratic Federal Yugoslavia",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q935996",
+        "party_label": "Frente Revolucion\u00e1ria de Timor-Leste Independente",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "East Timor",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q624111",
+        "party_label": "Uni\u00e3o Socialista \u00c1rabe do Egito",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Eagle%20of%20Saladin%20%28green%20scroll%29.png",
+        "country": "Egypt",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q641691",
+        "party_label": "Liga dos Comunistas da Iugosl\u00e1via",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem%20of%20the%20SKJ%20%28Cyrillic%29.svg",
+        "country": "Federal People's Republic of Yugoslavia",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q20012759",
+        "party_label": "Os Republicanos",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/LesR%C3%A9publicains15logo.svg",
+        "country": "France",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q170972",
+        "party_label": "Partido Socialista",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "France",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1052584",
+        "party_label": "Reagrupamento para a Rep\u00fablica",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "France",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1904825",
+        "party_label": "Uni\u00e3o dos Democratas pela Rep\u00fablica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo-UDR.png",
+        "country": "France",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q222897",
+        "party_label": "Coliga\u00e7\u00e3o da Esquerda Radical",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/SYRIZA%20logo%202020.svg",
+        "country": "Greece",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q776352",
+        "party_label": "Partido Africano para a Independ\u00eancia da Guin\u00e9 e Cabo Verde",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20PAIGC.svg",
+        "country": "Guinea-Bissau",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q641691",
+        "party_label": "Liga dos Comunistas da Iugosl\u00e1via",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem%20of%20the%20SKJ%20%28Cyrillic%29.svg",
+        "country": "Kingdom of Yugoslavia",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q63645885",
+        "party_label": "CHEGA",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20Chega%21.png",
+        "country": "Portugal",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1851550",
+        "party_label": "Partido Popular Mon\u00e1rquico",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q7232654",
+        "party_label": "Partido Trabalhista Portugu\u00eas",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1546030",
+        "party_label": "Partido da Terra",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q641691",
+        "party_label": "Liga dos Comunistas da Iugosl\u00e1via",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem%20of%20the%20SKJ%20%28Cyrillic%29.svg",
+        "country": "Socialist Federal Republic of Yugoslavia",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q178888",
+        "party_label": "Fatah",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Coat%20of%20arms%20of%20Palestine%20%28alternative%29.svg",
+        "country": "State of Palestine",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q9626",
+        "party_label": "Partido Conservador",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "United Kingdom",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q1336488",
+        "party_label": "Movimiento V Rep\u00fablica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20MVR.jpg",
+        "country": "Venezuela",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q197864",
+        "party_label": "Partido Socialista Unido da Venezuela",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Psuv%20%28Venezuela%29%20logo.svg",
+        "country": "Venezuela",
+        "nr_personalities": "2"
+    },
+    {
+        "wiki_id": "Q10332801",
+        "party_label": "Movimento Democr\u00e1tico de Liberta\u00e7\u00e3o de Portugal",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": null,
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q179933",
+        "party_label": "Partido Baath",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Syrian%20Baath%20Logo.svg",
+        "country": null,
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q49896",
+        "party_label": "ditadura militar",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": null,
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q28699",
+        "party_label": "Uni\u00e3o Nacional para a Independ\u00eancia Total de Angola",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Angola",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q750673",
+        "party_label": "Democratas-Crist\u00e3os e Flamengos",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20of%20the%20Christian%20Democratic%20and%20Flemish%20%282022%29.svg",
+        "country": "Belgium",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q533384",
+        "party_label": "Movimento Reformador",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Mouvement%20R%C3%A9formateur%20logo.svg",
+        "country": "Belgium",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2534868",
+        "party_label": "AGIR",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q74813264",
+        "party_label": "Alian\u00e7a pelo Brasil",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Alian%C3%A7a%20Pelo%20Brasil-logo.svg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2598527",
+        "party_label": "Cidadania",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q3366416",
+        "party_label": "Partido Democrata Crist\u00e3o",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2731720",
+        "party_label": "Partido Liberal",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20do%20Partido%20Liberal%20%28Brasil%29.png",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q17152116",
+        "party_label": "Partido Progressista",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q3366642",
+        "party_label": "Partido Progressista Renovador",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2626213",
+        "party_label": "Partido Social Crist\u00e3o",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PSC%20logo.svg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2366265",
+        "party_label": "Partido Social Liberal",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Partido%20Social%20Liberal%20logo.svg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q4345998",
+        "party_label": "Partido da Frente Liberal",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1322897",
+        "party_label": "Partido da Social Democracia Brasileira",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PSDB%20wordmark.svg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q926973",
+        "party_label": "Republicanos",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Brazil",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q497464",
+        "party_label": "Partido Africano da Independ\u00eancia de Cabo Verde",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem%20of%20PAICV.svg",
+        "country": "Cape Verde",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q218452",
+        "party_label": "Movimento 26 de Julho",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Cuba",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1525551",
+        "party_label": "Partido Ortodoxo",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Cuba",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1126036",
+        "party_label": "Congresso Nacional para a Reconstru\u00e7\u00e3o de Timor-Leste",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Bandeira%20do%20Congresso%20Nacional%20da%20Reconstru%C3%A7%C3%A3o%20Timorense.svg",
+        "country": "East Timor",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q841133",
+        "party_label": "Partido Nacional Democr\u00e1tico",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Egypt",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q506591",
+        "party_label": "Partido do Centro",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Keskusta.svg",
+        "country": "Finland",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q23731823",
+        "party_label": "Em Marcha!",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Renaissance-logotype-officiel.svg",
+        "country": "France",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q205150",
+        "party_label": "Frente Nacional",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20Rassemblement%20National.svg",
+        "country": "France",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q192821",
+        "party_label": "Partido Comunista Franc\u00eas",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20%E2%80%93%20Parti%20communiste%20fran%C3%A7ais%20%282018%29.svg",
+        "country": "France",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q7223378",
+        "party_label": "Uni\u00e3o para a Nova Rep\u00fablica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Croix%20de%20Lorraine.svg",
+        "country": "France",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q827415",
+        "party_label": "Uni\u00e3o pela Democracia Francesa",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/UDF%20logo%2C%201978.jpg",
+        "country": "France",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q22674451",
+        "party_label": "DiEM25",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/DiEM25.png",
+        "country": "Germany",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q61046702",
+        "party_label": "Frente da Desobedi\u00eancia Realista Europeia",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Mera25-logo.svg",
+        "country": "Greece",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q192406",
+        "party_label": "Partido Comunista da Gr\u00e9cia",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20of%20the%20Communist%20Party%20of%20Greece.svg",
+        "country": "Greece",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q219573",
+        "party_label": "Synaspismos",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Greece",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q461351",
+        "party_label": "Partido para a Renova\u00e7ao Social",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Guinea-Bissau",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q39655",
+        "party_label": "Kadima",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20Kadima.svg",
+        "country": "Israel",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q187009",
+        "party_label": "Likud",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Likud%20Logo.svg",
+        "country": "Israel",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1134161",
+        "party_label": "A Oliveira",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q815348",
+        "party_label": "Democracia Crist\u00e3",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/DC%20Party%20Logo%20%281968-1992%29.svg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2792033",
+        "party_label": "Escolha C\u00edvica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Scelta%20Civica.svg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q215350",
+        "party_label": "For\u00e7a It\u00e1lia",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Forza%20Italia.svg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q14924303",
+        "party_label": "For\u00e7a It\u00e1lia",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20Forza%20Italia.svg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q47720",
+        "party_label": "O Povo da Liberdade",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Il%20Popolo%20della%20Libert%C3%A0.svg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q47729",
+        "party_label": "Partido Democr\u00e1tico",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Partito%20Democratico%20Italy.svg",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1259087",
+        "party_label": "Partido Popular Italiano",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PartitoPopolareItaliano.gif",
+        "country": "Italy",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q8897236",
+        "party_label": "Uni\u00e3o Socialista \u00c1rabe",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Libya",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q275441",
+        "party_label": "Partido do Trabalho",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/PvdA%20logo%20%282018%E2%80%93present%29.svg",
+        "country": "Netherlands",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q156868",
+        "party_label": "Plataforma C\u00edvica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Civic%20Platform%20basic%20logo.svg",
+        "country": "Poland",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q59325416",
+        "party_label": "Alian\u00e7a",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20da%20Alian%C3%A7a.svg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q377349",
+        "party_label": "Alian\u00e7a Democr\u00e1tica",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2054681",
+        "party_label": "Ergue-te!",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q10332811",
+        "party_label": "Movimento Independente para a Reconstru\u00e7\u00e3o Nacional / Partido da Direita Portuguesa",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q20895387",
+        "party_label": "N\u00f3s, Cidad\u00e3os!",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logotipo%20n%C3%B3s%20cidad%C3%A3os.png",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2054807",
+        "party_label": "PSR",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/S%C3%ADmbolo%20do%20Partido%20Socialista%20Revolucion%C3%A1rio.png",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q10345627",
+        "party_label": "Partido Democr\u00e1tico Republicano",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/AlternativaDN%20OutroLogo.png",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1513692",
+        "party_label": "Partido Nacional Republicano",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q65164025",
+        "party_label": "Reagir Incluir Reciclar",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Reagir%20Incluir%20Reciclar%20Flag.png",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2119074",
+        "party_label": "Uni\u00e3o Democr\u00e1tica Popular (UDP)",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q954010",
+        "party_label": "Uni\u00e3o Nacional",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Uni%C3%A3o%20Nacional%20Flag.svg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q3112915",
+        "party_label": "Uni\u00e3o da Esquerda para a Democracia Socialista",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Portugal",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q216517",
+        "party_label": "Fianna F\u00e1il",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "Republic of Ireland",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q752435",
+        "party_label": "Partido Social-Democrata",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Partidul%20Social%20Democrat%20logo.svg",
+        "country": "Romania",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q151469",
+        "party_label": "R\u00fassia Unida",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/%D0%95%D0%B4%D0%A0%D0%BE%20%28%D0%BB%D0%BE%D0%B3%29.svg",
+        "country": "Russia",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q752521",
+        "party_label": "Partido Socialista da S\u00e9rvia",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20of%20the%20Socialist%20Party%20of%20Serbia.svg",
+        "country": "Serbia",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q83162",
+        "party_label": "Congresso Nacional Africano",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "South Africa",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q305317",
+        "party_label": "Partido Comunista Sul-Africano",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Emblem%20of%20the%20South%20African%20Communist%20Party.svg",
+        "country": "South Africa",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q79854",
+        "party_label": "Partido Comunista da Uni\u00e3o Sovi\u00e9tica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/%D0%9A%D0%9F%D0%A1%D0%A1.svg",
+        "country": "Soviet Union",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2838243",
+        "party_label": "Alian\u00e7a Popular",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Alianza%20Popular%20%28logo%2C%201983-89%29.svg",
+        "country": "Spain",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q185088",
+        "party_label": "Partido Popular",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20del%20PP%20%282022%29.svg",
+        "country": "Spain",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q138198",
+        "party_label": "Partido Socialista Oper\u00e1rio Espanhol",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logotipo%20del%20PSOE.svg",
+        "country": "Spain",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q16059622",
+        "party_label": "Podemos",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Logo%20de%20Podemos%20%282022%29.svg",
+        "country": "Spain",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q2788422",
+        "party_label": "Ac\u00e7\u00e3o Democr\u00e1tica Independente",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Independent%20Democratic%20Action.png",
+        "country": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1276673",
+        "party_label": "Movimento de Liberta\u00e7\u00e3o de S\u00e3o Tom\u00e9 e Pr\u00edncipe \u2013 Partido Social Democrata",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q9630",
+        "party_label": "Partido Trabalhista",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Labour%20Party%20Wordmark.svg",
+        "country": "United Kingdom",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1893430",
+        "party_label": "Partido Reformista",
+        "party_logo": "/assets/images/logos/no_picture.jpg",
+        "country": "United States of America",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q203427",
+        "party_label": "Uni\u00e3o Nacional Africana do Zimb\u00e1bue",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20ZANU-PF.svg",
+        "country": "Zimbabwe",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q1910161",
+        "party_label": "Uni\u00e3o Nacional Africana do Zimb\u00e1bue - Frente Patri\u00f3tica",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Flag%20of%20ZANU-PF.svg",
+        "country": "Zimbabwe",
+        "nr_personalities": "1"
+    },
+    {
+        "wiki_id": "Q203423",
+        "party_label": "Uni\u00e3o do Povo Africano do Zimb\u00e1bue",
+        "party_logo": "https://commons.wikimedia.org/wiki/Special:FilePath/Zimbabwe%20African%20People%27s%20Union%20flag.svg",
+        "country": "Zimbabwe",
+        "nr_personalities": "1"
+    }
+]
