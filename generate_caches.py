@@ -30,12 +30,10 @@ def get_entities() -> Dict[str, Any]:
         f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
         all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
 
-    sortedy_by_nr_articles = {
+    return {
         entry[0]: entry[1]
         for entry in sorted(all_politiquices_per.items(), key=lambda x: x[1]["nr_articles"], reverse=True)
     }
-
-    return sortedy_by_nr_articles
 
 
 def personalities_json_cache() -> Dict[str, Any]:

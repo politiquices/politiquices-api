@@ -5,18 +5,19 @@ from typing import List, Dict, Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from cache import all_entities_info
-from politiquices_api.config import (
+from config import (
     live_wikidata,
     no_image,
     politiquices_endpoint,
     ps_logo,
     wikidata_endpoint,
 )
-from politiquices_api.data_models import Element, Person, PoliticalParty
-from politiquices_api.utils import make_https, invert_relationship, _process_rel_type
+from data_models import Element, Person, PoliticalParty
+from utils import make_https, _process_rel_type
 
 LANG = "en"
 
+# ToDo: review this prefixes
 POLITIQUICES_PREFIXES = """
     PREFIX politiquices: <http://www.politiquices.pt/>
     PREFIX      rdfs: <http://www.w3.org/2000/01/rdf-schema#>

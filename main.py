@@ -8,7 +8,7 @@ import requests
 from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from neural_search.qa_neural_search import NeuralSearch
+from qa_neural_search import NeuralSearch
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
 from sparql_queries import (
@@ -337,6 +337,10 @@ async def read_item():
 
 @app.get("/qa/{question}")
 async def read_item(question: str):
+    # ToDo: do a quick warm-up:
+    #     n = NeuralSearch()
+    #     q = "Quem acusou José Sócrates?"
+    #     answers = n.predict(q)
     neural_search = NeuralSearch()
     answers = neural_search.predict(question)
     return answers
