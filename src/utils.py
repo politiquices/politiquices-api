@@ -16,7 +16,7 @@ def invert_relationship(rel_type):
     elif rel_type.endswith("ent1"):
         rel_type_inverted = "ent1_" + rel_only + "_ent2"
     else:
-        raise Exception("this should not happen")
+        raise ValueError(f"invalid relationship type {rel_type}")
 
     return rel_type_inverted
 
@@ -30,6 +30,8 @@ def get_info(wiki_id):
     for entry in all_entities_info.keys():
         if entry == wiki_id:
             return "person"
+
+    raise ValueError(f"invalid wiki_id {wiki_id}")
 
 
 def _process_rel_type(rel_type):

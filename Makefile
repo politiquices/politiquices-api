@@ -31,5 +31,5 @@ lint:
 	mypy --config mypy.ini .
 
 test:
-	coverage run --rcfile=setup.cfg --source=src -m pytest
+	PYTHONPATH=src coverage run --rcfile=setup.cfg --source=src -m pytest
 	coverage report --rcfile=setup.cfg

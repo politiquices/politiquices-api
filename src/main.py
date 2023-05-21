@@ -10,6 +10,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
+
 # from config import es_haystack
 # from qa_neural_search import NeuralSearch
 from sparql import (

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 import requests
-from utils import just_sleep
+from requests import RequestException
 
 from config import STATIC_DATA
 from sparql import (
@@ -17,6 +17,7 @@ from sparql import (
     get_all_parties_images,
     get_all_persons_images,
 )
+from utils import just_sleep
 
 
 def get_entities() -> Dict[str, Any]:
@@ -25,7 +26,7 @@ def get_entities() -> Dict[str, Any]:
     all_wikidata_per = get_persons_wiki_id_name_image_url()
     per_articles = get_total_nr_articles_for_each_person()
     all_politiquices_per = defaultdict(dict)
-    for wiki_id in all_wikidata_per.keys():
+    for wiki_id in all_wikidata_per.keys():  # pylint: disable=consider-using-dict-items, consider-iterating-dictionary
         all_politiquices_per[wiki_id]["nr_articles"] = per_articles.get(wiki_id, 0)
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
         f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
@@ -169,7 +170,7 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
                         f_out.write(r.content)
                 else:
                     print("HTTP: ", r.status_code)
-            except Exception as e:
+            except RequestException as e:
                 print(e, wiki_id)
             just_sleep(2)
 
