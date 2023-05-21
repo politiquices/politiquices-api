@@ -459,6 +459,7 @@ def get_person_detailed_info(wiki_id):
 
 # Person relationships
 def get_person_relationships(wiki_id):
+    # pylint: disable=too-many-branches, too-many-statements
     query = f"""
         SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{

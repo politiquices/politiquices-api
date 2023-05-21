@@ -4,6 +4,7 @@ from collections import defaultdict
 from typing import List, Union
 
 import numpy as np
+
 # import requests
 from bertopic import BERTopic
 from fastapi import FastAPI, Query
@@ -75,16 +76,17 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     return f"{base_url}/{f_name}"
 
 
-"""
 # ToDo: for Haystack
 def get_doc_text(arquivo_url: str):
+    """
     # Get the full document from ElasticSearch given a URL
     payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
     url = f"{es_haystack}/document/_search"
     headers = {"Content-Type": "application/json"}
     response = requests.request("GET", url, headers=headers, data=payload, timeout=10)
     return response.json()
-"""
+    """
+    return arquivo_url
 
 
 @app.get("/")
@@ -279,6 +281,7 @@ async def personalities_party(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 @app.get("/stats")
 async def stats():
+    # pylint: disable=too-many-locals
     # number of persons, parties, articles
     nr_persons = get_nr_of_persons()
     nr_parties = len(all_parties_info)
@@ -329,10 +332,11 @@ async def stats():
         "per_co_occurrence_values": co_occurrences_values[0:500],
     }
 
-"""
+
 # ToDo: for Haystack
 @app.get("/qa/{question}")
 async def natural_language_question(question: str):
+    """
     # ToDo: do a quick warm-up:
     #     n = NeuralSearch()
     #     q = "Quem acusou José Sócrates?"
@@ -340,7 +344,8 @@ async def natural_language_question(question: str):
     neural_search = NeuralSearch()
     answers = neural_search.predict(question)
     return answers
-"""
+    """
+    return question
 
 
 @app.get("/topics/bar/{doc_url_encoded}")
