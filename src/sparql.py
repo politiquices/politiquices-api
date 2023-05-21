@@ -577,7 +577,7 @@ def get_person_relationships(wiki_id):
 
     all_relationships = []
     sentiment_only = []
-    for rel_type in relations.keys():
+    for rel_type in relations.keys():  # pylint: disable=consider-using-dict-items
         all_relationships.extend(relations[rel_type])
         if rel_type in {"opposes", "supports"}:
             sentiment_only.extend(relations[rel_type])
