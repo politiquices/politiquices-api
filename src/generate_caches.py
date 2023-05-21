@@ -126,7 +126,7 @@ def persons_relationships_counts_by_type():
             "is_supported": 0,
         }
 
-    relationships = defaultdict(lambda: relationships_types())
+    relationships = defaultdict(relationships_types)
 
     for entry in opposes_subj:
         relationships[entry[0]]["opposes"] += entry[1]
@@ -162,7 +162,8 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
         else:
             print("downloading")
             try:
-                r = requests.get(url, allow_redirects=True, headers=headers)  # to get content after redirection
+                # to get content after redirection
+                r = requests.get(url, allow_redirects=True, headers=headers, timeout=10)
                 if r.status_code == 200:
                     with open(f"{base_out}/{f_name}", "wb") as f_out:
                         f_out.write(r.content)

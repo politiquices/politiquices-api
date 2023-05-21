@@ -1360,9 +1360,9 @@ def get_all_persons_images():
 def query_sparql(query, endpoint):
     if endpoint == "wikidata":
         endpoint_url = wikidata_endpoint
-    elif endpoint == "politiquices":
+    else:
         endpoint_url = politiquices_endpoint
-    user_agent = "Python/%s.%s" % (sys.version_info[0], sys.version_info[1])
+    user_agent = f"Python/{sys.version_info[0]}.{sys.version_info[1]}"
     sparql = SPARQLWrapper(endpoint_url, agent=user_agent)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)

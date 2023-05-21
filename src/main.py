@@ -5,15 +5,13 @@ from typing import List, Union
 
 import numpy as np
 import requests
-
 from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import es_haystack
-from qa_neural_search import NeuralSearch
-
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
+# from config import es_haystack
+# from qa_neural_search import NeuralSearch
 from sparql import (
     get_nr_of_persons,
     get_person_info,
@@ -81,7 +79,7 @@ def get_doc_text(arquivo_url: str):
     payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
     url = f"{es_haystack}/document/_search"
     headers = {"Content-Type": "application/json"}
-    response = requests.request("GET", url, headers=headers, data=payload)
+    response = requests.request("GET", url, headers=headers, data=payload, timeout=10)
     return response.json()
 
 
