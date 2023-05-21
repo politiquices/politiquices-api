@@ -16,8 +16,8 @@ POLITIQUICES_PREFIXES = """
     PREFIX politiquices: <http://www.politiquices.pt/>
     PREFIX      rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX        dc: <http://purl.org/dc/elements/1.1/>
-    PREFIX 		 ns1: <http://xmlns.com/foaf/0.1/>
-    PREFIX		 ns2: <http://www.w3.org/2004/02/skos/core#>
+    PREFIX       ns1: <http://xmlns.com/foaf/0.1/>
+    PREFIX       ns2: <http://www.w3.org/2004/02/skos/core#>
     """
 
 WIKIDATA_PREFIXES = """
