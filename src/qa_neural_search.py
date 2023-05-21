@@ -36,7 +36,5 @@ class NeuralSearch:
 
 
 if __name__ == "__main__":
-    n = NeuralSearch()
-    q = "Quem acusou José Sócrates?"
-    answers = n.predict(q)
-
+    haystack_db = NeuralSearch()
+    answers = haystack_db.predict("Quem acusou José Sócrates?")

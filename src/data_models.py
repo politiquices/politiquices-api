@@ -17,7 +17,7 @@ class PoliticalParty:
 
 @dataclass
 class Person:
-    # pylint: disable=R0902
+    # pylint: disable=too-many-instance-attributes
     wiki_id: str
     name: Optional[str] = None
     image_url: Optional[str] = None

@@ -4,9 +4,10 @@ from pathlib import Path
 from typing import Dict, Any
 
 import requests
-from nlp_extraction.utils.utils import just_sleep
-from politiquices_api.config import static_data
-from politiquices_api.sparql_queries import (
+from utils import just_sleep
+
+from config import STATIC_DATA
+from sparql import (
     get_all_parties_and_members_with_relationships,
     get_nr_relationships_as_subject,
     get_nr_relationships_as_target,
@@ -45,7 +46,7 @@ def personalities_json_cache() -> Dict[str, Any]:
 
     all_politiquices_per = get_entities()
     print(f"{len(all_politiquices_per)} personalities")
-    with open(static_data + "all_entities_info.json", "w") as f_out:
+    with open(STATIC_DATA + "all_entities_info.json", "wt", encoding="utf8") as f_out:
         json.dump(all_politiquices_per, f_out, indent=4)
 
     # persons.json - person names sorted alphabetically
@@ -54,18 +55,18 @@ def personalities_json_cache() -> Dict[str, Any]:
         for x in sorted(all_politiquices_per.items(), key=lambda x: x[1]["name"])
         if x[1]["nr_articles"] > 0
     ]
-    with open(static_data + "persons.json", "wt") as f_out:
+    with open(STATIC_DATA + "persons.json", "wt", encoding="utf8") as f_out:
         json.dump(persons, f_out, indent=True)
 
     return all_politiquices_per
 
 
 def parties_json_cache():
-
     # rename parties names to include short-forms, nice to have in autocomplete
     parties_mapping = {
         "Bloco de Esquerda": "BE - Bloco de Esquerda",
-        "Coliga\u00e7\u00e3o Democr\u00e1tica Unit\u00e1ria": "CDU - Coliga\u00e7\u00e3o Democr\u00e1tica Unit\u00e1ria (PCP-PEV)",
+        "Coliga\u00e7\u00e3o Democr\u00e1tica Unit\u00e1ria": "CDU - Coliga\u00e7\u00e3o Democr\u00e1tica "
+        "Unit\u00e1ria (PCP-PEV)",
         "Juntos pelo Povo": "JPP - Juntos pelo Povo",
         "Partido Comunista Portugu\u00eas": "PCP - Partido Comunista Portugu\u00eas",
         "Partido Social Democrata": "PSD - Partido Social Democrata",
@@ -73,7 +74,8 @@ def parties_json_cache():
         "Partido Socialista Revolucion\u00e1rio": "PSR - Partido Socialista Revolucion\u00e1rio",
         "Partido Democr\u00e1tico Republicano": "PDR - Partido Democr\u00e1tico Republicano",
         "Pessoas\u2013Animais\u2013Natureza": "PAN - Pessoas\u2013Animais\u2013Natureza",
-        "Partido Comunista dos Trabalhadores Portugueses": "PCTP/MRPP - Partido Comunista dos Trabalhadores Portugueses",
+        "Partido Comunista dos Trabalhadores Portugueses": "PCTP/MRPP - Partido Comunista dos Trabalhadores "
+        "Portugueses",
         "RIR": "RIR - Reagir Incluir Reciclar",
         "Partido da Terra": "MPT - Partido da Terra",
     }
@@ -81,7 +83,7 @@ def parties_json_cache():
     # 'all_parties_info.json'
     parties_data = get_all_parties_and_members_with_relationships()
     print(f"{len(parties_data)} parties")
-    with open(static_data + "all_parties_info.json", "w") as f_out:
+    with open(STATIC_DATA + "all_parties_info.json", "wt", encoding="utf8") as f_out:
         json.dump(parties_data, f_out)
 
     # 'parties.json cache' - search box, filtering only for political parties from Portugal (Q45)
@@ -90,7 +92,7 @@ def parties_json_cache():
         for x in sorted(parties_data, key=lambda x: x["party_label"])
         if x["country"] == "Portugal"
     ]
-    with open(static_data + "parties.json", "w") as f_out:
+    with open(STATIC_DATA + "parties.json", "wt", encoding="utf8") as f_out:
         json.dump(parties, f_out)
 
 
@@ -105,7 +107,7 @@ def entities_top_co_occurrences(all_politiquices_per):
                 "nr_occurrences": x["n_artigos"],
             }
         )
-    with open(static_data + "top_co_occurrences.json", "w") as f_out:
+    with open(STATIC_DATA + "top_co_occurrences.json", "wt", encoding="utf8") as f_out:
         json.dump(co_occurrences, f_out, indent=4)
     print(f"{len(co_occurrences)} entity co-occurrences")
 
@@ -138,7 +140,7 @@ def persons_relationships_counts_by_type():
     for entry in supports_target:
         relationships[entry[0]]["is_supported"] += entry[1]
 
-    with open(static_data + "person_relationships_counts.json", "wt") as f_out:
+    with open(STATIC_DATA + "person_relationships_counts.json", "wt", encoding="utf8") as f_out:
         json.dump(relationships, f_out, indent=True)
 
 

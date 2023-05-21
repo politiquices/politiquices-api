@@ -5,13 +5,16 @@ from typing import List, Union
 
 import numpy as np
 import requests
+
 from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+
+from config import es_haystack
 from qa_neural_search import NeuralSearch
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
-from sparql_queries import (
+from sparql import (
     get_nr_of_persons,
     get_person_info,
     get_person_relationships,
@@ -76,7 +79,7 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
 def get_doc_text(arquivo_url: str):
     """Get the full document from ElasticSearch given a URL"""
     payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
-    url = "http://127.0.0.1:9202/document/_search"
+    url = f"{es_haystack}/document/_search"
     headers = {"Content-Type": "application/json"}
     response = requests.request("GET", url, headers=headers, data=payload)
     return response.json()
@@ -88,7 +91,7 @@ async def root():
 
 
 @app.get("/personality/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality(wiki_id: str = Query(None, regex=wiki_id_regex)):
     person = get_person_info(wiki_id)
     person.image_url = local_image(person.wiki_id, person.image_url, ent_type="person")
     for party in person.parties:
@@ -103,13 +106,12 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
     def index2year(index: int):
         return index + start_year
 
-    # get all the relationships
-    relationships = get_person_relationships(wiki_id)
+    per_relationships = get_person_relationships(wiki_id)
     values = [
         {"opposes": 0, "supports": 0, "opposed_by": 0, "supported_by": 0} for _ in range(end_year - start_year + 1)
     ]
     for k in ["opposes", "supports", "opposed_by", "supported_by"]:
-        for r in relationships[k]:
+        for r in per_relationships[k]:
             year = r["date"][0:4]
             if int(year) > 2022:
                 continue
@@ -123,12 +125,12 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personality/relationships/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality_relationships(wiki_id: str = Query(None, regex=wiki_id_regex)):
     return get_person_relationships(wiki_id)
 
 
 @app.get("/personality/relationships_by_year/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality_relationships_by_year(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = {}
     for rel_type in rel_types:
         results[rel_type] = get_person_relationships_by_year(wiki_id, rel_type)
@@ -136,12 +138,12 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personality/top_related_personalities/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality_top_related_personalities(wiki_id: str = Query(None, regex=wiki_id_regex)):
     return get_top_relationships(wiki_id)
 
 
 @app.get("/relationships/{ent_1}/{rel_type}/{ent_2}")
-async def read_item(
+async def relationships(
     ent_1: str = Query(None, regex=wiki_id_regex),
     rel_type: str = Query(None, regex=rel_type_regex),
     ent_2: str = Query(None, regex=wiki_id_regex),
@@ -150,37 +152,30 @@ async def read_item(
 
 
 @app.get("/parties/")
-async def read_item():
-    return [party for party in all_parties_info]
+async def get_all_parties():
+    return list(all_parties_info)
 
 
 @app.get("/personalities/")
-async def read_item():
-    personalities = []
-    for k, v in all_entities_info.items():
-        personalities.append(
-            {
-                "label": v["name"],
-                "nr_articles": v["nr_articles"],
-                "local_image": v["image_url"],
-                "wiki_id": k,
-            }
-        )
-    return personalities
+async def get_personalities():
+    return [
+        {"label": v["name"], "nr_articles": v["nr_articles"], "local_image": v["image_url"], "wiki_id": k}
+        for k, v in all_entities_info.items()
+    ]
 
 
 @app.get("/persons/")
-async def read_item():
+async def get_all_persons():
     return persons
 
 
 @app.get("/persons_and_parties/")
-async def read_item():
+async def persons_and_parties():
     return sorted(persons + parties, key=lambda x: x["label"])
 
 
 @app.get("/timeline/")
-async def read_items(
+async def timeline(
     q: Union[List[str], None] = Query(default=None),
     selected: bool = Query(default=None),
     sentiment: bool = Query(default=None),
@@ -198,11 +193,9 @@ async def queries(
     start: str = Query(default=None),
     end: str = Query(default=None),
 ):
-
     # time interval for the query
     year_from = start
     year_to = end
-    rel_type = rel_type
     e1_type = get_info(ent1)
     e2_type = get_info(ent2)
 
@@ -223,7 +216,7 @@ async def queries(
 
 
 @app.get("/personalities/educated_at/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_educated_at(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_education(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -233,7 +226,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personalities/occupation/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_occupation(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -243,7 +236,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personalities/public_office/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_public_office(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -263,7 +256,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personalities/assembly/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_assembly(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -273,7 +266,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personalities/party/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_party(wiki_id: str = Query(None, regex=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -283,7 +276,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/stats")
-async def read_item():
+async def stats():
     # number of persons, parties, articles
     nr_persons = get_nr_of_persons()
     nr_parties = len(all_parties_info)
@@ -336,7 +329,7 @@ async def read_item():
 
 
 @app.get("/qa/{question}")
-async def read_item(question: str):
+async def natural_language_question(question: str):
     # ToDo: do a quick warm-up:
     #     n = NeuralSearch()
     #     q = "Quem acusou José Sócrates?"
@@ -347,7 +340,7 @@ async def read_item(question: str):
 
 
 @app.get("/topics/bar/{doc_url_encoded}")
-async def read_item(doc_url_encoded: str):
+async def topics_bar(doc_url_encoded: str):
     url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
     global topics
     global topic_distr
@@ -359,17 +352,17 @@ async def read_item(doc_url_encoded: str):
 
     if topic_distr is None:
         print("Loading Topics Distributions")
-        with open(f"bin/topic_distr_2023-02-05.npy", "rb") as f_in:
+        with open("bin/topic_distr_2023-02-05.npy", "rb") as f_in:
             topic_distr = np.load(f_in, allow_pickle=True)
 
     if topic_token_distr is None:
         print("Loading Topics Token Distributions")
-        with open(f"bin/topic_token_distr_2023-02-05.npy", "rb") as f_in:
+        with open("bin/topic_token_distr_2023-02-05.npy", "rb") as f_in:
             topic_token_distr = np.load(f_in, allow_pickle=True)
 
     if url2index is None:
         print("Loading URL2Index mappings")
-        with open(f"bin/url2index_2023-02-05.json", "r") as f_in:
+        with open("bin/url2index_2023-02-05.json", "rt", encoding="utf8") as f_in:
             url2index = json.load(f_in)
 
     print(f"Getting topics for {url_decoded}")
@@ -387,7 +380,7 @@ async def read_item(doc_url_encoded: str):
 
 
 @app.get("/topics/raw/{doc_url_encoded}")
-async def read_item(doc_url_encoded: str):
+async def topics_raw(doc_url_encoded: str):
     url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
     global topics
     global topic_distr
@@ -399,23 +392,23 @@ async def read_item(doc_url_encoded: str):
 
     if topic_distr is None:
         print("Loading Topics Distributions")
-        with open(f"bin/topic_distr_2023-02-05.npy", "rb") as f_in:
+        with open("bin/topic_distr_2023-02-05.npy", "rb") as f_in:
             topic_distr = np.load(f_in, allow_pickle=True)
 
     if topic_token_distr is None:
         print("Loading Topics Token Distributions")
-        with open(f"bin/topic_token_distr_2023-02-05.npy", "rb") as f_in:
+        with open("bin/topic_token_distr_2023-02-05.npy", "rb") as f_in:
             topic_token_distr = np.load(f_in, allow_pickle=True)
 
     if url2index is None:
         print("Loading URL2Index mappings")
-        with open(f"bin/url2index_2023-02-05.json", "r") as f_in:
+        with open("bin/url2index_2023-02-05.json", "rt", encoding="utf8") as f_in:
             url2index = json.load(f_in)
 
-    with open('../SPARQL-endpoint/entities_names.txt', 'rt') as f_in:
+    with open("../SPARQL-endpoint/entities_names.txt", "rt", encoding="utf8") as f_in:
         all_names = [line.strip() for line in f_in]
-        all_token_names = set([name.lower() for names in all_names for name in names.split()])
-        other = ['hoje', 'sobre', 'primeiro', 'ministro', 'porque', 'feira', 'euros', 'estado', 'política']
+        all_token_names = {name.lower() for names in all_names for name in names.split()}
+        other = ["hoje", "sobre", "primeiro", "ministro", "porque", "feira", "euros", "estado", "política"]
 
     min_probability = 0.10
 
@@ -425,6 +418,12 @@ async def read_item(doc_url_encoded: str):
     topics_n = np.where(topic_distr[doc_idx] > min_probability)
     all_topics = []
     for n in topics_n[0]:
-        all_topics.append([word[0] for word in topics.topic_representations_[n] if word[0] not in other and word[0] not in all_token_names])
+        all_topics.append(
+            [
+                word[0]
+                for word in topics.topic_representations_[n]
+                if word[0] not in other and word[0] not in all_token_names
+            ]
+        )
 
     return all_topics

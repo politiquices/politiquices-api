@@ -5,13 +5,7 @@ from typing import List, Dict, Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from cache import all_entities_info
-from config import (
-    live_wikidata,
-    no_image,
-    politiquices_endpoint,
-    ps_logo,
-    wikidata_endpoint,
-)
+from config import NO_IMAGE, politiquices_endpoint, PS_LOGO, wikidata_endpoint
 from data_models import Element, Person, PoliticalParty
 from utils import make_https, _process_rel_type
 
@@ -69,7 +63,7 @@ def get_total_nr_of_articles():
 
     query = """
         SELECT (COUNT(?rel) as ?nr_articles) WHERE {
-            VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1' 
+            VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                                 'ent1_supports_ent2' 'ent2_supports_ent1'} .
             ?rel politiquices:type ?rel_values .
             ?rel politiquices:url ?url .
@@ -205,7 +199,7 @@ def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
         results[wiki_id] = {
             "wiki_id": wiki_id,
             "name": e["label"]["value"],
-            "image_url": make_https(e["image_url"]["value"]) if "image_url" in e else no_image,
+            "image_url": make_https(e["image_url"]["value"]) if "image_url" in e else NO_IMAGE,
         }
 
     return results
@@ -236,9 +230,9 @@ def get_all_parties_and_members_with_relationships():
 
     political_parties = []
     for x in results["results"]["bindings"]:
-        party_logo = x["party_logo"]["value"] if "party_logo" in x else no_image
+        party_logo = x["party_logo"]["value"] if "party_logo" in x else NO_IMAGE
         if x["political_party"]["value"].split("/")[-1] == "Q847263":
-            party_logo = ps_logo
+            party_logo = PS_LOGO
         country = x["country_label"]["value"] if x.get("country_label") else None
         political_parties.append(
             {
@@ -349,13 +343,13 @@ def get_person_info(wiki_id):
         if not name:
             name = e["name"]["value"]
         if not image_url:
-            image_url = e["image_url"]["value"] if "image_url" in e else no_image
+            image_url = e["image_url"]["value"] if "image_url" in e else NO_IMAGE
         if "political_party" in e:
-            party_image_url = no_image
+            party_image_url = NO_IMAGE
 
             # add 'PS' logo since it's not on Wikidata
             if e["political_party"]["value"] == "http://www.wikidata.org/entity/Q847263":
-                party_image_url = ps_logo
+                party_image_url = PS_LOGO
 
             party = PoliticalParty(
                 wiki_id=e["political_party"]["value"].split("/")[-1],
@@ -494,7 +488,6 @@ def get_person_relationships(wiki_id):
         ent2_wiki = e["ent2"]["value"].split("/")[-1].strip()
 
         if e["rel_type"]["value"] == "ent1_supports_ent2":
-
             if wiki_id == ent1_wiki:
                 rel_type = "supports"
                 other_ent_url = ent2_wiki
@@ -508,7 +501,6 @@ def get_person_relationships(wiki_id):
                 focus_ent = e["ent2_str"]["value"].split("/")[-1]
 
         elif e["rel_type"]["value"] == "ent1_opposes_ent2":
-
             if wiki_id == ent1_wiki:
                 rel_type = "opposes"
                 other_ent_url = ent2_wiki
@@ -522,7 +514,6 @@ def get_person_relationships(wiki_id):
                 focus_ent = e["ent2_str"]["value"].split("/")[-1]
 
         elif e["rel_type"]["value"] == "ent2_supports_ent1":
-
             if wiki_id == ent2_wiki:
                 rel_type = "supports"
                 other_ent_url = ent1_wiki
@@ -536,7 +527,6 @@ def get_person_relationships(wiki_id):
                 focus_ent = e["ent1_str"]["value"].split("/")[-1]
 
         elif e["rel_type"]["value"] == "ent2_opposes_ent1":
-
             if wiki_id == ent2_wiki:
                 rel_type = "opposes"
                 other_ent_url = ent1_wiki
@@ -550,7 +540,6 @@ def get_person_relationships(wiki_id):
                 focus_ent = e["ent1_str"]["value"].split("/")[-1]
 
         elif e["rel_type"]["value"] == "other":
-
             if wiki_id == ent1_wiki:
                 rel_type = "other"
                 other_ent_url = ent2_wiki
@@ -662,7 +651,7 @@ def get_top_relationships(wiki_id):
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
             "freq": v,
-            "relative": str(round(v / total * 100, 2))+'%'
+            "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_subject["who_person_opposes"].items()
     ]
@@ -674,7 +663,7 @@ def get_top_relationships(wiki_id):
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
             "freq": v,
-            "relative": str(round(v / total * 100, 2))+'%'
+            "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_subject["who_person_supports"].items()
     ]
@@ -686,7 +675,7 @@ def get_top_relationships(wiki_id):
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
             "freq": v,
-            "relative": str(round(v / total * 100, 2))+'%'
+            "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_target["who_opposes_person"].items()
     ]
@@ -698,7 +687,7 @@ def get_top_relationships(wiki_id):
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
             "freq": v,
-            "relative": str(round(v / total * 100, 2))+'%'
+            "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_target["who_supports_person"].items()
     ]
@@ -765,7 +754,7 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
                            dc:date  ?date .
           }} UNION {{
               ?rel politiquices:ent2 wd:{wiki_id_one};
-                   politiquices:ent1 wd:{wiki_id_two};       
+                   politiquices:ent1 wd:{wiki_id_two};
                    politiquices:ent2 ?ent2;
                    politiquices:ent1 ?ent1;
                    politiquices:ent2_str ?ent2_str;
@@ -804,7 +793,6 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
 # relationship queries
 @lru_cache(maxsize=50)
 def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, start_year, end_year):
-
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
@@ -820,7 +808,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
                    politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
-              
+
               ?arquivo_doc dc:title ?title ;
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
            }}
@@ -835,7 +823,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
                    politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
-                   
+
               ?arquivo_doc dc:title ?title ;              
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
            }}            
@@ -867,7 +855,6 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
 
 @lru_cache(maxsize=50)
 def get_relationship_between_party_and_person(party, person, rel_type, start_year, end_year):
-
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
@@ -971,7 +958,6 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     results = []
     for x in result["results"]["bindings"]:
-
         results.append(
             {
                 "url": x["arquivo_doc"]["value"],
@@ -1057,37 +1043,12 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_wiki": x["person_party_b"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[
-                    x["ent1"]["value"].split("/")[-1],
-                ]["image_url"],
-                "ent2_img": all_entities_info[
-                    x["ent2"]["value"].split("/")[-1],
-                ]["image_url"],
+                "ent1_img": all_entities_info[x["person_party_a"]["value"].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[x["person_party_b"]["value"].split("/")[-1]]["image_url"],
             }
         )
 
     return relationships
-
-
-# misc. and other
-def get_entities_without_image():
-    query = f"""
-        SELECT DISTINCT ?item ?label ?image_url {{
-            ?item wdt:P31 wd:Q5.
-                SERVICE <{live_wikidata}> {{
-                ?item rdfs:label ?label .
-                FILTER(LANG(?label) = "{LANG}")
-                FILTER NOT EXISTS {{ ?item wdt:P18 ?image_url. }}
-          }}
-          }}
-        ORDER BY ?label
-        """
-    result = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    entities = []
-    for x in result["results"]["bindings"]:
-        entities.append({"wikidata_id": x["item"]["value"].split("/")[-1], "label": x["label"]["value"]})
-
-    return entities
 
 
 # new website
@@ -1188,7 +1149,7 @@ def get_personalities_by_education(institution_wiki_id: str):
         if "images_url" not in r:
             r["image_url"] = dict()
             r["image_url"]["type"] = "uri"
-            r["image_url"]["value"] = no_image
+            r["image_url"]["value"] = NO_IMAGE
         else:
             if images := r["images_url"]["value"].split(","):
                 r["image_url"] = r.pop("images_url")
@@ -1220,7 +1181,7 @@ def get_personalities_by_occupation(occupation_wiki_id: str):
         if "images_url" not in r:
             r["image_url"] = dict()
             r["image_url"]["type"] = "uri"
-            r["image_url"]["value"] = no_image
+            r["image_url"]["value"] = NO_IMAGE
         else:
             if images := r["images_url"]["value"].split(","):
                 r["image_url"] = r.pop("images_url")
@@ -1252,7 +1213,7 @@ def get_personalities_by_public_office(public_office: str):
         if "images_url" not in r:
             r["image_url"] = dict()
             r["image_url"]["type"] = "uri"
-            r["image_url"]["value"] = no_image
+            r["image_url"]["value"] = NO_IMAGE
         else:
             if images := r["images_url"]["value"].split(","):
                 r["image_url"] = r.pop("images_url")
@@ -1287,7 +1248,7 @@ def get_personalities_by_assembly(parliamentary_term: str):
         if "images_url" not in r:
             r["image_url"] = dict()
             r["image_url"]["type"] = "uri"
-            r["image_url"]["value"] = no_image
+            r["image_url"]["value"] = NO_IMAGE
         else:
             if images := r["images_url"]["value"].split(","):
                 r["image_url"] = r.pop("images_url")
@@ -1321,7 +1282,7 @@ def get_personalities_by_government(legislature: str):
         if "images_url" not in r:
             r["image_url"] = dict()
             r["image_url"]["type"] = "uri"
-            r["image_url"]["value"] = no_image
+            r["image_url"]["value"] = NO_IMAGE
         else:
             if images := r["images_url"]["value"].split(","):
                 r["image_url"] = r.pop("images_url")
@@ -1352,7 +1313,7 @@ def get_personalities_by_party(political_party: str):
         if "images_url" not in r:
             r["image_url"] = dict()
             r["image_url"]["type"] = "uri"
-            r["image_url"]["value"] = no_image
+            r["image_url"]["value"] = NO_IMAGE
         else:
             if images := r["images_url"]["value"].split(","):
                 r["image_url"] = r.pop("images_url")

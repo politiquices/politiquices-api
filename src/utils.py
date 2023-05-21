@@ -1,4 +1,6 @@
 import re
+from random import randint
+from time import sleep
 
 from cache import all_parties_info, all_entities_info
 
@@ -35,11 +37,11 @@ def _process_rel_type(rel_type):
         rel_type_inverted = invert_relationship(rel_type)
     elif rel_type in {"ent2_opposes_ent1", "ent2_supports_ent1"}:
         rel_type_inverted = rel_type
-    elif rel_type == 'all_sentiment':
-        rel_type = '.*(opposes|supports).*'
+    elif rel_type == "all_sentiment":
+        rel_type = ".*(opposes|supports).*"
         rel_type_inverted = rel_type
     else:
-        rel_type = '.*'
+        rel_type = ".*"
         rel_type_inverted = rel_type
     return rel_type, rel_type_inverted
 
@@ -52,3 +54,10 @@ def get_chart_labels_min_max(min_date="1994", max_date="2022"):
         all_years.append(current_date)
         current_date += 1
     return [str(year) for year in all_years]
+
+
+def just_sleep(upper_bound=3, verbose=False):
+    sec = randint(1, upper_bound)
+    if verbose:
+        print(f"sleeping for {sec} seconds")
+    sleep(sec)
