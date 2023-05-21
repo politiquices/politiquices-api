@@ -4,7 +4,7 @@ from collections import defaultdict
 from typing import List, Union
 
 import numpy as np
-import requests
+# import requests
 from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -75,13 +75,16 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     return f"{base_url}/{f_name}"
 
 
+"""
+# ToDo: for Haystack
 def get_doc_text(arquivo_url: str):
-    """Get the full document from ElasticSearch given a URL"""
+    # Get the full document from ElasticSearch given a URL
     payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
     url = f"{es_haystack}/document/_search"
     headers = {"Content-Type": "application/json"}
     response = requests.request("GET", url, headers=headers, data=payload, timeout=10)
     return response.json()
+"""
 
 
 @app.get("/")
@@ -326,7 +329,8 @@ async def stats():
         "per_co_occurrence_values": co_occurrences_values[0:500],
     }
 
-
+"""
+# ToDo: for Haystack
 @app.get("/qa/{question}")
 async def natural_language_question(question: str):
     # ToDo: do a quick warm-up:
@@ -336,6 +340,7 @@ async def natural_language_question(question: str):
     neural_search = NeuralSearch()
     answers = neural_search.predict(question)
     return answers
+"""
 
 
 @app.get("/topics/bar/{doc_url_encoded}")
@@ -368,7 +373,7 @@ async def topics_bar(doc_url_encoded: str):
     doc_idx = url2index[url_decoded]
 
     doc_topic_distr = topic_distr[doc_idx]
-    doc_topic_token_distr = topic_token_distr[doc_idx]
+    # doc_topic_token_distr = topic_token_distr[doc_idx]
 
     # see also: https://stackoverflow.com/questions/36262748/save-plotly-plot-to-local-file-and-insert-into-html
     figure = topics.visualize_distribution(

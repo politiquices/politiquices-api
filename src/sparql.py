@@ -46,7 +46,7 @@ def get_nr_articles_per_year():
         ORDER BY ?year
         """
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    nr_articles = dict()
+    nr_articles = {}
     for x in result["results"]["bindings"]:
         nr_articles[int(x["year"]["value"])] = int(x["nr_articles"]["value"])
     return nr_articles
@@ -123,7 +123,7 @@ def get_total_articles_by_year_by_relationship_type():
 def get_persons_co_occurrences_counts():
     query = """
         SELECT DISTINCT ?person_a ?person_b (COUNT (?url) as ?n_artigos) {
-            VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1' 
+            VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                                 'ent1_supports_ent2' 'ent2_supports_ent1'} .
 
             ?rel politiquices:type ?rel_values .
@@ -159,9 +159,9 @@ def get_persons_co_occurrences_counts():
 
 def get_persons_articles_freq():
     query = """
-        SELECT DISTINCT ?person (COUNT (?url) as ?n_artigos) 
-        WHERE {  
-            VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1' 
+        SELECT DISTINCT ?person (COUNT (?url) as ?n_artigos)
+        WHERE {
+            VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                                 'ent1_supports_ent2' 'ent2_supports_ent1'} .
 
             ?rel politiquices:type ?rel_values .
@@ -188,12 +188,12 @@ def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
         SELECT ?wiki_id ?label ?image_url {{
             VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
             ?wiki_id wdt:P31 ?valid_instances.
-            ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "{LANG}")  
+            ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "{LANG}")
             OPTIONAL {{ ?wiki_id wdt:P18 ?image_url. }}
         }}
         """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
-    results = dict()
+    results = {}
     for e in result["results"]["bindings"]:
         wiki_id = e["wiki_id"]["value"].split("/")[-1]
         results[wiki_id] = {
@@ -213,17 +213,17 @@ def get_all_parties_and_members_with_relationships():
         WHERE {{
             ?person p:P102 ?political_partyStmnt.
             ?political_partyStmnt ps:P102 ?political_party.
-            ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "pt")  
+            ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "pt")
             OPTIONAL {{ ?political_party wdt:P154 ?party_logo. }}
-            OPTIONAL {{ 
-                ?political_party wdt:P17 ?party_country. 
+            OPTIONAL {{
+                ?political_party wdt:P17 ?party_country.
                 ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
             }}
             SERVICE <http://0.0.0.0:3030/politiquices/query> {{
-                SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}     
+                SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}
             }}
         }}
-        GROUP BY ?political_party ?party_label ?party_logo ?country_label 
+        GROUP BY ?political_party ?party_label ?party_logo ?country_label
         ORDER BY DESC(?nr_personalities)
         """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
@@ -251,7 +251,7 @@ def get_total_nr_articles_for_each_person() -> Dict[str, int]:
     query = """
         SELECT ?person (COUNT(*) as ?count)
         WHERE {
-          VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1' 
+          VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                               'ent1_supports_ent2' 'ent2_supports_ent1' 'other'}
             ?person wdt:P31 wd:Q5 ;
             {?rel politiquices:ent1 ?person} UNION {?rel politiquices:ent2 ?person} .
@@ -269,8 +269,8 @@ def get_nr_relationships_as_subject(relationship: str):
         SELECT DISTINCT ?person_a (COUNT(?url) as ?nr_articles) {{
           {{ ?rel politiquices:ent1 ?person_a .
             ?rel politiquices:type 'ent1_{relationship}_ent2'.
-          }}  
-          UNION 
+          }}
+          UNION
           {{ ?rel politiquices:ent2 ?person_a .
             ?rel politiquices:type 'ent2_{relationship}_ent1'.
           }}
@@ -290,8 +290,8 @@ def get_nr_relationships_as_target(relationship: str):
         SELECT DISTINCT ?person_a (COUNT(?url) as ?nr_articles) {{
           {{ ?rel politiquices:ent2 ?person_a .
             ?rel politiquices:type 'ent1_{relationship}_ent2'.
-          }}  
-          UNION 
+          }}
+          UNION
           {{ ?rel politiquices:ent1 ?person_a .
             ?rel politiquices:type 'ent2_{relationship}_ent1'.
           }}
@@ -310,7 +310,7 @@ def get_nr_relationships_as_target(relationship: str):
 def get_wiki_id_affiliated_with_party(political_party: str):
     query = f"""
         SELECT DISTINCT ?wiki_id {{
-            ?wiki_id wdt:P102 wd:{political_party}; .  
+            ?wiki_id wdt:P102 wd:{political_party}; .
         }}
     """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
@@ -320,7 +320,7 @@ def get_wiki_id_affiliated_with_party(political_party: str):
 # Personality Information
 def get_person_info(wiki_id):
     query = f"""
-        SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label 
+        SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label
         WHERE {{
             wd:{wiki_id} rdfs:label ?name
             FILTER(LANG(?name)="{LANG}") .
@@ -328,7 +328,7 @@ def get_person_info(wiki_id):
             OPTIONAL {{
                 wd:{wiki_id} p:P102 ?political_partyStmnt.
                 ?political_partyStmnt ps:P102 ?political_party.
-                ?political_party rdfs:label ?political_party_label 
+                ?political_party rdfs:label ?political_party_label
                     FILTER(LANG(?political_party_label)="{LANG}").
                 OPTIONAL {{ ?political_party wdt:P154 ?political_party_logo. }}
             }}
@@ -401,7 +401,7 @@ def get_person_detailed_info(wiki_id):
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
             ?positionStmnt ps:P39 ?position .
-            ?position rdfs:label ?position_label FILTER(LANG(?position_label) = "{LANG}").
+             ?position rdfs:label ?position_label FILTER(LANG(?position_label) = "{LANG}").
         }}
         """
 
@@ -409,15 +409,15 @@ def get_person_detailed_info(wiki_id):
         SELECT DISTINCT ?government ?government_label
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
-            ?positionStmnt pq:P5054 ?government. 
-            ?government rdfs:label ?government_label . FILTER(LANG(?government_label) = "{LANG}").
+            ?positionStmnt pq:P5054 ?government .
+            ?government rdfs:label ?government_label . FILTER(LANG(?government_label) = "{LANG}") .
         }}"""
 
     assemblies_query = f"""
         SELECT DISTINCT ?parliamentary_term ?parliamentary_term_label
         WHERE {{
             wd:{wiki_id} p:P39 ?positionStmnt .
-            ?positionStmnt pq:P2937 ?parliamentary_term. 
+            ?positionStmnt pq:P2937 ?parliamentary_term.
             ?parliamentary_term rdfs:label ?parliamentary_term_label . FILTER(LANG(?parliamentary_term_label) = "{LANG}").
         }}"""
 
@@ -462,7 +462,7 @@ def get_person_relationships(wiki_id):
     query = f"""
         SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
-         {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{?rel politiquices:ent2 wd:{wiki_id} }}        
+         {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{?rel politiquices:ent2 wd:{wiki_id} }}
 
             ?rel politiquices:type ?rel_type;
                  politiquices:score ?score.
@@ -595,14 +595,14 @@ def get_top_relationships(wiki_id):
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
                  politiquices:ent2 ?ent2;
-                 politiquices:type ?rel_type. 
+                 politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent1_opposes|ent1_supports"))
           }}
           UNION
           {{
             ?rel politiquices:ent2 wd:{wiki_id};
                  politiquices:ent1 ?ent2;
-                 politiquices:type ?rel_type. 
+                 politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent2_opposes|ent2_supports"))
           }}
         }}
@@ -623,14 +623,14 @@ def get_top_relationships(wiki_id):
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
                  politiquices:ent2 ?ent2;
-                 politiquices:type ?rel_type. 
+                 politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent2_opposes|ent2_supports"))
-          }} 
+          }}
           UNION
           {{
             ?rel politiquices:ent2 wd:{wiki_id};
                  politiquices:ent1 ?ent2;
-                 politiquices:type ?rel_type. 
+                 politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent1_opposes|ent1_supports"))
           }}
         }}
@@ -726,7 +726,7 @@ def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
     """
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     # dicts are insertion ordered
-    year_articles = dict()
+    year_articles = {}
     for x in result["results"]["bindings"]:
         year = x["year"]["value"]
         year_articles[str(year)] = int(x["nr_articles"]["value"])
@@ -738,7 +738,7 @@ def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
 def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
     query = f"""
         SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
-        WHERE {{               
+        WHERE {{
           {{
               ?rel politiquices:ent1 wd:{wiki_id_one};
                    politiquices:ent2 wd:{wiki_id_two};
@@ -747,7 +747,7 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
                    politiquices:score ?score;
-                   politiquices:url ?arquivo_doc; 
+                   politiquices:url ?arquivo_doc;
                    politiquices:type ?rel_type. FILTER(!REGEX(?rel_type,"other"))
 
               ?arquivo_doc dc:title ?title;
@@ -760,7 +760,7 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
                    politiquices:ent2_str ?ent2_str;
                    politiquices:ent1_str ?ent1_str;
                    politiquices:score ?score;
-                   politiquices:url ?arquivo_doc;   
+                   politiquices:url ?arquivo_doc;
                    politiquices:type ?rel_type FILTER(!REGEX(?rel_type,"other"))
 
               ?arquivo_doc dc:title ?title;
@@ -797,10 +797,10 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
 
     query = f"""
         SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
-        WHERE {{ 
-            {{          
+        WHERE {{
+            {{
               ?rel politiquices:ent1 wd:{wiki_id_one};
-                   politiquices:ent2 wd:{wiki_id_two};                                             
+                   politiquices:ent2 wd:{wiki_id_two};
                    politiquices:score ?score;
                    politiquices:url ?arquivo_doc;
                    politiquices:ent1 ?ent1;
@@ -813,7 +813,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
            }}
            UNION
-           {{          
+           {{
               ?rel politiquices:ent2 wd:{wiki_id_one};
                    politiquices:ent1 wd:{wiki_id_two};
                    politiquices:score ?score;
@@ -824,9 +824,9 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:ent2_str ?ent2_str;
                    politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
-              ?arquivo_doc dc:title ?title ;              
+              ?arquivo_doc dc:title ?title;
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
-           }}            
+           }}
         }}
         ORDER BY ASC(?date)
         """
@@ -864,7 +864,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 ?rel politiquices:ent1 ?ent1;
                      politiquices:ent2 ?ent2 . FILTER(?ent2=wd:{person})
                 ?rel politiquices:ent1_str ?ent1_str;
-                     politiquices:ent2_str ?ent2_str;                 
+                     politiquices:ent2_str ?ent2_str;
                      politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
@@ -876,7 +876,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 ?rel politiquices:ent2 ?ent1;
                      politiquices:ent1 ?ent2 . FILTER(?ent2=wd:{person})
                 ?rel politiquices:ent1_str ?ent1_str;
-                     politiquices:ent2_str ?ent2_str;                 
+                     politiquices:ent2_str ?ent2_str;
                      politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
@@ -888,7 +888,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
             SERVICE <{wikidata_endpoint}> {{
                 ?ent1 wdt:P102 wd:{party};
                       rdfs:label ?personLabel.
-                FILTER(LANG(?personLabel) = "{LANG}")                
+                FILTER(LANG(?personLabel) = "{LANG}")
             }}
         }}
         ORDER BY DESC(?date) ASC(?score)
@@ -949,7 +949,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
 
             SERVICE <{wikidata_endpoint}> {{
                 ?ent2 wdt:P102 wd:{party};
-                      rdfs:label ?personLabel. FILTER(LANG(?personLabel) = "{LANG}")                
+                      rdfs:label ?personLabel. FILTER(LANG(?personLabel) = "{LANG}")
             }}
         }}
         ORDER BY DESC(?date) ASC(?score)
@@ -982,10 +982,10 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?title 
+    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?title
                     ?score ?rel_type
     WHERE {{
-      {{ 
+      {{
         VALUES ?person_party_a {{ {per_party_a} }}
         VALUES ?person_party_b {{ {per_party_b} }}
       }}
@@ -994,7 +994,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent2 ?person_party_b;
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
-              {{ 
+              {{
                 SELECT ?rel ?rel_type ?arquivo_doc ?title ?date ?score
                 WHERE {{
                      ?rel politiquices:score ?score;
@@ -1002,19 +1002,19 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                           politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
 
                       ?arquivo_doc dc:title ?title;
-                                   dc:date ?date; 
+                                   dc:date ?date;
                                    FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
                 }}
              }}
-      }}  
+      }}
 
-      UNION 
+      UNION
 
       {{ ?rel politiquices:ent1 ?person_party_b;
               politiquices:ent2 ?person_party_a;
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
-              {{ 
+              {{
                 SELECT ?rel ?rel_type ?arquivo_doc ?title ?date ?score
                 WHERE {{
                       ?rel politiquices:score ?score;
@@ -1022,7 +1022,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                            politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
                       ?arquivo_doc dc:title ?title;
-                                   dc:date ?date; 
+                                   dc:date ?date;
                                    FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
                 }}
               }}
@@ -1055,20 +1055,20 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
 def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool):
     values = " ".join(["wd:" + wiki_id for wiki_id in wiki_ids])
 
-    date_start = None
-    date_ent = None
+    # ToDo: activate this
+    # date_start = None
+    # date_ent = None
 
     query = f"""
         PREFIX politiquices: <http://www.politiquices.pt/>
         PREFIX      rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX        dc: <http://purl.org/dc/elements/1.1/>
-        PREFIX 		 ns1: <http://xmlns.com/foaf/0.1/>
-        PREFIX		 ns2: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX       ns1: <http://xmlns.com/foaf/0.1/>
+        PREFIX       ns2: <http://www.w3.org/2004/02/skos/core#>
         PREFIX        wd: <http://www.wikidata.org/entity/>
-        PREFIX	     wdt: <http://www.wikidata.org/prop/direct/>
+        PREFIX       wdt: <http://www.wikidata.org/prop/direct/>
 
-
-        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str 
+        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
                 VALUES ?person_one {{{values}}}
                 VALUES ?person_two {{{values}}}
@@ -1078,7 +1078,7 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
                             politiquices:ent2 ?ent2;
                             politiquices:ent1_str ?ent1_str;
                             politiquices:ent2_str ?ent2_str;
-                            politiquices:url ?arquivo_doc; 
+                            politiquices:url ?arquivo_doc;
                             politiquices:type ?rel_type.
 
                    ?arquivo_doc dc:title ?title;
@@ -1147,7 +1147,7 @@ def get_personalities_by_education(institution_wiki_id: str):
 
     for r in result["results"]["bindings"]:
         if "images_url" not in r:
-            r["image_url"] = dict()
+            r["image_url"] = {}
             r["image_url"]["type"] = "uri"
             r["image_url"]["value"] = NO_IMAGE
         else:
@@ -1179,7 +1179,7 @@ def get_personalities_by_occupation(occupation_wiki_id: str):
 
     for r in result["results"]["bindings"]:
         if "images_url" not in r:
-            r["image_url"] = dict()
+            r["image_url"] = {}
             r["image_url"]["type"] = "uri"
             r["image_url"]["value"] = NO_IMAGE
         else:
@@ -1211,7 +1211,7 @@ def get_personalities_by_public_office(public_office: str):
 
     for r in result["results"]["bindings"]:
         if "images_url" not in r:
-            r["image_url"] = dict()
+            r["image_url"] = {}
             r["image_url"]["type"] = "uri"
             r["image_url"]["value"] = NO_IMAGE
         else:
@@ -1229,7 +1229,7 @@ def get_personalities_by_assembly(parliamentary_term: str):
     # example of an assembly/parliament in Wikidata: https://www.wikidata.org/wiki/Q71014092
     query = f"""
     SELECT DISTINCT ?ent1 ?ent1_name
-    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url) 
+    (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               wdt:P27 wd:Q45;
@@ -1239,14 +1239,14 @@ def get_personalities_by_assembly(parliamentary_term: str):
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
     }}
     GROUP BY ?ent1 ?ent1_name
-    ORDER BY ASC(?ent1_name) 
+    ORDER BY ASC(?ent1_name)
     """
 
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
 
     for r in result["results"]["bindings"]:
         if "images_url" not in r:
-            r["image_url"] = dict()
+            r["image_url"] = {}
             r["image_url"]["type"] = "uri"
             r["image_url"]["value"] = NO_IMAGE
         else:
@@ -1280,7 +1280,7 @@ def get_personalities_by_government(legislature: str):
 
     for r in result["results"]["bindings"]:
         if "images_url" not in r:
-            r["image_url"] = dict()
+            r["image_url"] = {}
             r["image_url"]["type"] = "uri"
             r["image_url"]["value"] = NO_IMAGE
         else:
@@ -1311,7 +1311,7 @@ def get_personalities_by_party(political_party: str):
 
     for r in result["results"]["bindings"]:
         if "images_url" not in r:
-            r["image_url"] = dict()
+            r["image_url"] = {}
             r["image_url"]["type"] = "uri"
             r["image_url"]["value"] = NO_IMAGE
         else:
