@@ -28,7 +28,7 @@ lint:
 	black -t py39 -l 120 src
 	PYTHONPATH=src pylint src --rcfile=pylint.cfg
 	flake8 src --config=setup.cfg
-	mypy --config mypy.ini .
+	mypy --config mypy.ini src
 
 test:
 	PYTHONPATH=src coverage run --rcfile=setup.cfg --source=src -m pytest
