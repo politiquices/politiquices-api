@@ -16,7 +16,7 @@ build:
 
 production:
 	# run the docker image
-	docker run -d --env es_haystack='http://es_haystack:9202' --env sparql_endpoint='http://jena_sparql:3030' --name politiquices-api --net politiquices -p 127.0.0.1:8000:8000 politiquices-api
+	docker run -dit --env sparql_endpoint='http://jena_sparql:3030' --name politiquices-api --net politiquices -p 127.0.0.1:8000:8000 politiquices-api
 
 	
 development:
