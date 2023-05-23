@@ -11,6 +11,7 @@ from utils import make_https, _process_rel_type
 
 from sparql_prefixes import PREFIXES
 
+
 # Statistics
 def get_nr_articles_per_year():
     query = """
@@ -95,7 +96,6 @@ def get_total_articles_by_year_by_relationship_type():
         values[x["year"]["value"]][x["rel_type"]["value"]] = x["nr_articles"]["value"]
 
     return values
-
 
 
 def get_persons_articles_freq():
