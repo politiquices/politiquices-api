@@ -53,7 +53,7 @@ url2index = None
 app = FastAPI()
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
-origins = ["http://localhost:3000, http://beta.politiquices.pt/"]
+origins = ["http://localhost:3000", "http://beta.politiquices.pt/"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
