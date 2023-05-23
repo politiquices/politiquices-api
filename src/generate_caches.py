@@ -7,7 +7,7 @@ import requests
 from requests import RequestException
 
 from config import STATIC_DATA
-from sparql import (
+from sparql_queries_cache import (
     get_all_parties_and_members_with_relationships,
     get_nr_relationships_as_subject,
     get_nr_relationships_as_target,
