@@ -177,6 +177,7 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
                 # to get content after redirection
                 r = requests.get(url, allow_redirects=True, headers=headers, timeout=10)
                 if r.status_code == 200:
+                    path.mkdir(parents=True, exist_ok=True)
                     with open(f"{base_out}/{f_name}", "wb") as f_out:
                         f_out.write(r.content)
                 else:
@@ -198,7 +199,7 @@ def get_images():
 
 
 def main():
-    print("\nCaching and pre-computing static information")
+    print("Caching and pre-computing static information")
     all_politiquices_per = personalities_json_cache()
     parties_json_cache()
     entities_top_co_occurrences(all_politiquices_per)
