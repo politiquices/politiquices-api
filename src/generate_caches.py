@@ -1,6 +1,8 @@
 import json
 from collections import defaultdict
 from pathlib import Path
+from random import randint
+from time import sleep
 from typing import Dict, Any
 
 import requests
@@ -17,7 +19,13 @@ from sparql_queries_cache import (
     get_all_parties_images,
     get_all_persons_images,
 )
-from utils import just_sleep
+
+
+def just_sleep(upper_bound=3, verbose=False):
+    sec = randint(1, upper_bound)
+    if verbose:
+        print(f"sleeping for {sec} seconds")
+    sleep(sec)
 
 
 def get_entities() -> Dict[str, Any]:
