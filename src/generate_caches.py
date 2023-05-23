@@ -109,13 +109,16 @@ def entities_top_co_occurrences(all_politiquices_per):
     raw_counts = get_persons_co_occurrences_counts()
     co_occurrences = []
     for x in raw_counts:
-        co_occurrences.append(
-            {
-                "person_a": all_politiquices_per[x["person_a"].split("/")[-1]],
-                "person_b": all_politiquices_per[x["person_b"].split("/")[-1]],
-                "nr_occurrences": x["n_artigos"],
-            }
-        )
+        try:
+            co_occurrences.append(
+                {
+                    "person_a": all_politiquices_per[x["person_a"].split("/")[-1]],
+                    "person_b": all_politiquices_per[x["person_b"].split("/")[-1]],
+                    "nr_occurrences": x["n_artigos"],
+                }
+            )
+        except KeyError:
+            pass
     with open(STATIC_DATA + "top_co_occurrences.json", "wt", encoding="utf8") as f_out:
         json.dump(co_occurrences, f_out, indent=4)
     print(f"{len(co_occurrences)} entity co-occurrences")
