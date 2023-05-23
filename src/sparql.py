@@ -1147,9 +1147,6 @@ def query_sparql(query, endpoint):
     else:
         endpoint_url = politiquices_endpoint
     user_agent = f"Python/{sys.version_info[0]}.{sys.version_info[1]}"
-
-    print("endpoint_url", endpoint_url)
-    
     sparql = SPARQLWrapper(endpoint_url, agent=user_agent)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)

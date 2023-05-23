@@ -35,7 +35,7 @@ from sparql import (
     get_top_relationships,
     get_total_articles_by_year_by_relationship_type,
     get_total_nr_of_articles,
-    get_wiki_id_affiliated_with_party,
+    get_wiki_id_affiliated_with_party, get_nr_articles_per_year,
 )
 from utils import get_info, get_chart_labels_min_max
 
@@ -64,7 +64,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("SPARQL endpoint:", sparql_endpoint)
+print("Testing SPARQL endpoint:", sparql_endpoint)
+print(f"Found {get_nr_of_persons()} persons and {get_total_nr_of_articles()} articles.")
 
 
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
