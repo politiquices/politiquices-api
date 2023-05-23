@@ -1,3 +1,4 @@
+import re
 import sys
 from typing import Dict, Any
 
@@ -5,9 +6,12 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 
 from config import wikidata_endpoint, politiquices_endpoint, NO_IMAGE, PS_LOGO
 from sparql_prefixes import PREFIXES
-from utils import make_https
 
 LANG = "en"
+
+
+def make_https(url):
+    return re.sub(r"http://", "https://", url)
 
 
 def query_sparql(query, endpoint):
