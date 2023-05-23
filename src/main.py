@@ -11,6 +11,7 @@ from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
+from config import sparql_endpoint
 
 # from config import es_haystack
 # from qa_neural_search import NeuralSearch
@@ -62,6 +63,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+print("SPARQL endpoint:", sparql_endpoint)
 
 
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
