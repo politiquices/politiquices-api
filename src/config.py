@@ -1,7 +1,7 @@
 import os
 
-es_haystack = os.getenv("es_haystack", default=None)
-sparql_endpoint = os.getenv("sparql_endpoint", default=None)
+es_haystack = os.getenv("ES_HAYSTACK", default=None)
+sparql_endpoint = os.getenv("SPARQL_ENDPOINT", default=None)
 wikidata_endpoint = f"{sparql_endpoint}/wikidata/query"
 politiquices_endpoint = f"{sparql_endpoint}/politiquices/query"
 PS_LOGO = "../assets/images/parties/Q847263.png"

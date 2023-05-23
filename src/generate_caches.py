@@ -179,11 +179,11 @@ def get_images():
     """Download images for all personalities and parties in the Wikidata sub-graph"""
     print("\nPersonalities")
     transformed = get_all_persons_images()
-    save_images_from_url(transformed, base_out="assets/images/personalities")
+    save_images_from_url(transformed, base_out="../assets/images/personalities")
 
     print("\nParties")
     transformed = get_all_parties_images()
-    save_images_from_url(transformed, base_out="assets/images/parties")
+    save_images_from_url(transformed, base_out="../assets/images/parties")
 
 
 def main():
