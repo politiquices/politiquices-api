@@ -115,10 +115,14 @@ def get_persons_articles_freq():
         ORDER BY DESC(?n_artigos)
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    top_freq = [
-        {"person": all_entities_info[x["person"]["value"].split("/")[-1]]["name"], "freq": x["n_artigos"]["value"]}
-        for x in results["results"]["bindings"]
-    ]
+    try:
+        top_freq = [
+            {"person": all_entities_info[x["person"]["value"].split("/")[-1]]["name"], "freq": x["n_artigos"]["value"]}
+            for x in results["results"]["bindings"]
+        ]
+    except KeyError:
+        pass
+
     return top_freq
 
 
