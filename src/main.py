@@ -3,7 +3,7 @@ import json
 from collections import defaultdict
 from typing import List, Union
 
-import numpy as np
+# import numpy as np
 
 # import requests
 from bertopic import BERTopic
@@ -354,8 +354,10 @@ async def natural_language_question(question: str):
     return question
 
 
+# ToDo: for BERTopic
 @app.get("/topics/bar/{doc_url_encoded}")
 async def topics_bar(doc_url_encoded: str):
+    """
     url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
     global topics
     global topic_distr
@@ -392,10 +394,14 @@ async def topics_bar(doc_url_encoded: str):
         min_probability=0.20,
     )
     return {"figure": figure.to_dict()}
+    """
+    return doc_url_encoded
 
 
+# ToDo: for BERTopic
 @app.get("/topics/raw/{doc_url_encoded}")
 async def topics_raw(doc_url_encoded: str):
+    """
     url_decoded = base64.b64decode(doc_url_encoded).decode("utf8")
     global topics
     global topic_distr
@@ -442,3 +448,5 @@ async def topics_raw(doc_url_encoded: str):
         )
 
     return all_topics
+    """
+    return doc_url_encoded
