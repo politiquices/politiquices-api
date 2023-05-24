@@ -937,20 +937,23 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
 
     news = []
     for e in result["results"]["bindings"]:
-        news.append(
-            {
-                "arquivo_doc": e["arquivo_doc"]["value"],
-                "title": e["title"]["value"],
-                "date": e["date"]["value"].split("T")[0],
-                "ent1_id": e["ent1"]["value"].split("/")[0],
-                "ent1_img": all_entities_info[e["ent1"]["value"].split("/")[-1]]["image_url"],
-                "ent1_str": e["ent1_str"]["value"],
-                "ent2_id": e["ent2"]["value"].split("/")[0],
-                "ent2_img": all_entities_info[e["ent2"]["value"].split("/")[-1]]["image_url"],
-                "ent2_str": e["ent2_str"]["value"],
-                "rel_type": e["rel_type"]["value"],
-            }
-        )
+        try:
+            news.append(
+                {
+                    "arquivo_doc": e["arquivo_doc"]["value"],
+                    "title": e["title"]["value"],
+                    "date": e["date"]["value"].split("T")[0],
+                    "ent1_id": e["ent1"]["value"].split("/")[0],
+                    "ent1_img": all_entities_info[e["ent1"]["value"].split("/")[-1]]["image_url"],
+                    "ent1_str": e["ent1_str"]["value"],
+                    "ent2_id": e["ent2"]["value"].split("/")[0],
+                    "ent2_img": all_entities_info[e["ent2"]["value"].split("/")[-1]]["image_url"],
+                    "ent2_str": e["ent2_str"]["value"],
+                    "rel_type": e["rel_type"]["value"],
+                }
+            )
+        except KeyError:
+            print("KeyError", e)
 
     return news
 
