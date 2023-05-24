@@ -6,7 +6,7 @@ from typing import List, Union
 # import numpy as np
 
 # import requests
-from bertopic import BERTopic
+# from bertopic import BERTopic
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 
