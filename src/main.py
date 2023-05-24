@@ -66,7 +66,7 @@ app.add_middleware(
 
 print("Testing SPARQL endpoint:", sparql_endpoint)
 all_articles, no_other_articles = get_total_nr_of_articles()
-print(f"Found {get_nr_of_persons()} persons and {all_articles} articles, ({no_other_articles} with sentiment")
+print(f"Found {get_nr_of_persons()} persons and {all_articles} articles, {no_other_articles} tagged with sentiment")
 
 
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
