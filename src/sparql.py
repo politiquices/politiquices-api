@@ -123,7 +123,7 @@ def get_persons_articles_freq():
                  "freq": x["n_artigos"]["value"]}
             )
         except KeyError:
-            continue
+            print("KeyError: ", x["person"]["value"].split("/")[-1])
 
     return top_freq
 
@@ -381,21 +381,25 @@ def get_person_relationships(wiki_id):
             # ToDo: re-activate this Exception
             # raise Exception(e["rel_type"]["value"] + " not known")
 
-        relations[rel_type].append(
-            {
-                "arquivo_doc": e["arquivo_doc"]["value"],
-                "title": e["title"]["value"],
-                "score": str(e["score"]["value"])[0:5],
-                "date": e["date"]["value"].split("T")[0],
-                "ent1_id": wiki_id,
-                "ent1_img": all_entities_info[wiki_id]["image_url"],
-                "ent1_str": focus_ent,
-                "ent2_id": other_ent_url,
-                "ent2_img": all_entities_info[other_ent_url]["image_url"],
-                "ent2_str": other_ent_name,
-                "rel_type": rel_type,
-            }
-        )
+        try:
+            relations[rel_type].append(
+                {
+                    "arquivo_doc": e["arquivo_doc"]["value"],
+                    "title": e["title"]["value"],
+                    "score": str(e["score"]["value"])[0:5],
+                    "date": e["date"]["value"].split("T")[0],
+                    "ent1_id": wiki_id,
+                    "ent1_img": all_entities_info[wiki_id]["image_url"],
+                    "ent1_str": focus_ent,
+                    "ent2_id": other_ent_url,
+                    "ent2_img": all_entities_info[other_ent_url]["image_url"],
+                    "ent2_str": other_ent_name,
+                    "rel_type": rel_type,
+                }
+            )
+        except KeyError as error:
+            print("KeyError:", error)
+            continue
 
     all_relationships = []
     sentiment_only = []
