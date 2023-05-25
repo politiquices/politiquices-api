@@ -1,6 +1,9 @@
-uvicorn==0.20.0
-requests==2.28.2
-# bertopic==0.13.0
-fastapi==0.91.0
-# farm-haystack==1.12.2
 SPARQLWrapper==2.0.0
+black==23.3.0
+coverage==7.2.3
+flake8==6.0.0
+fastapi==0.91.0
+pylint==2.17.3
+pytest==7.2.2
+requests==2.28.2
+uvicorn==0.20.0
