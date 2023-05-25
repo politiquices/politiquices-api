@@ -22,7 +22,7 @@ jobs:
     
     - name: connect and pull
       # 'happy_cartwright' is the name of the container running the SPARQL endpoint
-      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && exit"
+      run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && git checkout ${{ secrets.MAIN_BRANCH }} && git pull && ./start_docker.sh && exit"
     
     - name: cleanup
       run: rm -rf ~/.ssh
