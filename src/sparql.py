@@ -119,8 +119,10 @@ def get_persons_articles_freq():
     for x in results["results"]["bindings"]:
         try:
             top_freq.append(
-                {"person": all_entities_info[x["person"]["value"].split("/")[-1]]["name"],
-                 "freq": x["n_artigos"]["value"]}
+                {
+                    "person": all_entities_info[x["person"]["value"].split("/")[-1]]["name"],
+                    "freq": x["n_artigos"]["value"],
+                }
             )
         except KeyError:
             print("KeyError: ", x["person"]["value"].split("/")[-1])
@@ -787,11 +789,11 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     for x in result["results"]["bindings"]:
         results.append(
             {
-                "url": x["arquivo_doc"]["value"],
+                "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
-                "rel_type": relation,
                 "score": x["score"]["value"][0:5],
+                "rel_type": relation,
                 "ent1_wiki": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_wiki": x["ent2"]["value"].split("/")[-1],

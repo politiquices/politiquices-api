@@ -19,16 +19,20 @@ production:
 	docker run -dit --env sparql_endpoint='http://jena_sparql:3030' --name politiquices-api --net politiquices -p 127.0.0.1:8000:8000 politiquices-api
 
 	
-development:
+develop:
 	# runs a local
-	sparql_endpoint='http://127.0.0.1:3030' es_haystack='http://127.0.0.1:9202' python main.py
+	SPARQL_ENDPOINT='http://127.0.0.1:3030' uvicorn src.main:app --reload
 
 
 lint:
 	black -t py39 -l 120 src
 	PYTHONPATH=src pylint src --rcfile=pylint.cfg
 	flake8 src --config=setup.cfg
+
+
+typecheck:
 	mypy --config mypy.ini src
+
 
 test:
 	PYTHONPATH=src coverage run --rcfile=setup.cfg --source=src -m pytest
