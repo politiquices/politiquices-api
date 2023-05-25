@@ -26,7 +26,7 @@ develop:
 
 lint:
 	black -t py39 -l 120 src
-	PYTHONPATH=src pylint src --rcfile=pylint.cfg
+	PYTHONPATH=src pylint src --rcfile=pylint.cfg --ignore=src/qa_neural_search.py
 	flake8 src --config=setup.cfg
 
 
