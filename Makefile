@@ -21,8 +21,7 @@ production:
 	
 develop:
 	# runs a local
-	SPARQL_ENDPOINT='http://127.0.0.1:3030' uvicorn src.main:app --reload
-
+	PYTHONPATH=`pwd`"/src" SPARQL_ENDPOINT='http://127.0.0.1:3030' uvicorn src.main:app --reload
 
 lint:
 	black -t py39 -l 120 src

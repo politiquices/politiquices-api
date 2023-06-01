@@ -26,6 +26,3 @@ jobs:
     
     - name: cleanup
       run: rm -rf ~/.ssh
-
-
-      # docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' happy_cartwright
