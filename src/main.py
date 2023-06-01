@@ -7,7 +7,7 @@ from typing import List, Union
 
 # import requests
 # from bertopic import BERTopic
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
@@ -101,7 +101,7 @@ async def root():
 
 
 @app.get("/personality/{wiki_id}")
-async def personality(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality(wiki_id: str = Path(regex=wiki_id_regex)):
     person = get_person_info(wiki_id)
     person.image_url = local_image(person.wiki_id, person.image_url, ent_type="person")
     for party in person.parties:
@@ -135,12 +135,12 @@ async def personality(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personality/relationships/{wiki_id}")
-async def personality_relationships(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality_relationships(wiki_id: str = Path(regex=wiki_id_regex)):
     return get_person_relationships(wiki_id)
 
 
 @app.get("/personality/relationships_by_year/{wiki_id}")
-async def personality_relationships_by_year(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality_relationships_by_year(wiki_id: str = Path(regex=wiki_id_regex)):
     results = {}
     for rel_type in rel_types:
         results[rel_type] = get_person_relationships_by_year(wiki_id, rel_type)
@@ -148,15 +148,15 @@ async def personality_relationships_by_year(wiki_id: str = Query(None, regex=wik
 
 
 @app.get("/personality/top_related_personalities/{wiki_id}")
-async def personality_top_related_personalities(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personality_top_related_personalities(wiki_id: str = Path(regex=wiki_id_regex)):
     return get_top_relationships(wiki_id)
 
 
 @app.get("/relationships/{ent_1}/{rel_type}/{ent_2}")
 async def relationships(
-    ent_1: str = Query(None, regex=wiki_id_regex),
-    rel_type: str = Query(None, regex=rel_type_regex),
-    ent_2: str = Query(None, regex=wiki_id_regex),
+    ent_1: str = Path(regex=wiki_id_regex),
+    rel_type: str = Path(regex=rel_type_regex),
+    ent_2: str = Path(regex=wiki_id_regex),
 ):
     return get_relationship_between_two_persons(ent_1, ent_2, rel_type, start_year, end_year)
 
@@ -186,23 +186,27 @@ async def persons_and_parties():
 
 @app.get("/timeline/")
 async def timeline(
-    q: Union[List[str], None] = Query(default=None),
-    selected: bool = Query(default=None),
-    sentiment: bool = Query(default=None),
+    q: Union[List[str], None] = Query(),
+    selected: bool = Query(),
+    sentiment: bool = Query(),
 ):
     query_items = {"q": q}
+
+    print(query_items)
+
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
     return results
 
 
 @app.get("/queries")
 async def queries(
-    ent1: str = Query(default=None, regex=wiki_id_regex),
-    ent2: str = Query(default=None, regex=wiki_id_regex),
-    rel_type: str = Query(default=None),
-    start: str = Query(default=None),
-    end: str = Query(default=None),
+    ent1: str = Query(regex=wiki_id_regex),
+    ent2: str = Query(regex=wiki_id_regex),
+    rel_type: str = Query(),
+    start: str = Query(),
+    end: str = Query(),
 ):
+
     # time interval for the query
     year_from = start
     year_to = end
@@ -226,7 +230,7 @@ async def queries(
 
 
 @app.get("/personalities/educated_at/{wiki_id}")
-async def personalities_educated_at(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_education(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -236,7 +240,7 @@ async def personalities_educated_at(wiki_id: str = Query(None, regex=wiki_id_reg
 
 
 @app.get("/personalities/occupation/{wiki_id}")
-async def personalities_occupation(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_occupation(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -246,7 +250,7 @@ async def personalities_occupation(wiki_id: str = Query(None, regex=wiki_id_rege
 
 
 @app.get("/personalities/public_office/{wiki_id}")
-async def personalities_public_office(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_public_office(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -256,7 +260,7 @@ async def personalities_public_office(wiki_id: str = Query(None, regex=wiki_id_r
 
 
 @app.get("/personalities/government/{wiki_id}")
-async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -266,7 +270,7 @@ async def read_item(wiki_id: str = Query(None, regex=wiki_id_regex)):
 
 
 @app.get("/personalities/assembly/{wiki_id}")
-async def personalities_assembly(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]
@@ -276,7 +280,7 @@ async def personalities_assembly(wiki_id: str = Query(None, regex=wiki_id_regex)
 
 
 @app.get("/personalities/party/{wiki_id}")
-async def personalities_party(wiki_id: str = Query(None, regex=wiki_id_regex)):
+async def personalities_party(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
     for r in results:
         wiki_id = r["ent1"]["value"].split("/")[-1]

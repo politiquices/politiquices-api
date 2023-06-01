@@ -177,7 +177,7 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
                 # to get content after redirection
                 r = requests.get(url, allow_redirects=True, headers=headers, timeout=10)
                 if r.status_code == 200:
-                    _ = Path(f"{base_out}.mkdir(parents=True, exist_ok=True")
+                    result = Path(base_out).mkdir(parents=True, exist_ok=True)
                     with open(f"{base_out}/{f_name}", "wb") as f_out:
                         f_out.write(r.content)
                 else:
@@ -191,11 +191,11 @@ def get_images():
     """Download images for all personalities and parties in the Wikidata sub-graph"""
     print("\nPersonalities")
     transformed = get_all_persons_images()
-    save_images_from_url(transformed, base_out="../assets/images/personalities")
+    save_images_from_url(transformed, base_out="assets/images/personalities")
 
     print("\nParties")
     transformed = get_all_parties_images()
-    save_images_from_url(transformed, base_out="../assets/images/parties")
+    save_images_from_url(transformed, base_out="assets/images/parties")
 
 
 def main():

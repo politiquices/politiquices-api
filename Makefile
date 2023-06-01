@@ -1,6 +1,6 @@
 cache:
 	# generate json files, resulting from SPARQL queries, to be used as cached date loaded when the API is launched
-	python generate_caches.py
+	SPARQL_ENDPOINT='http://127.0.0.1:3030' PYTHONPATH=`pwd`"/src" python src/generate_caches.py
 
 images:
 	# generate small images generate from the cacheing script and copies them to the react-app public assets
