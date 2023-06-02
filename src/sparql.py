@@ -179,8 +179,7 @@ def get_person_info(wiki_id):
                 wiki_id=e["political_party"]["value"].split("/")[-1],
                 name=e["political_party_label"]["value"],
                 image_url=make_https(e["political_party_logo"]["value"])
-                if "political_party_logo" in e
-                and e["political_party"]["value"] != "http://www.wikidata.org/entity/Q847263"
+                if "political_party_logo" in e and e["political_party"]["value"] != "http://www.wikidata.org/entity/Q847263"
                 else party_image_url,
             )
             if party not in parties:
@@ -253,24 +252,17 @@ def get_person_detailed_info(wiki_id):
         occupations.append(Element(x["occupation"]["value"], x["occupation_label"]["value"]))
 
     results = query_sparql(PREFIXES + "\n" + education_query, "wikidata")
-    education = [
-        Element(x["educatedAt"]["value"], x["educatedAt_label"]["value"]) for x in results["results"]["bindings"]
-    ]
+    education = [Element(x["educatedAt"]["value"], x["educatedAt_label"]["value"]) for x in results["results"]["bindings"]]
 
     results = query_sparql(PREFIXES + "\n" + positions_query, "wikidata")
     positions = [Element(x["position"]["value"], x["position_label"]["value"]) for x in results["results"]["bindings"]]
 
     results = query_sparql(PREFIXES + "\n" + governments_query, "wikidata")
-    governments = [
-        Element(x["government"]["value"], x["government_label"]["value"]) for x in results["results"]["bindings"]
-    ]
+    governments = [Element(x["government"]["value"], x["government_label"]["value"]) for x in results["results"]["bindings"]]
 
     results = query_sparql(PREFIXES + "\n" + assemblies_query, "wikidata")
 
-    assemblies = [
-        Element(x["parliamentary_term"]["value"], x["parliamentary_term_label"]["value"])
-        for x in results["results"]["bindings"]
-    ]
+    assemblies = [Element(x["parliamentary_term"]["value"], x["parliamentary_term_label"]["value"]) for x in results["results"]["bindings"]]
 
     return {
         "education": education,
@@ -1154,6 +1146,36 @@ def get_personalities_by_party(political_party: str):
                 r["image_url"] = r.pop("images_url")
 
     return result["results"]["bindings"]
+
+
+def get_relationships_aggregate_by_party(wiki_id: str):
+    # ToDo: ongoing
+    """
+    Shows which parties related more with a certain person through support, opposition relationships.
+    """
+
+    query = f"""
+        SELECT ?rel_type ?ent2 ?noticia ?d
+        WHERE {{
+            {{
+            ?rel politiquices:ent1 {{wd:wiki_id}};
+                 politiquices:ent2 ?ent2;
+                 politiquices:type ?rel_type;
+                 politiquices:url ?noticia.
+            ?noticia dc:date ?d
+            FILTER(REGEX((?rel_type), "^ent1_opposes|ent1_supports"))
+            }}
+            UNION
+            {{
+            ?rel politiquices:ent2 {{wd:wiki_id}};
+                 politiquices:ent1 ?ent2;
+                 politiquices:type ?rel_type;
+                 politiquices:url ?noticia .
+            ?noticia dc:date ?d
+            FILTER(REGEX((?rel_type), "^ent2_opposes|ent2_supports"))
+              }}
+        }}
+        """
 
 
 def query_sparql(query, endpoint):
