@@ -9,6 +9,7 @@ from typing import List, Union
 # from bertopic import BERTopic
 from fastapi import FastAPI, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
 from config import sparql_endpoint
@@ -54,8 +55,10 @@ url2index = None
 app = FastAPI()
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
-# origins = ["*"]
-origins = ["http://localhost:3000", "http://beta.politiquices.pt"]
+#origins = ["*"]
+
+origins = ["http://beta.politiquices.pt/"]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
