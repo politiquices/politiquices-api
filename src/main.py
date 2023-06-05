@@ -95,6 +95,24 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
         )
 
 
+# ####################################
+# # call API
+# import requests
+#
+# url = "http://localhost:8000/protected"
+#
+# # The client should pass the API key in the headers
+# headers = {
+#   'Content-Type': 'application/json',
+#   'Authorization': 'Bearer akljnv13bvi2vfo0b0bw'
+# }
+#
+# response = requests.get(url, headers=headers)
+# print(response.text)  # => "You used a valid API key."
+#
+
+
+
 @app.get("/protected", dependencies=[Depends(api_key_auth)])
 def add_post() -> dict:
     return {
