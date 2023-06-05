@@ -7,9 +7,9 @@ from typing import List, Union
 
 # import requests
 # from bertopic import BERTopic
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, Body, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.security import OAuth2PasswordBearer
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
 from config import sparql_endpoint
@@ -55,9 +55,7 @@ url2index = None
 app = FastAPI()
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
-#origins = ["*"]
-
-origins = ["http://beta.politiquices.pt/"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -83,6 +81,25 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     f_name = f"{wiki_id}.{org_url.split('.')[-1]}"
 
     return f"{base_url}/{f_name}"
+
+
+api_keys = ["akljnv13bvi2vfo0b0bw"]  # This is encrypted in the database
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
+
+
+def api_key_auth(api_key: str = Depends(oauth2_scheme)):
+    if api_key not in api_keys:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Forbidden"
+        )
+
+
+@app.get("/protected", dependencies=[Depends(api_key_auth)])
+def add_post() -> dict:
+    return {
+        "data": "You used a valid API key."
+    }
 
 
 # ToDo: for Haystack
