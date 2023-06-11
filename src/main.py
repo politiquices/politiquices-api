@@ -225,7 +225,6 @@ async def timeline(
     nodes = set()
 
     for x in results:
-        print(x)
         nodes.add(json.dumps({"id": x["ent1_id"], "label": all_entities_info[x["ent1_id"]]["name"]}))
         nodes.add(json.dumps({"id": x["ent2_id"], "label": all_entities_info[x["ent2_id"]]["name"]}))
         edges.append({"from": x["ent1_id"], "to": x["ent2_id"], "label": x["rel_type"]})
