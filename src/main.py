@@ -1,21 +1,14 @@
-# import base64
-# import json
+import json
+import logging
 from collections import defaultdict
 from typing import List, Union
 
-# import numpy as np
-
-# import requests
-# from bertopic import BERTopic
-from fastapi import FastAPI, Path, Query, Body, Depends, HTTPException, status
+from fastapi import FastAPI, Path, Query, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
 from config import sparql_endpoint
-
-# from config import es_haystack
-# from qa_neural_search import NeuralSearch
 from sparql import (
     get_nr_of_persons,
     get_person_info,
@@ -52,6 +45,8 @@ topic_distr = None
 topic_token_distr = None
 url2index = None
 
+logger = logging.getLogger("uvicorn")
+
 app = FastAPI()
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
@@ -65,9 +60,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("Testing SPARQL endpoint:", sparql_endpoint)
-all_articles, no_other_articles = get_total_nr_of_articles()
-print(f"Found {get_nr_of_persons()} persons and {all_articles} articles, {no_other_articles} tagged with sentiment")
+
+all_articles, n_other_articles = get_total_nr_of_articles()
+logger.info(f"Testing SPARQL endpoint: {sparql_endpoint}")
+logger.info(f"{get_nr_of_persons()} persons and {all_articles} articles, {n_other_articles} tagged with sentiment")
 
 
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
@@ -89,10 +85,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authenticati
 
 def api_key_auth(api_key: str = Depends(oauth2_scheme)):
     if api_key not in api_keys:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Forbidden"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden")
 
 
 # ####################################
@@ -112,12 +105,9 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
 #
 
 
-
 @app.get("/protected", dependencies=[Depends(api_key_auth)])
 def add_post() -> dict:
-    return {
-        "data": "You used a valid API key."
-    }
+    return {"data": "You used a valid API key."}
 
 
 # ToDo: for Haystack
@@ -229,11 +219,18 @@ async def timeline(
     sentiment: bool = Query(),
 ):
     query_items = {"q": q}
-
-    print(query_items)
-
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
-    return results
+
+    edges = []
+    nodes = set()
+
+    for x in results:
+        print(x)
+        nodes.add(json.dumps({"id": x["ent1_id"], "label": all_entities_info[x["ent1_id"]]["name"]}))
+        nodes.add(json.dumps({"id": x["ent2_id"], "label": all_entities_info[x["ent2_id"]]["name"]}))
+        edges.append({"from": x["ent1_id"], "to": x["ent2_id"], "label": x["rel_type"]})
+
+    return {"news": results, "nodes": nodes, "edges": edges}
 
 
 @app.get("/queries")
@@ -244,7 +241,6 @@ async def queries(
     start: str = Query(),
     end: str = Query(),
 ):
-
     # time interval for the query
     year_from = start
     year_to = end
