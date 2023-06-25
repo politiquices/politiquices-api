@@ -1,6 +1,7 @@
 #/bin/bash
 docker container stop politiquices-api
 docker container rm politiquices-api
+docker build . -t politiquices-api
 PROTOCOL="HTTP://"
 IP_ADDRESS=`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' happy_cartwright`
 PORT="3030"
