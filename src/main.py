@@ -221,13 +221,57 @@ async def timeline(
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
 
+    built_nodes = set()
+    nodes = []
+    edges_agg = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
     edges = []
-    nodes = set()
+
+    def build_node(key, result):
+        if result[key] not in built_nodes:
+            nodes.append({"id": result[key], "label": all_entities_info[x[key]]["name"]})
+            built_nodes.add(result[key])
 
     for x in results:
-        nodes.add(json.dumps({"id": x["ent1_id"], "label": all_entities_info[x["ent1_id"]]["name"]}))
-        nodes.add(json.dumps({"id": x["ent2_id"], "label": all_entities_info[x["ent2_id"]]["name"]}))
-        edges.append({"from": x["ent1_id"], "to": x["ent2_id"], "label": x["rel_type"]})
+        build_node("ent1_id", x)
+        build_node("ent2_id", x)
+        """
+        if x["ent1_id"] not in built_nodes:
+            nodes.append({"id": x["ent1_id"], "label": all_entities_info[x["ent1_id"]]["name"]})
+            built_nodes.add(x["ent1_id"])
+
+        if x["ent2_id"] not in built_nodes:
+            nodes.append({"id": x["ent2_id"], "label": all_entities_info[x["ent2_id"]]["name"]})
+            built_nodes.add(x["ent2_id"])
+        """
+        edges_agg[x["ent1_id"]][x["ent2_id"]][x["rel_type"]] += 1
+
+    for s, v in edges_agg.items():
+        for t, rels in v.items():
+            for rel_type, freq in rels.items():
+
+                if "opposes" in rel_type:
+                    rel_text = "opõe-se"
+                    color = "#FF0000"
+                    highlight = "#780000"
+                else:
+                    rel_text = "apoia"
+                    color = "#44861E"
+                    highlight = "#1d4a03"
+
+                edges.append(
+                    {
+                        "from": s,
+                        "to": t,
+                        "id": len(edges) + 1,
+                        "color": {
+                            "color": color,
+                            "highlight": highlight,
+                        },
+                        "scaling": {"max": 7},
+                        "title": rel_text,
+                        "value": freq,
+                    }
+                )
 
     return {"news": results, "nodes": nodes, "edges": edges}
 
