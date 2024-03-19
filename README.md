@@ -19,7 +19,7 @@ c[![python](https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=p
 
 Generate thumbnails for each downloaded image.
 
-    make image
+    make images
 
 Make a Docker image for the API.
 

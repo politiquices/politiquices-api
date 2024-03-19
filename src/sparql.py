@@ -378,7 +378,7 @@ def get_person_relationships(wiki_id):
 
         else:
             print("unknown rel_type:", e)
-            raise Exception(e["rel_type"]["value"] + " not known")
+            # raise Exception(e["rel_type"]["value"] + " not known")
 
         try:
             relations[rel_type].append(
