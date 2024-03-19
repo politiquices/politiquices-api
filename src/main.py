@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
-from config import sparql_endpoint
+from config import sparql_endpoint, start_year, end_year
 from sparql import (
     get_nr_of_persons,
     get_person_info,
@@ -33,8 +33,6 @@ from sparql import (
 )
 from utils import get_info, get_chart_labels_min_max
 
-start_year = 1994
-end_year = 2022
 rel_types = ["ent1_opposes_ent2", "ent1_supports_ent2", "ent2_opposes_ent1", "ent2_supports_ent1", "other"]
 
 wiki_id_regex = r"^Q\d+$"
@@ -88,41 +86,6 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden")
 
 
-# ####################################
-# # call API
-# import requests
-#
-# url = "http://localhost:8000/protected"
-#
-# # The client should pass the API key in the headers
-# headers = {
-#   'Content-Type': 'application/json',
-#   'Authorization': 'Bearer akljnv13bvi2vfo0b0bw'
-# }
-#
-# response = requests.get(url, headers=headers)
-# print(response.text)  # => "You used a valid API key."
-#
-
-
-@app.get("/protected", dependencies=[Depends(api_key_auth)])
-def add_post() -> dict:
-    return {"data": "You used a valid API key."}
-
-
-# ToDo: for Haystack
-def get_doc_text(arquivo_url: str):
-    """
-    # Get the full document from ElasticSearch given a URL
-    payload = json.dumps({"query": {"match": {"url": arquivo_url}}})
-    url = f"{es_haystack}/document/_search"
-    headers = {"Content-Type": "application/json"}
-    response = requests.request("GET", url, headers=headers, data=payload, timeout=10)
-    return response.json()
-    """
-    return arquivo_url
-
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -151,7 +114,7 @@ async def personality(wiki_id: str = Path(regex=wiki_id_regex)):
     for k in ["opposes", "supports", "opposed_by", "supported_by"]:
         for r in per_relationships[k]:
             year = r["date"][0:4]
-            if int(year) > 2022:
+            if int(year) > end_year:
                 continue
             values[year2index(year)][k] += 1
 
@@ -377,7 +340,7 @@ async def stats():
     nr_all_articles, nr_all_articles_sentiment = get_total_nr_of_articles()
 
     # query returns results for each rel_type, but we aggregate by rel_type discarding direction and 'other'
-    all_years = get_chart_labels_min_max()
+    all_years = get_chart_labels_min_max(min_date=start_year, max_date=end_year)
     values = get_total_articles_by_year_by_relationship_type()
     aggregated_values = defaultdict(lambda: {"oposição": 0, "apoio": 0})
     all_values = []
