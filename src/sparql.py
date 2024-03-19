@@ -285,12 +285,11 @@ def get_person_detailed_info(wiki_id):
 def get_person_relationships(wiki_id):
     # pylint: disable=too-many-branches, too-many-statements
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
          {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{?rel politiquices:ent2 wd:{wiki_id} }}
 
-            ?rel politiquices:type ?rel_type;
-                 politiquices:score ?score.
+            ?rel politiquices:type ?rel_type.
 
              ?rel politiquices:ent1 ?ent1 ;
                   politiquices:ent2 ?ent2 ;
@@ -379,16 +378,13 @@ def get_person_relationships(wiki_id):
 
         else:
             print("unknown rel_type:", e)
-            continue
-            # ToDo: re-activate this Exception
-            # raise Exception(e["rel_type"]["value"] + " not known")
+            raise Exception(e["rel_type"]["value"] + " not known")
 
         try:
             relations[rel_type].append(
                 {
                     "arquivo_doc": e["arquivo_doc"]["value"],
                     "title": e["title"]["value"],
-                    "score": str(e["score"]["value"])[0:5],
                     "date": e["date"]["value"].split("T")[0],
                     "ent1_id": wiki_id,
                     "ent1_img": all_entities_info[wiki_id]["image_url"],
@@ -536,8 +532,7 @@ def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
         WHERE {{
 
               ?rel politiquices:{ent} wd:{wiki_id} .
-              ?rel politiquices:type ?rel_type ;
-                   politiquices:score ?score.
+              ?rel politiquices:type ?rel_type .
 
               FILTER (?rel_type = "{rel_type}")
 
@@ -566,7 +561,7 @@ def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
 # Get relationships for 'Entity vs. Entity'
 def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
           {{
               ?rel politiquices:ent1 wd:{wiki_id_one};
@@ -575,7 +570,6 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
                    politiquices:ent2 ?ent2;
                    politiquices:ent1_str ?ent1_str;
                    politiquices:ent2_str ?ent2_str;
-                   politiquices:score ?score;
                    politiquices:url ?arquivo_doc;
                    politiquices:type ?rel_type. FILTER(!REGEX(?rel_type,"other"))
 
@@ -588,7 +582,6 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
                    politiquices:ent1 ?ent1;
                    politiquices:ent2_str ?ent2_str;
                    politiquices:ent1_str ?ent1_str;
-                   politiquices:score ?score;
                    politiquices:url ?arquivo_doc;
                    politiquices:type ?rel_type FILTER(!REGEX(?rel_type,"other"))
 
@@ -608,7 +601,6 @@ def get_all_relationships_between_two_entities(wiki_id_one, wiki_id_two):
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
-                "score": x["score"]["value"][0:5],
                 "ent1_wiki": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_wiki": x["ent2"]["value"].split("/")[-1],
@@ -625,12 +617,11 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?score ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?arquivo_doc ?date ?title ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
             {{
               ?rel politiquices:ent1 wd:{wiki_id_one};
                    politiquices:ent2 wd:{wiki_id_two};
-                   politiquices:score ?score;
                    politiquices:url ?arquivo_doc;
                    politiquices:ent1 ?ent1;
                    politiquices:ent2 ?ent2;
@@ -645,7 +636,6 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
            {{
               ?rel politiquices:ent2 wd:{wiki_id_one};
                    politiquices:ent1 wd:{wiki_id_two};
-                   politiquices:score ?score;
                    politiquices:url ?arquivo_doc;
                    politiquices:ent1 ?ent1;
                    politiquices:ent2 ?ent2;
@@ -668,7 +658,6 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                 "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
-                "score": x["score"]["value"][0:5],
                 "rel_type": x["rel_type"]["value"],
                 "ent1_wiki": wiki_id_one,
                 "ent1_str": x["ent1_str"]["value"],
@@ -687,14 +676,13 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
-        SELECT DISTINCT ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?arquivo_doc ?date ?title ?score
+        SELECT DISTINCT ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?arquivo_doc ?date ?title
         WHERE {{
             {{
                 ?rel politiquices:ent1 ?ent1;
                      politiquices:ent2 ?ent2 . FILTER(?ent2=wd:{person})
                 ?rel politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
-                     politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
                 ?arquivo_doc dc:title ?title;
@@ -706,7 +694,6 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                      politiquices:ent1 ?ent2 . FILTER(?ent2=wd:{person})
                 ?rel politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
-                     politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
@@ -720,7 +707,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 FILTER(LANG(?personLabel) = "{LANG}")
             }}
         }}
-        ORDER BY DESC(?date) ASC(?score)
+        ORDER BY DESC(?date)
         """
 
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
@@ -732,7 +719,6 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
-                "score": x["score"]["value"][0:5],
                 "ent1_wiki": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_wiki": x["ent2"]["value"].split("/")[-1],
@@ -750,14 +736,13 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-        SELECT DISTINCT ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?score
+        SELECT DISTINCT ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title
         WHERE {{
             {{
                 ?rel politiquices:ent2 ?ent2;
                      politiquices:ent1 ?ent1 . FILTER(?ent1=wd:{person})
                 ?rel politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
-                     politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
                 ?arquivo_doc dc:title ?title;
@@ -769,7 +754,6 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                      politiquices:ent2 ?ent1 . FILTER(?ent1=wd:{person})
                 ?rel politiquices:ent1_str ?ent1_str;
                      politiquices:ent2_str ?ent2_str;
-                     politiquices:score ?score;
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
                 ?arquivo_doc dc:title ?title;
@@ -781,7 +765,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                       rdfs:label ?personLabel. FILTER(LANG(?personLabel) = "{LANG}")
             }}
         }}
-        ORDER BY DESC(?date) ASC(?score)
+        ORDER BY DESC(?date)
         """
 
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
@@ -792,7 +776,6 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                 "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
-                "score": x["score"]["value"][0:5],
                 "rel_type": relation,
                 "ent1_wiki": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
@@ -811,8 +794,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?title
-                    ?score ?rel_type
+    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?title?rel_type
     WHERE {{
       {{
         VALUES ?person_party_a {{ {per_party_a} }}
@@ -824,10 +806,9 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
               {{
-                SELECT ?rel ?rel_type ?arquivo_doc ?title ?date ?score
+                SELECT ?rel ?rel_type ?arquivo_doc ?title ?date
                 WHERE {{
-                     ?rel politiquices:score ?score;
-                          politiquices:url ?arquivo_doc;
+                     ?rel politiquices:url ?arquivo_doc;
                           politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
 
                       ?arquivo_doc dc:title ?title;
@@ -844,10 +825,9 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
               {{
-                SELECT ?rel ?rel_type ?arquivo_doc ?title ?date ?score
+                SELECT ?rel ?rel_type ?arquivo_doc ?title ?date
                 WHERE {{
-                      ?rel politiquices:score ?score;
-                           politiquices:url ?arquivo_doc;
+                      ?rel politiquices:url ?arquivo_doc;
                            politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
                       ?arquivo_doc dc:title ?title;
@@ -867,7 +847,6 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
-                "score": x["score"]["value"][0:5],
                 "ent1_wiki": x["person_party_a"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_wiki": x["person_party_b"]["value"].split("/")[-1],
