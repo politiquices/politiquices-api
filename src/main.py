@@ -266,7 +266,8 @@ async def queries(
         # get the members for each party
         party_a = " ".join(["wd:" + x for x in get_wiki_id_affiliated_with_party(ent1)])
         party_b = " ".join(["wd:" + x for x in get_wiki_id_affiliated_with_party(ent2)])
-        return get_relationship_between_parties(party_a, party_b, rel_type, year_from, year_to)
+        r = get_relationship_between_parties(party_a, party_b, rel_type, year_from, year_to)
+        return r
 
 
 @app.get("/personalities/educated_at/{wiki_id}")

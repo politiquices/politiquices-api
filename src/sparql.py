@@ -659,9 +659,9 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
-                "ent1_wiki": wiki_id_one,
+                "ent1_id": wiki_id_one,
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": wiki_id_two,
+                "ent2_id": wiki_id_two,
                 "ent2_str": x["ent2_str"]["value"],
                 "ent1_img": all_entities_info[wiki_id_one]["image_url"],
                 "ent2_img": all_entities_info[wiki_id_two]["image_url"],
@@ -715,13 +715,13 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
     for x in result["results"]["bindings"]:
         results.append(
             {
-                "url": x["arquivo_doc"]["value"],
+                "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
-                "ent1_wiki": x["ent1"]["value"].split("/")[-1],
+                "ent1_id": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x["ent2"]["value"].split("/")[-1],
+                "ent2_id": x["ent2"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
                 "ent1_img": all_entities_info[x["ent1"]["value"].split("/")[-1]]["image_url"],
                 "ent2_img": all_entities_info[x["ent2"]["value"].split("/")[-1]]["image_url"],
@@ -777,9 +777,9 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": relation,
-                "ent1_wiki": x["ent1"]["value"].split("/")[-1],
+                "ent1_id": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x["ent2"]["value"].split("/")[-1],
+                "ent2_id": x["ent2"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
                 "ent1_img": all_entities_info[x["ent1"]["value"].split("/")[-1]]["image_url"],
                 "ent2_img": all_entities_info[x["ent2"]["value"].split("/")[-1]]["image_url"],
@@ -838,18 +838,19 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
       }}
     }}
     """
+
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     relationships = []
     for x in result["results"]["bindings"]:
         relationships.append(
             {
-                "url": x["arquivo_doc"]["value"],
+                "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
                 "rel_type": x["rel_type"]["value"],
-                "ent1_wiki": x["person_party_a"]["value"].split("/")[-1],
+                "ent1_id": x["person_party_a"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
-                "ent2_wiki": x["person_party_b"]["value"].split("/")[-1],
+                "ent2_id": x["person_party_b"]["value"].split("/")[-1],
                 "ent2_str": x["ent2_str"]["value"],
                 "ent1_img": all_entities_info[x["person_party_a"]["value"].split("/")[-1]]["image_url"],
                 "ent2_img": all_entities_info[x["person_party_b"]["value"].split("/")[-1]]["image_url"],
