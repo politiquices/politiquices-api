@@ -16,7 +16,7 @@ build:
 
 production:
 	# run the docker image
-	docker run -dit --env sparql_endpoint='http://jena_sparql:3030' --name politiquices-api --net politiquices -p 127.0.0.1:8000:8000 politiquices-api
+	echo "Running the API inside the politiquices network and connecting to the jena_sparql container see start_docker.sh"
 
 develop:
 	# runs a local
