@@ -1,4 +1,4 @@
-c[![python](https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
+[![python](https://img.shields.io/badge/Python-3.9-3776AB.svg?style=flat&logo=python&logoColor=white)](https://www.python.org)
 &nbsp;
 ![example event parameter](https://github.com/politiquices/politiquices-api/actions/workflows/code_checks.yml/badge.svg?event=pull_request)
 &nbsp;
