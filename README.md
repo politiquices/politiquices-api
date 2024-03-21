@@ -14,18 +14,16 @@
 - Compute statistics for the Politiquices.PT website.
 - Download images associated with each personality, parties.
 
-  
     make cache
 
-Generate thumbnails for each downloaded image.
+- Generate thumbnails for each downloaded image.
 
     make images
 
-Make a Docker image for the API.
+- Make a Docker image for the API.
 
     make docker
 
-
-Run a local instance of the API: http://127.0.0.1:8000/docs
+- Run a local instance of the API: http://127.0.0.1:8000/docs
 
     make develop
