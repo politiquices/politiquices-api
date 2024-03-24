@@ -26,11 +26,14 @@ Now let's generate thumbnails for each downloaded image
 
 __NOTE__: this will copy all the images to `politiquces-app/public` so that it's part of the static html data of the website
 
-Make a Docker image for the API.
+
+- Make a Docker image for the API.
+
 
     make build
 
 
-Run a local instance of the API: http://127.0.0.1:8000/docs
+- Run a local instance of the API: http://127.0.0.1:8000/docs
+
 
     make develop
