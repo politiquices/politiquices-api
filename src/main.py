@@ -1,11 +1,10 @@
-import json
 import logging
 from collections import defaultdict
 from typing import List, Union
 
-from fastapi import FastAPI, Path, Query, Depends, HTTPException, status
+from fastapi import FastAPI, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
+
 
 from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
 from config import sparql_endpoint, start_year, end_year
@@ -36,7 +35,7 @@ from utils import get_info, get_chart_labels_min_max
 rel_types = ["ent1_opposes_ent2", "ent1_supports_ent2", "ent2_opposes_ent1", "ent2_supports_ent1", "other"]
 
 wiki_id_regex = r"^Q\d+$"
-rel_type_regex = r"(?=(" + "|".join(rel_types) + r"))"
+rel_type_regex = r"((" + "|".join(rel_types) + r"))"
 
 topics = None
 topic_distr = None
@@ -75,15 +74,6 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     f_name = f"{wiki_id}.{org_url.split('.')[-1]}"
 
     return f"{base_url}/{f_name}"
-
-
-api_keys = ["akljnv13bvi2vfo0b0bw"]  # This is encrypted in the database
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
-
-
-def api_key_auth(api_key: str = Depends(oauth2_scheme)):
-    if api_key not in api_keys:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden")
 
 
 @app.get("/")
