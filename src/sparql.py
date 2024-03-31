@@ -285,7 +285,7 @@ def get_person_detailed_info(wiki_id):
 def get_person_relationships(wiki_id):
     # pylint: disable=too-many-branches, too-many-statements
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?date ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
          {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{?rel politiquices:ent2 wd:{wiki_id} }}
 
@@ -299,6 +299,8 @@ def get_person_relationships(wiki_id):
 
               ?arquivo_doc dc:title ?title ;
                            dc:description ?description;
+                           dc:creator ?creator;
+                           dc:publisher ?publisher;
                            dc:date  ?date .
         }}
         ORDER BY ASC(?date)
@@ -386,6 +388,8 @@ def get_person_relationships(wiki_id):
                 {
                     "arquivo_doc": e["arquivo_doc"]["value"],
                     "title": e["title"]["value"],
+                    "domain": e["creator"]["value"],
+                    "original_url": e["publisher"]["value"],
                     "paragraph": e["description"]["value"],
                     "date": e["date"]["value"].split("T")[0],
                     "ent1_id": wiki_id,
