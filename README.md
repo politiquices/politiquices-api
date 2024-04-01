@@ -13,27 +13,20 @@
 ### 1. Cache contents
 
 This will get info for each personality and parties, compute statistics for the Politiquices.PT and it's parties and entities and download images associated with each personality
+This will save everything under a `assets` directory
 
-      make cache
-
-__NOTE__: this will save everything under a `assets` directory
+    make cache
 
 
-Now let's generate thumbnails for each downloaded image
+Now let's generate thumbnails for each downloaded image. This will copy all the images to `politiquces-app/public` so that it's part of the static html data of the website
 
     make images
 
 
-__NOTE__: this will copy all the images to `politiquces-app/public` so that it's part of the static html data of the website
-
-
-- Make a Docker image for the API.
-
+Make a Docker image for the API.
 
     make build
 
-
-- Run a local instance of the API: http://127.0.0.1:8000/docs
-
+Run a local instance of the API: http://127.0.0.1:8000/docs
 
     make develop

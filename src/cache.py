@@ -6,9 +6,6 @@ with open("json/all_entities_info.json", encoding="utf8") as f_in:
 with open("json/all_parties_info.json", encoding="utf8") as f_in:
     all_parties_info = json.load(f_in)
 
-# with open("../json/party_members.json", encoding="utf8") as f_in:
-#     all_parties_members = json.load(f_in)
-
 with open("json/persons.json", encoding="utf8") as f_in:
     persons = json.load(f_in)
 

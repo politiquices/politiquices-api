@@ -379,6 +379,22 @@ def get_person_relationships(wiki_id):
                 other_ent_name = e["ent1_str"]["value"].split("/")[-1]
                 focus_ent = e["ent2_str"]["value"].split("/")[-1]
 
+        elif e["rel_type"]["value"] == "mutual_agreement":
+            print("mutual_agreement")
+            if wiki_id == ent1_wiki:
+                rel_type = "mutual_agreement"
+                other_ent_url = ent2_wiki
+                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
+                focus_ent = e["ent1_str"]["value"].split("/")[-1]
+
+        elif e["rel_type"]["value"] == "mutual_opposition":
+            print("mutual_opposition")
+            if wiki_id == ent1_wiki:
+                rel_type = "mutual_agreement"
+                other_ent_url = ent2_wiki
+                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
+                focus_ent = e["ent1_str"]["value"].split("/")[-1]
+
         else:
             print("unknown rel_type:", e)
             # raise Exception(e["rel_type"]["value"] + " not known")
