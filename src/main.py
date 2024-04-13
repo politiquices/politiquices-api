@@ -147,12 +147,16 @@ async def get_all_parties():
     return list(all_parties_info)
 
 
-@app.get("/personalities/")
-async def get_personalities():
-    return [
+@app.get("/personalities/{page_nr}")
+async def get_personalities(page_nr: int = Path(..., title="Page Number")):
+    personalities_per_page = 32
+    start_index = (page_nr - 1) * personalities_per_page
+    end_index = start_index + personalities_per_page
+    personalities = [
         {"label": v["name"], "nr_articles": v["nr_articles"], "local_image": v["image_url"], "wiki_id": k}
         for k, v in all_entities_info.items()
     ]
+    return personalities[start_index:end_index]
 
 
 @app.get("/persons/")
