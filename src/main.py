@@ -174,6 +174,7 @@ async def timeline(
     q: Union[List[str], None] = Query(),
     selected: bool = Query(),
     sentiment: bool = Query(),
+    min_freq: int = 10,
 ):
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
@@ -205,6 +206,11 @@ async def timeline(
     for s, v in edges_agg.items():
         for t, rels in v.items():
             for rel_type, freq in rels.items():
+
+                if freq < min_freq:
+                    continue
+
+                print(f"freq: {freq}, rel_type: {rel_type}, s: {s}, t: {t}")
 
                 if "opposes" in rel_type:
                     rel_text = "opõe-se"
