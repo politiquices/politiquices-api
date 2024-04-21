@@ -174,7 +174,7 @@ async def timeline(
     q: Union[List[str], None] = Query(),
     selected: bool = Query(),
     sentiment: bool = Query(),
-    min_freq: int = 10,
+    min_freq: int = 10 or Query()
 ):
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment)
@@ -192,15 +192,6 @@ async def timeline(
     for x in results:
         build_node("ent1_id", x)
         build_node("ent2_id", x)
-        """
-        if x["ent1_id"] not in built_nodes:
-            nodes.append({"id": x["ent1_id"], "label": all_entities_info[x["ent1_id"]]["name"]})
-            built_nodes.add(x["ent1_id"])
-
-        if x["ent2_id"] not in built_nodes:
-            nodes.append({"id": x["ent2_id"], "label": all_entities_info[x["ent2_id"]]["name"]})
-            built_nodes.add(x["ent2_id"])
-        """
         edges_agg[x["ent1_id"]][x["ent2_id"]][x["rel_type"]] += 1
 
     for s, v in edges_agg.items():
@@ -209,8 +200,6 @@ async def timeline(
 
                 if freq < min_freq:
                     continue
-
-                print(f"freq: {freq}, rel_type: {rel_type}, s: {s}, t: {t}")
 
                 if "opposes" in rel_type:
                     rel_text = "opõe-se"
@@ -236,7 +225,10 @@ async def timeline(
                     }
                 )
 
-    return {"news": results, "nodes": nodes, "edges": edges}
+    # remove nodes with edges < min_freq
+    nodes_filtered = [n for n in nodes if n["id"] in set([e["from"] for e in edges] + [e["to"] for e in edges])]
+
+    return {"news": results, "nodes": nodes_filtered, "edges": edges}
 
 
 @app.get("/queries")
