@@ -774,7 +774,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                 "domain": x["creator"]["value"],
                 "original_url": x["publisher"]["value"],
                 "paragraph": x["description"]["value"],
-                "rel_type": relation,
+                "rel_type": x["rel_type"]["value"],
                 "ent1_id": x["ent1"]["value"].split("/")[-1],
                 "ent1_str": x["ent1_str"]["value"],
                 "ent2_id": x["ent2"]["value"].split("/")[-1],
