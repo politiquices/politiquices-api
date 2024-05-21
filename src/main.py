@@ -231,7 +231,13 @@ async def timeline(
     # remove nodes with edges < min_freq
     nodes_filtered = [n for n in nodes if n["id"] in set([e["from"] for e in edges] + [e["to"] for e in edges])]
 
-    return {"news": results, "nodes": nodes_filtered, "edges": edges}
+    # filter news where the entities are not in the nodes
+    news_filtered = [x for x in results
+                     if x["ent1_id"] in [n["id"] for n in nodes_filtered]
+                     and x["ent2_id"] in [n["id"] for n in nodes_filtered]
+                     ]
+
+    return {"news": news_filtered, "nodes": nodes_filtered, "edges": edges}
 
 
 @app.get("/queries")

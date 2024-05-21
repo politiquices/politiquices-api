@@ -583,6 +583,7 @@ def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
 # relationship queries
 @lru_cache(maxsize=50)
 def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, start_year, end_year):
+
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
