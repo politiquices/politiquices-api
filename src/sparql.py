@@ -861,13 +861,8 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
     return relationships
 
 
-# new website
-def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool):
+def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, only_sentiment: bool, start_year: str, end_year: str):
     values = " ".join(["wd:" + wiki_id for wiki_id in wiki_ids])
-
-    # ToDo: activate this
-    # date_start = None
-    # date_ent = None
 
     query = f"""
         PREFIX politiquices: <http://www.politiquices.pt/>
@@ -895,7 +890,7 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
                            dc:description ?description;
                            dc:creator ?creator;
                            dc:publisher ?publisher;
-                           dc:date  ?date .
+                           dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
 
             }}
         }}

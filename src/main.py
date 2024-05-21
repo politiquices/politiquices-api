@@ -174,10 +174,13 @@ async def timeline(
     q: Union[List[str], None] = Query(),
     selected: bool = Query(),
     sentiment: bool = Query(),
-    min_freq: int = 10 or Query()
+    min_freq: int = 10 or Query(),
+    start: str = Query(),
+    end: str = Query()
+
 ):
     query_items = {"q": q}
-    results = get_timeline_personalities(query_items["q"], selected, sentiment)
+    results = get_timeline_personalities(query_items["q"], selected, sentiment, start, end)
 
     built_nodes = set()
     nodes = []
