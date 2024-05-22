@@ -133,13 +133,15 @@ async def personality_top_related_personalities(wiki_id: str = Path(regex=wiki_i
     return get_top_relationships(wiki_id)
 
 
-@app.get("/relationships/{ent_1}/{rel_type}/{ent_2}")
+@app.get("/relationships/{ent_1}/{rel_type}/{ent_2}/{start}/{end}")
 async def relationships(
     ent_1: str = Path(regex=wiki_id_regex),
     rel_type: str = Path(regex=rel_type_regex),
     ent_2: str = Path(regex=wiki_id_regex),
+    start: str = Path(),
+    end: str = Path(),
 ):
-    return get_relationship_between_two_persons(ent_1, ent_2, rel_type, start_year, end_year)
+    return get_relationship_between_two_persons(ent_1, ent_2, rel_type, start, end)
 
 
 @app.get("/parties/")
