@@ -184,6 +184,8 @@ async def timeline(
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment, start, end)
 
+    print(results)
+
     built_nodes = set()
     nodes = []
     edges_agg = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
@@ -239,6 +241,7 @@ async def timeline(
                      and x["ent2_id"] in [n["id"] for n in nodes_filtered]
                      ]
 
+    print(f"nodes: {len(nodes)}, edges: {len(edges)}, news: {len(news_filtered)}")
     return {"news": news_filtered, "nodes": nodes_filtered, "edges": edges}
 
 
