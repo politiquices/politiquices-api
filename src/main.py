@@ -130,7 +130,7 @@ async def personality_relationships_by_year(wiki_id: str = Path(regex=wiki_id_re
 
 @app.get("/personality/top_related_personalities/{wiki_id}")
 async def personality_top_related_personalities(wiki_id: str = Path(regex=wiki_id_regex)):
-    return get_top_relationships(wiki_id)
+    return get_top_relationships(wiki_id, 3)
 
 
 @app.get("/relationships/{ent_1}/{rel_type}/{ent_2}/{start}/{end}")
@@ -367,16 +367,16 @@ async def stats():
         all_values.append(v)
 
     # personalities frequency chart
-    per_freq = get_persons_articles_freq()
-    top_500 = per_freq[0:250]
-    top_500.reverse()
+    # per_freq = get_persons_articles_freq()
+    # top_500 = per_freq[0:250]
+    # top_500.reverse()
 
     # personalities co-occurrence chart
-    co_occurrences_labels = []
-    co_occurrences_values = []
-    for x in top_co_occurrences:
-        co_occurrences_labels.append(x["person_a"]["name"] + " / " + x["person_b"]["name"])
-        co_occurrences_values.append(x["nr_occurrences"])
+    # co_occurrences_labels = []
+    # co_occurrences_values = []
+    # for x in top_co_occurrences:
+    #    co_occurrences_labels.append(x["person_a"]["name"] + " / " + x["person_b"]["name"])
+    #    co_occurrences_values.append(x["nr_occurrences"])
 
     return {
         "nr_parties": nr_parties,
@@ -384,7 +384,7 @@ async def stats():
         "nr_all_articles_sentiment": nr_all_articles_sentiment,
         "nr_all_articles": nr_all_articles,
         "year_values": all_values,
-        "personality_freq": top_500,
-        "per_co_occurrence_labels": co_occurrences_labels[0:500],
-        "per_co_occurrence_values": co_occurrences_values[0:500],
+        # "personality_freq": top_500,
+        # "per_co_occurrence_labels": co_occurrences_labels[0:500],
+        # "per_co_occurrence_values": co_occurrences_values[0:500],
     }

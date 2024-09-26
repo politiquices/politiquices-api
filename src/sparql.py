@@ -434,7 +434,7 @@ def get_person_relationships(wiki_id):
     return relations
 
 
-def get_top_relationships(wiki_id):
+def get_top_relationships(wiki_id, top_n=3):
     # get all the relationships where the person acts as subject, i.e: opposes and supports
     query = f"""
         SELECT ?rel_type ?ent2
@@ -541,10 +541,10 @@ def get_top_relationships(wiki_id):
 
     # see PEP448: https://peps.python.org/pep-0448/
     return {
-        "who_person_opposes": who_person_opposes[0:10],
-        "who_person_supports": who_person_supports[0:10],
-        "who_opposes_person": who_opposes_person[0:10],
-        "who_supports_person": who_supports_person[0:10],
+        "who_person_opposes": who_person_opposes[0:top_n],
+        "who_person_supports": who_person_supports[0:top_n],
+        "who_opposes_person": who_opposes_person[0:top_n],
+        "who_supports_person": who_supports_person[0:top_n],
     }
 
 
