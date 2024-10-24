@@ -1,8 +1,9 @@
+import json
 import logging
 from collections import defaultdict
 from typing import List, Union
 
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -388,3 +389,33 @@ async def stats():
         # "per_co_occurrence_labels": co_occurrences_labels[0:500],
         # "per_co_occurrence_values": co_occurrences_values[0:500],
     }
+
+@app.post("/corrections")
+async def corrections(request: Request):
+    try:
+        data = await request.json()
+        
+        # Get the client's IP address
+        client_ip = request.client.host
+        
+        """
+        # Resolve the DNS value of the IP address
+        try:
+            dns_value = socket.gethostbyaddr(client_ip)[0]
+        except socket.herror:
+            dns_value = "DNS resolution failed"
+        """
+
+        # Add IP and DNS information to the data
+        data["client_ip"] = client_ip
+        # data["dns_value"] = dns_value
+
+        print(data)
+
+        # Save the data to a JSON lines file
+        with open("corrections.jsonl", "a") as f:
+            f.write(json.dumps(data) + "\n")
+        
+        return {"message": "Correction saved successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
