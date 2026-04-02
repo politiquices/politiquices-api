@@ -21,8 +21,8 @@ from sparql_queries_cache import (
 )
 
 
-def just_sleep(upper_bound=3, verbose=False):
-    sec = randint(1, upper_bound)
+def just_sleep(lower_bound=1, upper_bound=3, verbose=False):
+    sec = randint(lower_bound, upper_bound)
     if verbose:
         print(f"sleeping for {sec} seconds")
     sleep(sec)
@@ -184,7 +184,7 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
                     print("HTTP: ", r.status_code)
             except RequestException as e:
                 print(e, wiki_id)
-            just_sleep(2)
+            just_sleep(10, 20, verbose=True)
 
 
 def get_images():

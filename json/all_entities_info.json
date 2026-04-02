@@ -77,7 +77,7 @@
     "Q612666": {
         "nr_articles": 601,
         "name": "Catarina Martins",
-        "image_url": "/assets/images/personalities_small/Q612666.png"
+        "image_url": "/assets/images/personalities_small/Q612666.jpg"
     },
     "Q239248": {
         "nr_articles": 582,
@@ -172,7 +172,7 @@
     "Q157": {
         "nr_articles": 360,
         "name": "Fran\u00e7ois Hollande",
-        "image_url": "/assets/images/personalities_small/Q157.jpeg"
+        "image_url": "/assets/images/personalities_small/Q157.jpg"
     },
     "Q737410": {
         "nr_articles": 335,
@@ -227,7 +227,7 @@
     "Q13581124": {
         "nr_articles": 261,
         "name": "Maria Lu\u00eds Albuquerque",
-        "image_url": "/assets/images/personalities_small/Q13581124.png"
+        "image_url": "/assets/images/personalities_small/Q13581124.jpg"
     },
     "Q6706787": {
         "nr_articles": 254,
@@ -242,12 +242,12 @@
     "Q58132": {
         "nr_articles": 251,
         "name": "Nicol\u00e1s Maduro",
-        "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+        "image_url": "/assets/images/personalities_small/Q58132.jpg"
     },
     "Q656518": {
         "nr_articles": 246,
         "name": "Francisco Assis",
-        "image_url": "/assets/images/personalities_small/Q656518.png"
+        "image_url": "/assets/images/personalities_small/Q656518.jpg"
     },
     "Q1124": {
         "nr_articles": 245,
@@ -276,7 +276,7 @@
     },
     "Q8440": {
         "nr_articles": 221,
-        "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+        "name": "Hugo Ch\u00e1vez",
         "image_url": "/assets/images/personalities_small/Q8440.jpeg"
     },
     "Q769747": {
@@ -647,7 +647,7 @@
     "Q65498266": {
         "nr_articles": 82,
         "name": "Ana Catarina Mendes",
-        "image_url": "/assets/images/personalities_small/Q65498266.png"
+        "image_url": "/assets/images/personalities_small/Q65498266.jpg"
     },
     "Q10338225": {
         "nr_articles": 81,
@@ -824,15 +824,15 @@
         "name": "Marta Temido",
         "image_url": "/assets/images/personalities_small/Q57339530.jpg"
     },
-    "Q17318300": {
-        "nr_articles": 61,
-        "name": "Miguel Pinto Luz",
-        "image_url": "/assets/images/personalities_small/Q17318300.jpg"
-    },
     "Q34211": {
         "nr_articles": 61,
         "name": "Yasser Arafat",
         "image_url": "/assets/images/personalities_small/Q34211.jpg"
+    },
+    "Q17318300": {
+        "nr_articles": 61,
+        "name": "Miguel Pinto Luz",
+        "image_url": "/assets/images/personalities_small/Q17318300.jpg"
     },
     "Q10281394": {
         "nr_articles": 59,
@@ -1012,7 +1012,7 @@
     "Q946": {
         "nr_articles": 46,
         "name": "Donald Tusk",
-        "image_url": "/assets/images/personalities_small/Q946.png"
+        "image_url": "/assets/images/personalities_small/Q946.jpg"
     },
     "Q21140733": {
         "nr_articles": 45,
@@ -1517,7 +1517,7 @@
     "Q72310730": {
         "nr_articles": 23,
         "name": "Jo\u00e3o Cotrim de Figueiredo",
-        "image_url": "/assets/images/personalities_small/Q72310730.png"
+        "image_url": "/assets/images/personalities_small/Q72310730.jpg"
     },
     "Q481124": {
         "nr_articles": 23,
@@ -1669,6 +1669,11 @@
         "name": "\u00c1lvaro Almeida",
         "image_url": "/assets/images/personalities_small/Q106943329.jpg"
     },
+    "Q52112309": {
+        "nr_articles": 18,
+        "name": "Ana Mendes Godinho",
+        "image_url": "/assets/images/personalities_small/Q52112309.jpg"
+    },
     "Q23799289": {
         "nr_articles": 18,
         "name": "Tiago Brand\u00e3o Rodrigues",
@@ -1698,11 +1703,6 @@
         "nr_articles": 18,
         "name": "Carlos Cruz",
         "image_url": "/assets/images/personalities_small/Q5041962.jpg"
-    },
-    "Q52112309": {
-        "nr_articles": 18,
-        "name": "Ana Mendes Godinho",
-        "image_url": "/assets/images/personalities_small/Q52112309.jpg"
     },
     "Q5284": {
         "nr_articles": 18,
@@ -1902,7 +1902,7 @@
     "Q47539921": {
         "nr_articles": 14,
         "name": "Jo\u00e3o Oliveira",
-        "image_url": "/assets/images/personalities_small/Q47539921.png"
+        "image_url": "/assets/images/personalities_small/Q47539921.jpg"
     },
     "Q5041861": {
         "nr_articles": 14,
@@ -2357,7 +2357,7 @@
     "Q60780752": {
         "nr_articles": 9,
         "name": "M\u00e1rio Machado",
-        "image_url": "/assets/images/personalities_small/Q60780752.png"
+        "image_url": "/assets/images/personalities_small/Q60780752.jpg"
     },
     "Q64153989": {
         "nr_articles": 9,
@@ -3142,7 +3142,7 @@
     "Q518861": {
         "nr_articles": 4,
         "name": "Frank Carlucci",
-        "image_url": "/assets/images/personalities_small/Q518861.jpg"
+        "image_url": "/assets/images/personalities_small/Q518861.JPEG"
     },
     "Q15105537": {
         "nr_articles": 4,
@@ -3191,7 +3191,7 @@
     },
     "Q27134712": {
         "nr_articles": 4,
-        "name": "Catarina Marques de Almeida Vaz Pinto",
+        "name": "Catarina Vaz Pinto",
         "image_url": "/assets/images/personalities_small/Q27134712.jpg"
     },
     "Q27999259": {
@@ -5576,7 +5576,7 @@
     },
     "Q55195140": {
         "nr_articles": 0,
-        "name": "Paula Martins",
+        "name": "Ana Paula Martins",
         "image_url": "/assets/images/personalities_small/Q55195140.png"
     },
     "Q6298410": {
@@ -5638,6 +5638,11 @@
         "nr_articles": 0,
         "name": "Nuno Rodrigues dos Santos",
         "image_url": "/assets/images/personalities_small/Q10338246.jpg"
+    },
+    "Q98077041": {
+        "nr_articles": 0,
+        "name": "Bruno Fialho",
+        "image_url": "/assets/images/personalities_small/Q98077041.jpg"
     },
     "Q10346717": {
         "nr_articles": 0,
@@ -6724,6 +6729,11 @@
         "name": "Ant\u00f3nio Azevedo",
         "image_url": "/assets/images/personalities_small/Q108699775.jpg"
     },
+    "Q108734148": {
+        "nr_articles": 0,
+        "name": "Tom\u00e1s Dias",
+        "image_url": "/assets/images/personalities_small/Q108734148.jpg"
+    },
     "Q108737015": {
         "nr_articles": 0,
         "name": "Lu\u00eds Cacito",
@@ -7249,6 +7259,11 @@
         "name": "Manuel Ferreira",
         "image_url": "/assets/images/personalities_small/Q113471792.jpg"
     },
+    "Q113500991": {
+        "nr_articles": 0,
+        "name": "Carlos Dur\u00e3o",
+        "image_url": "/assets/images/personalities_small/Q113500991.jpg"
+    },
     "Q114141242": {
         "nr_articles": 0,
         "name": "Joaquim Can\u00e1rio",
@@ -7257,7 +7272,7 @@
     "Q114398640": {
         "nr_articles": 0,
         "name": "Sebasti\u00e3o Bugalho",
-        "image_url": "/assets/images/personalities_small/Q114398640.png"
+        "image_url": "/assets/images/personalities_small/Q114398640.jpg"
     },
     "Q114571574": {
         "nr_articles": 0,
@@ -7644,6 +7659,11 @@
         "name": "Maria In\u00eas Fernandes Maldonado Rodrigues",
         "image_url": "/assets/images/personalities_small/Q124477068.jpg"
     },
+    "Q125993912": {
+        "nr_articles": 0,
+        "name": "Angelo Custodio Maldonado Rodrigues",
+        "image_url": "/assets/images/personalities_small/Q125993912.jpg"
+    },
     "Q124552228": {
         "nr_articles": 0,
         "name": "Paulo Muacho",
@@ -7729,11 +7749,6 @@
         "name": "Jorge Pinto",
         "image_url": "/assets/images/personalities_small/Q125103492.png"
     },
-    "Q125109625": {
-        "nr_articles": 0,
-        "name": "Isabel Mendes Lopes",
-        "image_url": "/assets/images/personalities_small/Q125109625.jpg"
-    },
     "Q125110136": {
         "nr_articles": 0,
         "name": "Marcus Santos",
@@ -7773,6 +7788,11 @@
         "nr_articles": 0,
         "name": "In\u00eas Domingos",
         "image_url": "/assets/images/personalities_small/Q125187885.jpg"
+    },
+    "Q125190301": {
+        "nr_articles": 0,
+        "name": "Pedro Reis",
+        "image_url": "/assets/images/personalities_small/Q125190301.jpg"
     },
     "Q125207866": {
         "nr_articles": 0,
@@ -7854,6 +7874,11 @@
         "name": "Paulo Cunha",
         "image_url": "/assets/images/personalities_small/Q125556730.jpg"
     },
+    "Q125581901": {
+        "nr_articles": 0,
+        "name": "Carla Tavares",
+        "image_url": "/assets/images/personalities_small/Q125581901.jpg"
+    },
     "Q125584169": {
         "nr_articles": 0,
         "name": "Berto Messias",
@@ -7929,6 +7954,81 @@
         "name": "Paula Cardoso",
         "image_url": "/assets/images/personalities_small/Q126262893.jpg"
     },
+    "Q126325522": {
+        "nr_articles": 0,
+        "name": "Sofia Carreira",
+        "image_url": "/assets/images/personalities_small/Q126325522.jpg"
+    },
+    "Q126369369": {
+        "nr_articles": 0,
+        "name": "S\u00f3nia Monteiro",
+        "image_url": "/assets/images/personalities_small/Q126369369.jpg"
+    },
+    "Q126377628": {
+        "nr_articles": 0,
+        "name": "Ana Santos",
+        "image_url": "/assets/images/personalities_small/Q126377628.jpg"
+    },
+    "Q126486908": {
+        "nr_articles": 0,
+        "name": "Andr\u00e9 Rodrigues",
+        "image_url": "/assets/images/personalities_small/Q126486908.jpg"
+    },
+    "Q126683205": {
+        "nr_articles": 0,
+        "name": "Jos\u00e9 Ant\u00f3nio Carvalho",
+        "image_url": "/assets/images/personalities_small/Q126683205.jpg"
+    },
+    "Q126686628": {
+        "nr_articles": 0,
+        "name": "Raul Melo",
+        "image_url": "/assets/images/personalities_small/Q126686628.jpg"
+    },
+    "Q126939829": {
+        "nr_articles": 0,
+        "name": "Odete Isabel",
+        "image_url": "/assets/images/personalities_small/Q126939829.jpg"
+    },
+    "Q127009304": {
+        "nr_articles": 0,
+        "name": "S\u00e9rgio Gon\u00e7alves",
+        "image_url": "/assets/images/personalities_small/Q127009304.jpg"
+    },
+    "Q127226353": {
+        "nr_articles": 0,
+        "name": "Bruno Gon\u00e7alves",
+        "image_url": "/assets/images/personalities_small/Q127226353.jpg"
+    },
+    "Q127271506": {
+        "nr_articles": 0,
+        "name": "Rodrigo Alves Taxa",
+        "image_url": "/assets/images/personalities_small/Q127271506.jpg"
+    },
+    "Q127271825": {
+        "nr_articles": 0,
+        "name": "Ana Miguel Pedro",
+        "image_url": "/assets/images/personalities_small/Q127271825.jpg"
+    },
+    "Q127287935": {
+        "nr_articles": 0,
+        "name": "Lurdes Breu",
+        "image_url": "/assets/images/personalities_small/Q127287935.jpg"
+    },
+    "Q127467131": {
+        "nr_articles": 0,
+        "name": "Ana Martins",
+        "image_url": "/assets/images/personalities_small/Q127467131.jpg"
+    },
+    "Q127511267": {
+        "nr_articles": 0,
+        "name": "Paulo do Nascimento Cabral",
+        "image_url": "/assets/images/personalities_small/Q127511267.jpg"
+    },
+    "Q128034049": {
+        "nr_articles": 0,
+        "name": "Palmira Alberto Matos",
+        "image_url": "/assets/images/personalities_small/Q128034049.jpg"
+    },
     "Q1281014": {
         "nr_articles": 0,
         "name": "Fernando Pereira",
@@ -7938,6 +8038,16 @@
         "nr_articles": 0,
         "name": "Fradique de Menezes",
         "image_url": "/assets/images/personalities_small/Q271012.jpg"
+    },
+    "Q128416614": {
+        "nr_articles": 0,
+        "name": "Humberto Rosa",
+        "image_url": "/assets/images/personalities_small/Q128416614.jpg"
+    },
+    "Q128475440": {
+        "nr_articles": 0,
+        "name": "Rui Cruz",
+        "image_url": "/assets/images/personalities_small/Q128475440.jpg"
     },
     "Q1287504": {
         "nr_articles": 0,
@@ -7949,10 +8059,50 @@
         "name": "Miguel Trovoada",
         "image_url": "/assets/images/personalities_small/Q504522.jpg"
     },
+    "Q128796701": {
+        "nr_articles": 0,
+        "name": "Manuel Ara\u00fajo Pimenta",
+        "image_url": "/assets/images/personalities_small/Q128796701.jpg"
+    },
+    "Q128902542": {
+        "nr_articles": 0,
+        "name": "Maria Albertina Diogo",
+        "image_url": "/assets/images/personalities_small/Q128902542.jpg"
+    },
+    "Q129105492": {
+        "nr_articles": 0,
+        "name": "Maur\u00edcio Marques",
+        "image_url": "/assets/images/personalities_small/Q129105492.jpg"
+    },
+    "Q129346060": {
+        "nr_articles": 0,
+        "name": "Manuel Lu\u00eds Maca\u00edsta Malheiros",
+        "image_url": "/assets/images/personalities_small/Q129346060.jpg"
+    },
+    "Q129677126": {
+        "nr_articles": 0,
+        "name": "Orlando Almeida",
+        "image_url": "/assets/images/personalities_small/Q129677126.jpg"
+    },
     "Q12981": {
         "nr_articles": 0,
         "name": "Yves Leterme",
         "image_url": "/assets/images/personalities_small/Q12981.jpg"
+    },
+    "Q130247454": {
+        "nr_articles": 0,
+        "name": "Manuel Queir\u00f3",
+        "image_url": "/assets/images/personalities_small/Q130247454.jpg"
+    },
+    "Q130297674": {
+        "nr_articles": 0,
+        "name": "M\u00e1rio Coelho Fernandes",
+        "image_url": "/assets/images/personalities_small/Q130297674.jpg"
+    },
+    "Q130301873": {
+        "nr_articles": 0,
+        "name": "Rita Pi\u00e7arra",
+        "image_url": "/assets/images/personalities_small/Q130301873.jpg"
     },
     "Q9697452": {
         "nr_articles": 0,
@@ -8048,11 +8198,6 @@
         "nr_articles": 0,
         "name": "Jos\u00e9 Da Silva Costa",
         "image_url": "/assets/images/personalities_small/Q16149118.jpg"
-    },
-    "Q16195739": {
-        "nr_articles": 0,
-        "name": "Jo\u00e3o Paulo Peixoto",
-        "image_url": "/assets/images/personalities_small/Q16195739.JPG"
     },
     "Q16215552": {
         "nr_articles": 0,
@@ -8353,6 +8498,11 @@
         "nr_articles": 0,
         "name": "Helena M. Vaz Da Silva",
         "image_url": "/assets/images/personalities_small/Q17420920.JPG"
+    },
+    "Q29107257": {
+        "nr_articles": 0,
+        "name": "Alberto Vaz da Silva",
+        "image_url": "/assets/images/personalities_small/Q29107257.jpg"
     },
     "Q17444314": {
         "nr_articles": 0,
@@ -8794,11 +8944,6 @@
         "name": "Carlos Manuel Soares Miguel",
         "image_url": "/assets/images/personalities_small/Q28973900.jpg"
     },
-    "Q29107257": {
-        "nr_articles": 0,
-        "name": "Alberto Vaz da Silva",
-        "image_url": "/assets/images/personalities_small/Q29107257.jpg"
-    },
     "Q29865153": {
         "nr_articles": 0,
         "name": "Maria do Carmo Jardim",
@@ -9019,6 +9164,11 @@
         "name": "Bruno Bobone",
         "image_url": "/assets/images/personalities_small/Q52005580.jpg"
     },
+    "Q535922": {
+        "nr_articles": 0,
+        "name": "L\u00e1szl\u00f3 T\u0151k\u00e9s",
+        "image_url": "/assets/images/personalities_small/Q535922.JPG"
+    },
     "Q5444589": {
         "nr_articles": 0,
         "name": "Fernando Amaral",
@@ -9223,6 +9373,11 @@
         "nr_articles": 0,
         "name": "Cristina Fonseca",
         "image_url": "/assets/images/personalities_small/Q64176555.jpg"
+    },
+    "Q64280455": {
+        "nr_articles": 0,
+        "name": "Nicolae \u0218tef\u0103nu\u021b\u0103",
+        "image_url": "/assets/images/personalities_small/Q64280455.jpg"
     },
     "Q64282369": {
         "nr_articles": 0,
@@ -9707,7 +9862,7 @@
     "Q87720378": {
         "nr_articles": 0,
         "name": "Etelvina Lopes de Almeida",
-        "image_url": "/assets/images/personalities_small/Q87720378.jpg"
+        "image_url": "/assets/images/personalities_small/Q87720378.png"
     },
     "Q89398": {
         "nr_articles": 0,

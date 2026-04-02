@@ -177,7 +177,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "66"
     },
@@ -398,7 +398,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "46"
     },
@@ -541,7 +541,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "33"
     },
@@ -749,7 +749,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "28"
     },
@@ -931,7 +931,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "24"
     },
@@ -1087,7 +1087,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "22"
     },
@@ -1477,7 +1477,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "18"
     },
@@ -1581,7 +1581,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "17"
     },
@@ -1658,7 +1658,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "16"
@@ -1736,7 +1736,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "15"
@@ -1893,7 +1893,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "14"
     },
@@ -1906,7 +1906,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "14"
     },
@@ -1971,7 +1971,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "14"
     },
@@ -1992,7 +1992,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 156,
@@ -2005,7 +2005,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 1219,
@@ -2083,7 +2083,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 2129,
@@ -2382,7 +2382,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 2181,
@@ -2395,7 +2395,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 630,
@@ -2543,7 +2543,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "12"
     },
@@ -2582,7 +2582,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "12"
     },
@@ -2686,7 +2686,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "11"
     },
@@ -2907,7 +2907,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "11"
     },
@@ -2985,7 +2985,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "10"
     },
@@ -3058,7 +3058,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 294,
@@ -3076,7 +3076,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "10"
     },
@@ -3128,7 +3128,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "10"
     },
@@ -3279,11 +3279,11 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "10"
@@ -3383,7 +3383,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 1050,
@@ -3409,7 +3409,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 528,
@@ -3786,7 +3786,7 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 1109,
@@ -4033,12 +4033,12 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "8"
     },
@@ -4415,7 +4415,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "8"
     },
@@ -4488,7 +4488,7 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 217,
@@ -4501,7 +4501,7 @@
         "person_a": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "person_b": {
             "nr_articles": 1219,
@@ -4545,7 +4545,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "7"
     },
@@ -4696,7 +4696,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 239,
@@ -4709,7 +4709,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 1148,
@@ -5013,7 +5013,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "7"
     },
@@ -5091,7 +5091,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "7"
     },
@@ -5489,7 +5489,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 127,
@@ -5554,7 +5554,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 1109,
@@ -5740,7 +5740,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "6"
@@ -5923,7 +5923,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "6"
     },
@@ -6157,7 +6157,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "6"
     },
@@ -6321,7 +6321,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 423,
@@ -6508,7 +6508,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "5"
     },
@@ -6572,7 +6572,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "5"
@@ -6698,7 +6698,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 110,
@@ -6711,7 +6711,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 850,
@@ -6724,7 +6724,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 3835,
@@ -6911,7 +6911,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "5"
     },
@@ -7054,7 +7054,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "5"
     },
@@ -7569,7 +7569,7 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 876,
@@ -7587,7 +7587,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "5"
     },
@@ -7673,12 +7673,12 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "5"
     },
@@ -8219,7 +8219,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 3052,
@@ -8250,7 +8250,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -8575,7 +8575,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -8730,7 +8730,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "4"
@@ -8848,7 +8848,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -8991,7 +8991,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -9043,7 +9043,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -9302,7 +9302,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "4"
@@ -9355,7 +9355,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -9394,7 +9394,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "4"
     },
@@ -9623,7 +9623,7 @@
         "person_a": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "person_b": {
             "nr_articles": 1219,
@@ -9649,7 +9649,7 @@
         "person_a": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "person_b": {
             "nr_articles": 164,
@@ -10187,7 +10187,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -10317,7 +10317,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -10356,7 +10356,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -10806,7 +10806,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 252,
@@ -10819,7 +10819,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 372,
@@ -10832,7 +10832,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 332,
@@ -10845,7 +10845,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 388,
@@ -10858,7 +10858,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 1058,
@@ -11097,7 +11097,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -11396,7 +11396,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -11430,7 +11430,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 876,
@@ -11604,7 +11604,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -12279,7 +12279,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "3"
@@ -12358,7 +12358,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -12371,7 +12371,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -12878,7 +12878,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -13202,7 +13202,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "3"
@@ -13306,7 +13306,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "3"
@@ -13658,7 +13658,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -13762,7 +13762,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -13801,7 +13801,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "3"
     },
@@ -13913,7 +13913,7 @@
         "person_a": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "person_b": {
             "nr_articles": 33,
@@ -13926,7 +13926,7 @@
         "person_a": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "person_b": {
             "nr_articles": 335,
@@ -14698,7 +14698,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -14906,7 +14906,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -15699,7 +15699,7 @@
         "person_b": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -15751,7 +15751,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -16167,7 +16167,7 @@
         "person_b": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -16578,7 +16578,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 131,
@@ -16591,7 +16591,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 66,
@@ -16604,7 +16604,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 423,
@@ -16617,7 +16617,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 27,
@@ -16661,7 +16661,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -16908,7 +16908,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -17103,7 +17103,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -17449,7 +17449,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 174,
@@ -17462,7 +17462,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 200,
@@ -17475,7 +17475,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 109,
@@ -17488,7 +17488,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 2129,
@@ -17501,7 +17501,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 294,
@@ -18208,7 +18208,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -18715,7 +18715,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -19235,7 +19235,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -19612,7 +19612,7 @@
         "person_b": {
             "nr_articles": 4,
             "name": "Frank Carlucci",
-            "image_url": "/assets/images/personalities_small/Q518861.jpg"
+            "image_url": "/assets/images/personalities_small/Q518861.JPEG"
         },
         "nr_occurrences": "2"
     },
@@ -20314,7 +20314,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -20626,7 +20626,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -20717,7 +20717,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -20730,7 +20730,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -20899,7 +20899,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -21419,7 +21419,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -21536,7 +21536,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -21679,7 +21679,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -21796,7 +21796,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -21821,7 +21821,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "2"
@@ -22051,7 +22051,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 65,
@@ -22108,7 +22108,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -22120,7 +22120,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "2"
@@ -22181,7 +22181,7 @@
         "person_a": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "person_b": {
             "nr_articles": 33,
@@ -22277,7 +22277,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "2"
     },
@@ -22667,7 +22667,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -22797,7 +22797,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -23135,7 +23135,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -23499,7 +23499,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -23888,7 +23888,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "1"
@@ -24578,7 +24578,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -25761,7 +25761,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -26528,7 +26528,7 @@
         "person_b": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -26905,7 +26905,7 @@
         "person_b": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -27113,7 +27113,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -27490,7 +27490,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -28075,7 +28075,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -28101,7 +28101,7 @@
         "person_b": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -29011,7 +29011,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -29102,7 +29102,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -29310,7 +29310,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -29336,7 +29336,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -29427,7 +29427,7 @@
         "person_b": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -29986,7 +29986,7 @@
         "person_b": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -30272,7 +30272,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -31247,7 +31247,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -31450,7 +31450,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 402,
@@ -31463,7 +31463,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 3687,
@@ -31476,7 +31476,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 38,
@@ -31489,7 +31489,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 1219,
@@ -31502,7 +31502,7 @@
         "person_a": {
             "nr_articles": 261,
             "name": "Maria Lu\u00eds Albuquerque",
-            "image_url": "/assets/images/personalities_small/Q13581124.png"
+            "image_url": "/assets/images/personalities_small/Q13581124.jpg"
         },
         "person_b": {
             "nr_articles": 128,
@@ -32170,7 +32170,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -33210,7 +33210,7 @@
         "person_b": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -33509,7 +33509,7 @@
         "person_b": {
             "nr_articles": 4,
             "name": "Frank Carlucci",
-            "image_url": "/assets/images/personalities_small/Q518861.jpg"
+            "image_url": "/assets/images/personalities_small/Q518861.JPEG"
         },
         "nr_occurrences": "1"
     },
@@ -33561,7 +33561,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -33621,7 +33621,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 402,
@@ -33634,7 +33634,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 53,
@@ -33647,7 +33647,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 127,
@@ -33660,7 +33660,7 @@
         "person_a": {
             "nr_articles": 360,
             "name": "Fran\u00e7ois Hollande",
-            "image_url": "/assets/images/personalities_small/Q157.jpeg"
+            "image_url": "/assets/images/personalities_small/Q157.jpg"
         },
         "person_b": {
             "nr_articles": 3835,
@@ -33768,7 +33768,7 @@
         },
         "person_b": {
             "nr_articles": 4,
-            "name": "Catarina Marques de Almeida Vaz Pinto",
+            "name": "Catarina Vaz Pinto",
             "image_url": "/assets/images/personalities_small/Q27134712.jpg"
         },
         "nr_occurrences": "1"
@@ -34692,7 +34692,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -35459,7 +35459,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -35485,7 +35485,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -35576,7 +35576,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -35901,7 +35901,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -36317,7 +36317,7 @@
         "person_b": {
             "nr_articles": 9,
             "name": "M\u00e1rio Machado",
-            "image_url": "/assets/images/personalities_small/Q60780752.png"
+            "image_url": "/assets/images/personalities_small/Q60780752.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -37370,7 +37370,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -37448,7 +37448,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -37994,7 +37994,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -38527,7 +38527,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -40087,7 +40087,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -40139,7 +40139,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -40646,7 +40646,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -40737,7 +40737,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -41140,7 +41140,7 @@
         "person_b": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -41387,7 +41387,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -41465,7 +41465,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -42050,7 +42050,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -42309,7 +42309,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "1"
@@ -42686,7 +42686,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "1"
@@ -42752,7 +42752,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -43670,7 +43670,7 @@
         "person_a": {
             "nr_articles": 14,
             "name": "Jo\u00e3o Oliveira",
-            "image_url": "/assets/images/personalities_small/Q47539921.png"
+            "image_url": "/assets/images/personalities_small/Q47539921.jpg"
         },
         "person_b": {
             "nr_articles": 14,
@@ -44026,7 +44026,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -44078,7 +44078,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -44234,7 +44234,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -44325,7 +44325,7 @@
         "person_b": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -44520,7 +44520,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -44793,7 +44793,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -44844,7 +44844,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "1"
@@ -45139,7 +45139,7 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 3835,
@@ -45152,7 +45152,7 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 607,
@@ -45165,12 +45165,12 @@
         "person_a": {
             "nr_articles": 251,
             "name": "Nicol\u00e1s Maduro",
-            "image_url": "/assets/images/personalities_small/Q58132.jpeg"
+            "image_url": "/assets/images/personalities_small/Q58132.jpg"
         },
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -45196,7 +45196,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -45443,7 +45443,7 @@
         "person_b": {
             "nr_articles": 46,
             "name": "Donald Tusk",
-            "image_url": "/assets/images/personalities_small/Q946.png"
+            "image_url": "/assets/images/personalities_small/Q946.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -45451,7 +45451,7 @@
         "person_a": {
             "nr_articles": 9,
             "name": "M\u00e1rio Machado",
-            "image_url": "/assets/images/personalities_small/Q60780752.png"
+            "image_url": "/assets/images/personalities_small/Q60780752.jpg"
         },
         "person_b": {
             "nr_articles": 15,
@@ -45802,7 +45802,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 47,
@@ -45815,7 +45815,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 470,
@@ -45828,7 +45828,7 @@
         "person_a": {
             "nr_articles": 601,
             "name": "Catarina Martins",
-            "image_url": "/assets/images/personalities_small/Q612666.png"
+            "image_url": "/assets/images/personalities_small/Q612666.jpg"
         },
         "person_b": {
             "nr_articles": 217,
@@ -45846,7 +45846,7 @@
         "person_b": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -45963,7 +45963,7 @@
         "person_b": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -46002,7 +46002,7 @@
         "person_b": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "nr_occurrences": "1"
     },
@@ -46062,7 +46062,7 @@
         "person_a": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "person_b": {
             "nr_articles": 59,
@@ -46075,7 +46075,7 @@
         "person_a": {
             "nr_articles": 82,
             "name": "Ana Catarina Mendes",
-            "image_url": "/assets/images/personalities_small/Q65498266.png"
+            "image_url": "/assets/images/personalities_small/Q65498266.jpg"
         },
         "person_b": {
             "nr_articles": 12,
@@ -46127,7 +46127,7 @@
         "person_a": {
             "nr_articles": 246,
             "name": "Francisco Assis",
-            "image_url": "/assets/images/personalities_small/Q656518.png"
+            "image_url": "/assets/images/personalities_small/Q656518.jpg"
         },
         "person_b": {
             "nr_articles": 7,
@@ -46387,7 +46387,7 @@
         "person_a": {
             "nr_articles": 23,
             "name": "Jo\u00e3o Cotrim de Figueiredo",
-            "image_url": "/assets/images/personalities_small/Q72310730.png"
+            "image_url": "/assets/images/personalities_small/Q72310730.jpg"
         },
         "person_b": {
             "nr_articles": 217,
@@ -46534,7 +46534,7 @@
         },
         "person_b": {
             "nr_articles": 221,
-            "name": "Hugo Rafael Ch\u00e1vez fr\u00edas",
+            "name": "Hugo Ch\u00e1vez",
             "image_url": "/assets/images/personalities_small/Q8440.jpeg"
         },
         "nr_occurrences": "1"
