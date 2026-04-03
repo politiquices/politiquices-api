@@ -29,14 +29,23 @@ def just_sleep(lower_bound=1, upper_bound=3, verbose=False):
 
 
 def get_entities() -> Dict[str, Any]:
-    """Get for each personality in the wikidata graph: name, image url, wikidata id, nr_articles"""
+    """Get for each personality in the wikidata graph: name, image url, wikidata id, nr_articles per rel_type"""
 
     all_wikidata_per = get_persons_wiki_id_name_image_url()
     per_articles = get_total_nr_articles_for_each_person()
     all_politiquices_per = defaultdict(dict)
     for wiki_id in all_wikidata_per.keys():  # pylint: disable=consider-using-dict-items, consider-iterating-dictionary
-        all_politiquices_per[wiki_id]["nr_articles"] = per_articles.get(wiki_id, 0)
+        rel_counts = per_articles.get(wiki_id, {})
+        all_politiquices_per[wiki_id]["nr_articles"] = sum(rel_counts.values())
+        all_politiquices_per[wiki_id]["nr_articles_by_type"] = {
+            "ent1_supports_ent2": rel_counts.get("ent1_supports_ent2", 0),
+            "ent2_supports_ent1": rel_counts.get("ent2_supports_ent1", 0),
+            "ent1_opposes_ent2":  rel_counts.get("ent1_opposes_ent2", 0),
+            "ent2_opposes_ent1":  rel_counts.get("ent2_opposes_ent1", 0),
+            "other":              rel_counts.get("other", 0),
+        }
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
+        all_politiquices_per[wiki_id]["countries"] = all_wikidata_per[wiki_id]["countries"]
         f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
         all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
 
@@ -62,7 +71,7 @@ def personalities_json_cache() -> Dict[str, Any]:
     persons = [
         {"label": x[1]["name"], "value": x[0]}
         for x in sorted(all_politiquices_per.items(), key=lambda x: x[1]["name"])
-        if x[1]["nr_articles"] > 0
+        if (x[1]["nr_articles"] - x[1]["nr_articles_by_type"]["other"]) > 0
     ]
     with open(STATIC_DATA + "persons.json", "wt", encoding="utf8") as f_out:
         json.dump(persons, f_out, indent=True)

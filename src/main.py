@@ -151,14 +151,15 @@ async def get_all_parties():
 
 
 @app.get("/personalities/{page_nr}")
-async def get_personalities(page_nr: int = Path(..., title="Page Number")):
+async def get_personalities(page_nr: int = Path(..., title="Page Number"), portuguese_only: bool = False):
     personalities_per_page = 32
-    start_index = (page_nr - 1) * personalities_per_page
-    end_index = start_index + personalities_per_page
     personalities = [
         {"label": v["name"], "nr_articles": v["nr_articles"], "local_image": v["image_url"], "wiki_id": k}
         for k, v in all_entities_info.items()
+        if not portuguese_only or any(c["wiki_id"] == "Q45" for c in v.get("countries", []))
     ]
+    start_index = (page_nr - 1) * personalities_per_page
+    end_index = start_index + personalities_per_page
     return personalities[start_index:end_index]
 
 
@@ -177,15 +178,13 @@ async def timeline(
     q: Union[List[str], None] = Query(),
     selected: bool = Query(),
     sentiment: bool = Query(),
-    min_freq: int = 10 or Query(),
+    min_freq: int = Query(default=10),
     start: str = Query(),
     end: str = Query()
 
 ):
     query_items = {"q": q}
     results = get_timeline_personalities(query_items["q"], selected, sentiment, start, end)
-
-    print(results)
 
     built_nodes = set()
     nodes = []
@@ -194,13 +193,22 @@ async def timeline(
 
     def build_node(key, result):
         if result[key] not in built_nodes:
-            nodes.append({"id": result[key], "label": all_entities_info[x[key]]["name"]})
+            nodes.append({"id": result[key], "label": all_entities_info[x[key]]["name"], "image_url": all_entities_info[x[key]]["image_url"]})
             built_nodes.add(result[key])
 
     for x in results:
         build_node("ent1_id", x)
         build_node("ent2_id", x)
-        edges_agg[x["ent1_id"]][x["ent2_id"]][x["rel_type"]] += 1
+        rel_type = x["rel_type"]
+        # Determine the actor (who is doing the action) and the target
+        if rel_type in ("ent1_opposes_ent2", "ent1_supports_ent2"):
+            actor, target = x["ent1_id"], x["ent2_id"]
+        else:  # ent2_opposes_ent1, ent2_supports_ent1
+            actor, target = x["ent2_id"], x["ent1_id"]
+        sentiment = "opposes" if "opposes" in rel_type else "supports"
+        # Use canonical ordering so A→B and B→A of same type merge into one edge
+        canon_s, canon_t = (actor, target) if actor < target else (target, actor)
+        edges_agg[canon_s][canon_t][sentiment] += 1
 
     for s, v in edges_agg.items():
         for t, rels in v.items():
@@ -209,7 +217,7 @@ async def timeline(
                 if freq < min_freq:
                     continue
 
-                if "opposes" in rel_type:
+                if rel_type == "opposes":
                     rel_text = "opõe-se"
                     color = "#FF0000"
                     highlight = "#780000"
@@ -281,9 +289,9 @@ async def queries(
 async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_education(wiki_id)
     for r in results:
-        wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
+        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
     return results
 
 
@@ -291,9 +299,9 @@ async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
 async def personalities_occupation(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
     for r in results:
-        wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
+        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
     return results
 
 
@@ -301,9 +309,9 @@ async def personalities_occupation(wiki_id: str = Path(regex=wiki_id_regex)):
 async def personalities_public_office(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
     for r in results:
-        wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
+        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
     return results
 
 
@@ -311,9 +319,9 @@ async def personalities_public_office(wiki_id: str = Path(regex=wiki_id_regex)):
 async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
     for r in results:
-        wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
+        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
     return results
 
 
@@ -321,9 +329,9 @@ async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
 async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     for r in results:
-        wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
+        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
     return results
 
 
@@ -331,9 +339,9 @@ async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
 async def personalities_party(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
     for r in results:
-        wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[wiki_id]["nr_articles"]
+        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
+        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
+        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
     return results
 
 

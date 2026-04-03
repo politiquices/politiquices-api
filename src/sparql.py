@@ -501,6 +501,7 @@ def get_top_relationships(wiki_id, top_n=3):
             "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_subject["who_person_opposes"].items()
+        if k in all_entities_info
     ]
 
     total = sum(person_as_subject["who_person_supports"].values())
@@ -513,6 +514,7 @@ def get_top_relationships(wiki_id, top_n=3):
             "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_subject["who_person_supports"].items()
+        if k in all_entities_info
     ]
 
     total = sum(person_as_target["who_opposes_person"].values())
@@ -525,6 +527,7 @@ def get_top_relationships(wiki_id, top_n=3):
             "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_target["who_opposes_person"].items()
+        if k in all_entities_info
     ]
 
     total = sum(person_as_target["who_supports_person"].values())
@@ -537,14 +540,15 @@ def get_top_relationships(wiki_id, top_n=3):
             "relative": str(round(v / total * 100, 2)) + "%",
         }
         for k, v in person_as_target["who_supports_person"].items()
+        if k in all_entities_info
     ]
 
     # see PEP448: https://peps.python.org/pep-0448/
     return {
-        "who_person_opposes": who_person_opposes[0:top_n],
-        "who_person_supports": who_person_supports[0:top_n],
-        "who_opposes_person": who_opposes_person[0:top_n],
-        "who_supports_person": who_supports_person[0:top_n],
+        "who_person_opposes": sorted(who_person_opposes, key=lambda x: x["freq"], reverse=True)[0:top_n],
+        "who_person_supports": sorted(who_person_supports, key=lambda x: x["freq"], reverse=True)[0:top_n],
+        "who_opposes_person": sorted(who_opposes_person, key=lambda x: x["freq"], reverse=True)[0:top_n],
+        "who_supports_person": sorted(who_supports_person, key=lambda x: x["freq"], reverse=True)[0:top_n],
     }
 
 

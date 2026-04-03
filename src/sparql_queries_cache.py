@@ -152,41 +152,61 @@ def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
     # wd:Q5 -> all human beings
     # wd:Q15904441 -> Dailai Lama, he's not a human being, it's a position/spiritual leader
     query = f"""
-        SELECT ?wiki_id ?label ?image_url {{
+        SELECT ?wiki_id ?label ?image_url ?country ?country_label {{
             VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
             ?wiki_id wdt:P31 ?valid_instances.
             ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "{LANG}")
             OPTIONAL {{ ?wiki_id wdt:P18 ?image_url. }}
+            OPTIONAL {{
+                ?wiki_id wdt:P27 ?country .
+                ?country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
+            }}
         }}
         """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
     results = {}
     for e in result["results"]["bindings"]:
         wiki_id = e["wiki_id"]["value"].split("/")[-1]
-        results[wiki_id] = {
-            "wiki_id": wiki_id,
-            "name": e["label"]["value"],
-            "image_url": make_https(e["image_url"]["value"]) if "image_url" in e else NO_IMAGE,
-        }
+        if wiki_id not in results:
+            results[wiki_id] = {
+                "wiki_id": wiki_id,
+                "name": e["label"]["value"],
+                "image_url": make_https(e["image_url"]["value"]) if "image_url" in e else NO_IMAGE,
+                "countries": [],
+            }
+        if "country" in e:
+            country_id = e["country"]["value"].split("/")[-1]
+            country_label = e["country_label"]["value"]
+            entry = {"wiki_id": country_id, "label": country_label}
+            if entry not in results[wiki_id]["countries"]:
+                results[wiki_id]["countries"].append(entry)
 
     return results
 
 
-def get_total_nr_articles_for_each_person() -> Dict[str, int]:
+def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, int]]:
     query = """
-        SELECT ?person (COUNT(*) as ?count)
+        SELECT ?person ?rel_type (COUNT(*) as ?count)
         WHERE {
-          VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
-                              'ent1_supports_ent2' 'ent2_supports_ent1' 'other'}
-            ?person wdt:P31 wd:Q5 ;
+          VALUES ?rel_type {'ent1_opposes_ent2' 'ent2_opposes_ent1'
+                            'ent1_supports_ent2' 'ent2_supports_ent1' 'other'}
+            ?person wdt:P31 wd:Q5 .
             {?rel politiquices:ent1 ?person} UNION {?rel politiquices:ent2 ?person} .
-            ?rel politiquices:type ?rel_values .
+            ?rel politiquices:type ?rel_type .
           }
-        GROUP BY ?person
-        ORDER BY DESC (?count)
+        GROUP BY ?person ?rel_type
+        ORDER BY ?person
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    return {e["person"]["value"].split("/")[-1]: int(e["count"]["value"]) for e in results["results"]["bindings"]}
+    counts: Dict[str, Dict[str, int]] = {}
+    for e in results["results"]["bindings"]:
+        wiki_id = e["person"]["value"].split("/")[-1]
+        rel_type = e["rel_type"]["value"]
+        count = int(e["count"]["value"])
+        if wiki_id not in counts:
+            counts[wiki_id] = {}
+        counts[wiki_id][rel_type] = count
+    return counts
 
 
 def get_all_parties_images():
