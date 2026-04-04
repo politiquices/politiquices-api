@@ -156,7 +156,8 @@ async def get_personalities(page_nr: int = Path(..., title="Page Number"), portu
     personalities = [
         {"label": v["name"], "nr_articles": v["nr_articles"], "local_image": v["image_url"], "wiki_id": k}
         for k, v in all_entities_info.items()
-        if not portuguese_only or any(c["wiki_id"] == "Q45" for c in v.get("countries", []))
+        if (v["nr_articles"] - v["nr_articles_by_type"].get("other", 0)) > 0
+        and (not portuguese_only or any(c["wiki_id"] == "Q45" for c in v.get("countries", [])))
     ]
     start_index = (page_nr - 1) * personalities_per_page
     end_index = start_index + personalities_per_page
