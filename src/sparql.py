@@ -950,17 +950,19 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
 
 def get_personalities_by_education(institution_wiki_id: str):
     query = f"""
-    SELECT ?ent1 ?ent1_name
+    SELECT ?ent1 ?ent1_name ?entity_label
     (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               rdfs:label ?ent1_name;
               p:P69 ?educatedAtStmnt.
         ?educatedAtStmnt ps:P69 wd:{institution_wiki_id} .
+        wd:{institution_wiki_id} rdfs:label ?entity_label .
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
         FILTER(LANG(?ent1_name) = "{LANG}")
+        FILTER(LANG(?entity_label) = "{LANG}")
       }}
-    GROUP BY ?ent1 ?ent1_name
+    GROUP BY ?ent1 ?ent1_name ?entity_label
     ORDER BY ASC(?ent1_name)
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
@@ -982,17 +984,19 @@ def get_personalities_by_education(institution_wiki_id: str):
 
 def get_personalities_by_occupation(occupation_wiki_id: str):
     query = f"""
-    SELECT ?ent1 ?ent1_name
+    SELECT ?ent1 ?ent1_name ?entity_label
     (GROUP_CONCAT(DISTINCT ?image_url;separator=",") as ?images_url)
     WHERE {{
         ?ent1 wdt:P31 wd:Q5;
               rdfs:label ?ent1_name;
               p:P106 ?occupationStmnt .
         ?occupationStmnt ps:P106 wd:{occupation_wiki_id} .
+        wd:{occupation_wiki_id} rdfs:label ?entity_label .
         OPTIONAL {{ ?ent1 wdt:P18 ?image_url. }}
         FILTER(LANG(?ent1_name) = "{LANG}")
+        FILTER(LANG(?entity_label) = "{LANG}")
     }}
-    GROUP BY ?ent1 ?ent1_name
+    GROUP BY ?ent1 ?ent1_name ?entity_label
     ORDER BY ASC(?ent1_name)
     """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
