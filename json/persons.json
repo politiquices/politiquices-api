@@ -1,15 +1,27 @@
 [
  {
+  "label": "Abel Baptista",
+  "value": "Q318379"
+ },
+ {
+  "label": "Ab\u00edlio Curto",
+  "value": "Q65496925"
+ },
+ {
+  "label": "Ab\u00edlio Dias Fernandes",
+  "value": "Q65498268"
+ },
+ {
+  "label": "Ac\u00e1cio Barreiros",
+  "value": "Q104692407"
+ },
+ {
   "label": "Adalberto Campos Fernandes",
   "value": "Q23805019"
  },
  {
   "label": "Adelino Amaro da Costa",
   "value": "Q4681974"
- },
- {
-  "label": "Adelino Maltez",
-  "value": "Q4681977"
  },
  {
   "label": "Adolfo Mesquita Nunes",
@@ -24,8 +36,12 @@
   "value": "Q65499616"
  },
  {
-  "label": "Afonso Candal",
-  "value": "Q109853331"
+  "label": "Afonso Oliveira",
+  "value": "Q106946850"
+ },
+ {
+  "label": "Aga Khan IV",
+  "value": "Q311793"
  },
  {
   "label": "Agostinho Branquinho",
@@ -104,16 +120,40 @@
   "value": "Q4723726"
  },
  {
+  "label": "Alma Rivera",
+  "value": "Q102293068"
+ },
+ {
+  "label": "Almeida Henriques",
+  "value": "Q16336402"
+ },
+ {
   "label": "Almerindo da Silva Marques",
   "value": "Q9604772"
  },
  {
-  "label": "Am\u00e2ndio Madaleno",
-  "value": "Q106627153"
+  "label": "Altino Bessa",
+  "value": "Q16489067"
  },
  {
-  "label": "Am\u00e9rico Duarte",
-  "value": "Q106267889"
+  "label": "Al\u00edpio Dias",
+  "value": "Q110271563"
+ },
+ {
+  "label": "Amadeu Guerra",
+  "value": "Q132203528"
+ },
+ {
+  "label": "Amadeu Jos\u00e9 Ferreira",
+  "value": "Q25694318"
+ },
+ {
+  "label": "Amadeu Soares Albergaria",
+  "value": "Q110623942"
+ },
+ {
+  "label": "Am\u00e2ndio Madaleno",
+  "value": "Q106627153"
  },
  {
   "label": "Am\u00edlcar Theias",
@@ -140,14 +180,6 @@
   "value": "Q2844986"
  },
  {
-  "label": "Ana Jorge",
-  "value": "Q482868"
- },
- {
-  "label": "Ana Lu\u00eds",
-  "value": "Q4750402"
- },
- {
   "label": "Ana Mendes Godinho",
   "value": "Q52112309"
  },
@@ -164,12 +196,16 @@
   "value": "Q83250122"
  },
  {
-  "label": "Anabela Rodrigues",
-  "value": "Q18564749"
- },
- {
   "label": "Andr\u00e9 Bradford",
   "value": "Q61944387"
+ },
+ {
+  "label": "Andr\u00e9 Moz Caldas",
+  "value": "Q115763575"
+ },
+ {
+  "label": "Andr\u00e9 Rodrigues",
+  "value": "Q126486908"
  },
  {
   "label": "Andr\u00e9 Silva",
@@ -188,6 +224,10 @@
   "value": "Q16336736"
  },
  {
+  "label": "Antonio Tajani",
+  "value": "Q440710"
+ },
+ {
   "label": "Ant\u00f3nio Abreu",
   "value": "Q4777608"
  },
@@ -198,10 +238,6 @@
  {
   "label": "Ant\u00f3nio Arnault",
   "value": "Q4777527"
- },
- {
-  "label": "Ant\u00f3nio Bag\u00e3o F\u00e9lix",
-  "value": "Q2857730"
  },
  {
   "label": "Ant\u00f3nio Barbosa de Melo",
@@ -228,16 +264,16 @@
   "value": "Q16491360"
  },
  {
-  "label": "Ant\u00f3nio Chora",
-  "value": "Q17496450"
- },
- {
   "label": "Ant\u00f3nio Correia de Campos",
   "value": "Q365986"
  },
  {
-  "label": "Ant\u00f3nio Costa",
-  "value": "Q610788"
+  "label": "Ant\u00f3nio Cunha",
+  "value": "Q106957328"
+ },
+ {
+  "label": "Ant\u00f3nio Duarte Silva",
+  "value": "Q16491505"
  },
  {
   "label": "Ant\u00f3nio Filipe",
@@ -260,8 +296,16 @@
   "value": "Q311440"
  },
  {
+  "label": "Ant\u00f3nio Jos\u00e9 Fernandes de Sousa",
+  "value": "Q16491799"
+ },
+ {
   "label": "Ant\u00f3nio Jos\u00e9 Seguro",
   "value": "Q1580316"
+ },
+ {
+  "label": "Ant\u00f3nio Lacerda Sales",
+  "value": "Q72902300"
  },
  {
   "label": "Ant\u00f3nio Leit\u00e3o Amaro",
@@ -272,16 +316,16 @@
   "value": "Q9619510"
  },
  {
+  "label": "Ant\u00f3nio Macedo",
+  "value": "Q9619601"
+ },
+ {
   "label": "Ant\u00f3nio Mal\u00f3 de Abreu",
   "value": "Q106963550"
  },
  {
   "label": "Ant\u00f3nio Marinho e Pinto",
   "value": "Q611182"
- },
- {
-  "label": "Ant\u00f3nio Marques Mendes",
-  "value": "Q4777584"
  },
  {
   "label": "Ant\u00f3nio Mendon\u00e7a",
@@ -312,6 +356,10 @@
   "value": "Q60114"
  },
  {
+  "label": "Ant\u00f3nio Rebelo de Sousa",
+  "value": "Q16492287"
+ },
+ {
   "label": "Ant\u00f3nio Reis",
   "value": "Q9158198"
  },
@@ -330,10 +378,6 @@
  {
   "label": "Ant\u00f3nio Sousa Lara",
   "value": "Q9620197"
- },
- {
-  "label": "Ant\u00f3nio Tavares",
-  "value": "Q25443380"
  },
  {
   "label": "Ant\u00f3nio Ventura",
@@ -380,6 +424,14 @@
   "value": "Q16493646"
  },
  {
+  "label": "Armando Fernandes",
+  "value": "Q117037639"
+ },
+ {
+  "label": "Armando Guebuza",
+  "value": "Q57392"
+ },
+ {
   "label": "Armando Sevinate Pinto",
   "value": "Q9629375"
  },
@@ -400,20 +452,12 @@
   "value": "Q21173863"
  },
  {
-  "label": "Artur Torres Pereira",
-  "value": "Q56349776"
- },
- {
   "label": "Ascenso Sim\u00f5es",
   "value": "Q106963658"
  },
  {
   "label": "Assun\u00e7\u00e3o Cristas",
   "value": "Q439377"
- },
- {
-  "label": "Augusto Lopes Cardoso",
-  "value": "Q121846202"
  },
  {
   "label": "Augusto Mateus",
@@ -436,10 +480,6 @@
   "value": "Q1253"
  },
  {
-  "label": "Barack Obama",
-  "value": "Q76"
- },
- {
   "label": "Bas\u00edlio Horta",
   "value": "Q9650912"
  },
@@ -458,10 +498,6 @@
  {
   "label": "Bernardo Blanco",
   "value": "Q111621297"
- },
- {
-  "label": "Bernardo Trindade",
-  "value": "Q117356232"
  },
  {
   "label": "Bernie Sanders",
@@ -488,16 +524,28 @@
   "value": "Q180589"
  },
  {
+  "label": "Bruno Dias",
+  "value": "Q9180431"
+ },
+ {
   "label": "B\u00e1rbara Guimar\u00e3es",
   "value": "Q13581707"
  },
  {
-  "label": "Carla Castro",
-  "value": "Q111590010"
+  "label": "Carlos Abreu Amorim",
+  "value": "Q134705967"
  },
  {
   "label": "Carlos Alexandre",
   "value": "Q18707871"
+ },
+ {
+  "label": "Carlos Antunes",
+  "value": "Q105047246"
+ },
+ {
+  "label": "Carlos Bai\u00e3o Morais",
+  "value": "Q63487499"
  },
  {
   "label": "Carlos Brito",
@@ -532,10 +580,6 @@
   "value": "Q2571494"
  },
  {
-  "label": "Carlos Eduardo Reis",
-  "value": "Q106978092"
- },
- {
   "label": "Carlos Encarna\u00e7\u00e3o",
   "value": "Q9697042"
  },
@@ -548,16 +592,16 @@
   "value": "Q9697231"
  },
  {
+  "label": "Carlos Mota Pinto",
+  "value": "Q388965"
+ },
+ {
   "label": "Carlos Pereira",
   "value": "Q47539817"
  },
  {
   "label": "Carlos Pimenta",
   "value": "Q17420856"
- },
- {
-  "label": "Carlos Pinto",
-  "value": "Q9697287"
  },
  {
   "label": "Carlos Santos Ferreira",
@@ -604,6 +648,10 @@
   "value": "Q16337119"
  },
  {
+  "label": "Celeste Correia",
+  "value": "Q84977846"
+ },
+ {
   "label": "Celso Cruzeiro",
   "value": "Q111836301"
  },
@@ -620,16 +668,16 @@
   "value": "Q106980408"
  },
  {
+  "label": "Cl\u00e1udio Monteiro",
+  "value": "Q26256214"
+ },
+ {
   "label": "Colin Powell",
   "value": "Q150851"
  },
  {
   "label": "Constan\u00e7a Urbano de Sousa",
   "value": "Q23797153"
- },
- {
-  "label": "Costa Martins",
-  "value": "Q10261183"
  },
  {
   "label": "Cristina Rodrigues",
@@ -654,6 +702,10 @@
  {
   "label": "Daniel Campelo",
   "value": "Q10263926"
+ },
+ {
+  "label": "Daniel Chapo",
+  "value": "Q97058466"
  },
  {
   "label": "Daniel Oliveira",
@@ -724,6 +776,10 @@
   "value": "Q946"
  },
  {
+  "label": "Duarte Alves",
+  "value": "Q103819821"
+ },
+ {
   "label": "Duarte Cordeiro",
   "value": "Q111349255"
  },
@@ -742,10 +798,6 @@
  {
   "label": "Duarte Pio of Braganza",
   "value": "Q1262756"
- },
- {
-  "label": "Edgar Correia",
-  "value": "Q27093788"
  },
  {
   "label": "Edgar Silva",
@@ -816,10 +868,6 @@
   "value": "Q85871588"
  },
  {
-  "label": "Emanuel Rodrigues",
-  "value": "Q25420666"
- },
- {
   "label": "Emmanuel Macron",
   "value": "Q3052772"
  },
@@ -840,6 +888,10 @@
   "value": "Q66713877"
  },
  {
+  "label": "Ernesto Melo Antunes",
+  "value": "Q736289"
+ },
+ {
   "label": "Ern\u00e2ni Lopes",
   "value": "Q481124"
  },
@@ -848,12 +900,28 @@
   "value": "Q110806434"
  },
  {
-  "label": "Eurico de Melo",
-  "value": "Q3060511"
+  "label": "Eurico Figueiredo",
+  "value": "Q115309624"
+ },
+ {
+  "label": "Eva Rapdiva",
+  "value": "Q111730445"
  },
  {
   "label": "Fausto Correia",
   "value": "Q1378001"
+ },
+ {
+  "label": "Feliciano Barreiras Duarte",
+  "value": "Q112518396"
+ },
+ {
+  "label": "Fernando Alexandre",
+  "value": "Q125221132"
+ },
+ {
+  "label": "Fernando Ant\u00f3nio Pinheiro Correia",
+  "value": "Q28677563"
  },
  {
   "label": "Fernando Faria de Oliveira",
@@ -870,6 +938,10 @@
  {
   "label": "Fernando Jos\u00e9 Pinto Monteiro",
   "value": "Q10281394"
+ },
+ {
+  "label": "Fernando Leal da Costa",
+  "value": "Q23905319"
  },
  {
   "label": "Fernando Medina",
@@ -924,20 +996,28 @@
   "value": "Q11256"
  },
  {
+  "label": "Filipa Roseta",
+  "value": "Q107019540"
+ },
+ {
+  "label": "Filipe Ara\u00fajo",
+  "value": "Q116291614"
+ },
+ {
   "label": "Filipe Lobo d'\u00c1vila",
   "value": "Q9259658"
  },
  {
+  "label": "Filipe Melo",
+  "value": "Q110759819"
+ },
+ {
+  "label": "Filipe Neto Brand\u00e3o",
+  "value": "Q107020056"
+ },
+ {
   "label": "Filipe Nyusi",
   "value": "Q5448556"
- },
- {
-  "label": "Filipe Soares Franco",
-  "value": "Q3745041"
- },
- {
-  "label": "Filipe Sousa",
-  "value": "Q97276622"
  },
  {
   "label": "Filipe de Botton",
@@ -948,8 +1028,16 @@
   "value": "Q5482965"
  },
  {
+  "label": "Francisco Andr\u00e9",
+  "value": "Q115763580"
+ },
+ {
   "label": "Francisco Assis",
   "value": "Q656518"
+ },
+ {
+  "label": "Francisco George",
+  "value": "Q20045781"
  },
  {
   "label": "Francisco Guerreiro",
@@ -1040,12 +1128,20 @@
   "value": "Q368644"
  },
  {
+  "label": "Gon\u00e7alo da C\u00e2mara Pereira",
+  "value": "Q97168965"
+ },
+ {
   "label": "Gra\u00e7a Carvalho",
   "value": "Q10291438"
  },
  {
   "label": "Gra\u00e7a Fonseca",
   "value": "Q30930777"
+ },
+ {
+  "label": "Guida Vieira",
+  "value": "Q60999850"
  },
  {
   "label": "Guilherme Costa",
@@ -1064,10 +1160,6 @@
   "value": "Q3119570"
  },
  {
-  "label": "Guillermo Fari\u00f1as",
-  "value": "Q362274"
- },
- {
   "label": "Helder Bataglia dos Santos",
   "value": "Q17492584"
  },
@@ -1080,6 +1172,10 @@
   "value": "Q10294464"
  },
  {
+  "label": "Helena Torres Marques",
+  "value": "Q11708836"
+ },
+ {
   "label": "Helmut Kohl",
   "value": "Q2518"
  },
@@ -1090,6 +1186,10 @@
  {
   "label": "Henrique Alberto Freitas do Nascimento Rodrigues",
   "value": "Q3132528"
+ },
+ {
+  "label": "Henrique Chaves",
+  "value": "Q938490"
  },
  {
   "label": "Henrique Granadeiro",
@@ -1112,6 +1212,10 @@
   "value": "Q18707969"
  },
  {
+  "label": "Hern\u00e2ni Dinis Ven\u00e2ncio Dias",
+  "value": "Q18707970"
+ },
+ {
   "label": "Hillary Clinton",
   "value": "Q6294"
  },
@@ -1128,12 +1232,16 @@
   "value": "Q34105"
  },
  {
-  "label": "Hugo Carvalho",
-  "value": "Q107024959"
+  "label": "Hugo Carneiro",
+  "value": "Q107024473"
  },
  {
   "label": "Hugo Ch\u00e1vez",
   "value": "Q8440"
+ },
+ {
+  "label": "Hugo Pires",
+  "value": "Q107028953"
  },
  {
   "label": "Hugo Santos Mendes",
@@ -1152,16 +1260,12 @@
   "value": "Q20142356"
  },
  {
-  "label": "Humberto Vasconcelos",
-  "value": "Q59572077"
+  "label": "Humberto Rosa",
+  "value": "Q128416614"
  },
  {
   "label": "Id\u00e1lia Serr\u00e3o",
   "value": "Q10299830"
- },
- {
-  "label": "Igrejas Caeiro",
-  "value": "Q10300977"
  },
  {
   "label": "Ilda Figueiredo",
@@ -1172,8 +1276,8 @@
   "value": "Q48123414"
  },
  {
-  "label": "In\u00eas Sousa Real",
-  "value": "Q84171272"
+  "label": "In\u00eas Zuber",
+  "value": "Q1671880"
  },
  {
   "label": "In\u00eas de Medeiros",
@@ -1184,12 +1288,12 @@
   "value": "Q20045850"
  },
  {
-  "label": "Isabel Al\u00e7ada",
-  "value": "Q3154816"
- },
- {
   "label": "Isabel Camarinha",
   "value": "Q96195570"
+ },
+ {
+  "label": "Isabel Carvalhais",
+  "value": "Q67115913"
  },
  {
   "label": "Isabel Meireles",
@@ -1200,12 +1304,8 @@
   "value": "Q19409554"
  },
  {
-  "label": "Isabel Pires de Lima",
-  "value": "Q180801"
- },
- {
-  "label": "Isabel Santos",
-  "value": "Q43376217"
+  "label": "Isabel Pires",
+  "value": "Q106953409"
  },
  {
   "label": "Isabel dos Santos",
@@ -1228,8 +1328,8 @@
   "value": "Q14632307"
  },
  {
-  "label": "Ivone Dias Louren\u00e7o",
-  "value": "Q106926134"
+  "label": "J. Tiago de Oliveira",
+  "value": "Q94665280"
  },
  {
   "label": "Jacques Chirac",
@@ -1246,6 +1346,10 @@
  {
   "label": "Jaime Ramos",
   "value": "Q48856511"
+ },
+ {
+  "label": "Jaime Serra",
+  "value": "Q105206451"
  },
  {
   "label": "Jaime Silva",
@@ -1292,16 +1396,20 @@
   "value": "Q6205661"
  },
  {
+  "label": "Joana Barata Lopes",
+  "value": "Q65499243"
+ },
+ {
   "label": "Joana Marques Vidal",
   "value": "Q19360799"
  },
  {
-  "label": "Joana Mort\u00e1gua",
-  "value": "Q23905015"
- },
- {
   "label": "Joaquim Barreto",
   "value": "Q107082574"
+ },
+ {
+  "label": "Joaquim Biancard Cruz",
+  "value": "Q16913454"
  },
  {
   "label": "Joaquim Chissano",
@@ -1312,12 +1420,8 @@
   "value": "Q3179722"
  },
  {
-  "label": "Joaquim Magalh\u00e3es Mota",
-  "value": "Q3179729"
- },
- {
-  "label": "Joaquim Miranda",
-  "value": "Q4068708"
+  "label": "Joaquim Miranda Sarmento",
+  "value": "Q112875862"
  },
  {
   "label": "Joaquim Pina Moura",
@@ -1328,8 +1432,8 @@
   "value": "Q10307408"
  },
  {
-  "label": "Joaquim Silva Pinto",
-  "value": "Q111908770"
+  "label": "Joaquim Sousa Ribeiro",
+  "value": "Q24040312"
  },
  {
   "label": "Joe Berardo",
@@ -1354,6 +1458,10 @@
  {
   "label": "Jorge Barreto Xavier",
   "value": "Q17725191"
+ },
+ {
+  "label": "Jorge Carvalho",
+  "value": "Q85873087"
  },
  {
   "label": "Jorge Coelho",
@@ -1384,8 +1492,16 @@
   "value": "Q4576565"
  },
  {
+  "label": "Jorge Neto",
+  "value": "Q10308196"
+ },
+ {
   "label": "Jorge Nuno Pinto da Costa",
   "value": "Q714173"
+ },
+ {
+  "label": "Jorge Pinto",
+  "value": "Q125103492"
  },
  {
   "label": "Jorge Sampaio",
@@ -1408,6 +1524,14 @@
   "value": "Q21582227"
  },
  {
+  "label": "Jos\u00e9 Alberto Carvalho",
+  "value": "Q10308719"
+ },
+ {
+  "label": "Jos\u00e9 Albino Silva Peneda",
+  "value": "Q6291307"
+ },
+ {
   "label": "Jos\u00e9 Alencar",
   "value": "Q349583"
  },
@@ -1422,10 +1546,6 @@
  {
   "label": "Jos\u00e9 Ant\u00f3nio Vieira da Silva",
   "value": "Q1709692"
- },
- {
-  "label": "Jos\u00e9 Apolin\u00e1rio Nunes Portada",
-  "value": "Q17420661"
  },
  {
   "label": "Jos\u00e9 Barata-Moura",
@@ -1452,14 +1572,6 @@
   "value": "Q11728561"
  },
  {
-  "label": "Jos\u00e9 Decq Mota",
-  "value": "Q108595678"
- },
- {
-  "label": "Jos\u00e9 Eduardo Bettencourt",
-  "value": "Q10309292"
- },
- {
   "label": "Jos\u00e9 Eduardo Martins",
   "value": "Q10309299"
  },
@@ -1472,24 +1584,36 @@
   "value": "Q57313"
  },
  {
-  "label": "Jos\u00e9 Estevens",
-  "value": "Q118733322"
+  "label": "Jos\u00e9 Fernando Gomes Mendes",
+  "value": "Q107092699"
+ },
+ {
+  "label": "Jos\u00e9 Freire Antunes",
+  "value": "Q19359508"
  },
  {
   "label": "Jos\u00e9 Gir\u00e3o Pereira",
   "value": "Q17420747"
  },
  {
+  "label": "Jos\u00e9 Gomes Ferreira",
+  "value": "Q10309512"
+ },
+ {
   "label": "Jos\u00e9 Gomes Palmeiro da Costa",
   "value": "Q65031560"
+ },
+ {
+  "label": "Jos\u00e9 Guilherme Reis Leite",
+  "value": "Q6292409"
  },
  {
   "label": "Jos\u00e9 Gusm\u00e3o",
   "value": "Q17496473"
  },
  {
-  "label": "Jos\u00e9 Jorge Letria",
-  "value": "Q10309712"
+  "label": "Jos\u00e9 In\u00e1cio da Costa Martins",
+  "value": "Q10261183"
  },
  {
   "label": "Jos\u00e9 J\u00falio Pereira Gomes",
@@ -1504,10 +1628,6 @@
   "value": "Q64688"
  },
  {
-  "label": "Jos\u00e9 Lino Tranquada Gomes",
-  "value": "Q26256253"
- },
- {
   "label": "Jos\u00e9 Luis Rodr\u00edguez Zapatero",
   "value": "Q41395"
  },
@@ -1520,8 +1640,8 @@
   "value": "Q74256324"
  },
  {
-  "label": "Jos\u00e9 Magalh\u00e3es",
-  "value": "Q17285265"
+  "label": "Jos\u00e9 Lu\u00eds Ferreira",
+  "value": "Q10309832"
  },
  {
   "label": "Jos\u00e9 Manuel Bolieiro",
@@ -1564,16 +1684,16 @@
   "value": "Q4287613"
  },
  {
-  "label": "Jos\u00e9 Mendes Bota",
-  "value": "Q11728611"
- },
- {
   "label": "Jos\u00e9 Men\u00e9res Pimentel",
   "value": "Q3186473"
  },
  {
   "label": "Jos\u00e9 Miguel J\u00fadice",
   "value": "Q10310141"
+ },
+ {
+  "label": "Jos\u00e9 Miguel Prata Roque",
+  "value": "Q27999259"
  },
  {
   "label": "Jos\u00e9 Moura Soeiro",
@@ -1588,8 +1708,8 @@
   "value": "Q10310185"
  },
  {
-  "label": "Jos\u00e9 Niza",
-  "value": "Q10310204"
+  "label": "Jos\u00e9 Neves",
+  "value": "Q41179468"
  },
  {
   "label": "Jos\u00e9 Oliveira Costa",
@@ -1652,8 +1772,8 @@
   "value": "Q10389774"
  },
  {
-  "label": "Jos\u00e9 da Silva Lopes",
-  "value": "Q10310706"
+  "label": "Jos\u00e9 Vieira de Carvalho",
+  "value": "Q10310636"
  },
  {
   "label": "Jos\u00e9 de Sousa Cintra",
@@ -1672,12 +1792,12 @@
   "value": "Q106164"
  },
  {
-  "label": "Jo\u00e3o B\u00e9nard da Costa",
-  "value": "Q2284734"
- },
- {
   "label": "Jo\u00e3o Calv\u00e3o da Silva",
   "value": "Q21290312"
+ },
+ {
+  "label": "Jo\u00e3o Costa",
+  "value": "Q60042754"
  },
  {
   "label": "Jo\u00e3o Cotrim de Figueiredo",
@@ -1698,6 +1818,10 @@
  {
   "label": "Jo\u00e3o Gomes Cravinho",
   "value": "Q57343622"
+ },
+ {
+  "label": "Jo\u00e3o Gon\u00e7alves Pereira",
+  "value": "Q23836569"
  },
  {
   "label": "Jo\u00e3o Le\u00e3o",
@@ -1736,12 +1860,8 @@
   "value": "Q23800376"
  },
  {
-  "label": "Jo\u00e3o Pereira Coutinho",
-  "value": "Q10312054"
- },
- {
-  "label": "Jo\u00e3o Ramos",
-  "value": "Q11728720"
+  "label": "Jo\u00e3o Pimenta Lopes",
+  "value": "Q22443735"
  },
  {
   "label": "Jo\u00e3o Rendeiro",
@@ -1780,6 +1900,10 @@
   "value": "Q10313391"
  },
  {
+  "label": "J\u00falio Foga\u00e7a",
+  "value": "Q6321713"
+ },
+ {
   "label": "J\u00falio Machado Vaz",
   "value": "Q10313446"
  },
@@ -1800,16 +1924,24 @@
   "value": "Q86472082"
  },
  {
-  "label": "Laurentino Dias",
-  "value": "Q65497451"
- },
- {
   "label": "Laurinda Alves",
   "value": "Q10316578"
  },
  {
+  "label": "Leonardo Charles Zaffiri Duarte Mathias",
+  "value": "Q61000700"
+ },
+ {
+  "label": "Leonardo Ribeiro de Almeida",
+  "value": "Q6526073"
+ },
+ {
   "label": "Leonor Beleza",
   "value": "Q6526652"
+ },
+ {
+  "label": "Lia Ferreira",
+  "value": "Q135219988"
  },
  {
   "label": "Loureiro dos Santos",
@@ -1838,10 +1970,6 @@
  {
   "label": "Lu\u00eds Amado",
   "value": "Q1382641"
- },
- {
-  "label": "Lu\u00eds Ant\u00f3nio Pita Ameixa",
-  "value": "Q65161985"
  },
  {
   "label": "Lu\u00eds Campos e Cunha",
@@ -1892,6 +2020,10 @@
   "value": "Q10321558"
  },
  {
+  "label": "Lu\u00eds Miguel Franco",
+  "value": "Q65174414"
+ },
+ {
   "label": "Lu\u00eds Mira Amaral",
   "value": "Q10321568"
  },
@@ -1908,6 +2040,10 @@
   "value": "Q10321580"
  },
  {
+  "label": "Lu\u00eds Paix\u00e3o Martins",
+  "value": "Q6706830"
+ },
+ {
   "label": "Lu\u00eds Queir\u00f3",
   "value": "Q6706856"
  },
@@ -1920,20 +2056,16 @@
   "value": "Q1878439"
  },
  {
-  "label": "Lu\u00edsa Mesquita",
-  "value": "Q65497966"
- },
- {
   "label": "Lu\u00edsa Salgueiro",
   "value": "Q25431044"
  },
  {
-  "label": "L\u00eddia Maria Bulc\u00e3o Rosa da Silveira Dutra",
-  "value": "Q10322008"
- },
- {
   "label": "L\u00eddia Pereira",
   "value": "Q63141476"
+ },
+ {
+  "label": "L\u00edlia Bernardes",
+  "value": "Q50384580"
  },
  {
   "label": "Mac\u00e1rio Correia",
@@ -1948,16 +2080,12 @@
   "value": "Q467633"
  },
  {
+  "label": "Mamadou Ba",
+  "value": "Q106546659"
+ },
+ {
   "label": "Manuel Alegre",
   "value": "Q737410"
- },
- {
-  "label": "Manuel Ant\u00f3nio Correia",
-  "value": "Q16337835"
- },
- {
-  "label": "Manuel Ant\u00f3nio Pina",
-  "value": "Q543349"
  },
  {
   "label": "Manuel Caldeira Cabral",
@@ -1972,16 +2100,8 @@
   "value": "Q28677402"
  },
  {
-  "label": "Manuel Correia de Jesus",
-  "value": "Q66713341"
- },
- {
   "label": "Manuel Dias Loureiro",
   "value": "Q10324087"
- },
- {
-  "label": "Manuel Jacinto Nunes",
-  "value": "Q10324229"
  },
  {
   "label": "Manuel Jos\u00e9 Alvarenga de Sousa Santos",
@@ -2004,8 +2124,20 @@
   "value": "Q1382767"
  },
  {
+  "label": "Manuel Pinto Coelho",
+  "value": "Q47537813"
+ },
+ {
   "label": "Manuel Pizarro",
   "value": "Q10324447"
+ },
+ {
+  "label": "Manuel Queir\u00f3",
+  "value": "Q130247454"
+ },
+ {
+  "label": "Manuel Ramirez",
+  "value": "Q112061947"
  },
  {
   "label": "Manuel Salgado",
@@ -2016,8 +2148,8 @@
   "value": "Q15833722"
  },
  {
-  "label": "Manuel Vilarinho",
-  "value": "Q10324550"
+  "label": "Manuel Tarr\u00e9",
+  "value": "Q27835615"
  },
  {
   "label": "Manuel dos Santos",
@@ -2044,6 +2176,10 @@
   "value": "Q6756617"
  },
  {
+  "label": "Marco Almeida",
+  "value": "Q133259651"
+ },
+ {
   "label": "Marco Ant\u00f3nio Costa",
   "value": "Q11767932"
  },
@@ -2052,12 +2188,20 @@
   "value": "Q115763590"
  },
  {
+  "label": "Marco Silva",
+  "value": "Q135270470"
+ },
+ {
   "label": "Marcos Perestrello",
   "value": "Q23836571"
  },
  {
   "label": "Margarida Balseiro Lopes",
   "value": "Q52161254"
+ },
+ {
+  "label": "Margarida Blasco",
+  "value": "Q125208881"
  },
  {
   "label": "Margarida Mano",
@@ -2072,6 +2216,10 @@
   "value": "Q85875291"
  },
  {
+  "label": "Maria Ant\u00f3nia de Almeida Santos",
+  "value": "Q107122950"
+ },
+ {
   "label": "Maria Barroso",
   "value": "Q75062"
  },
@@ -2080,8 +2228,8 @@
   "value": "Q72618895"
  },
  {
-  "label": "Maria Carrilho",
-  "value": "Q11768765"
+  "label": "Maria Cavaco Silva",
+  "value": "Q74501"
  },
  {
   "label": "Maria Elisa",
@@ -2094,6 +2242,10 @@
  {
   "label": "Maria Jos\u00e9 Nogueira Pinto",
   "value": "Q10325930"
+ },
+ {
+  "label": "Maria Jos\u00e9 Ritta",
+  "value": "Q82322"
  },
  {
   "label": "Maria Jo\u00e3o Rodrigues",
@@ -2112,10 +2264,6 @@
   "value": "Q2868303"
  },
  {
-  "label": "Maria das Dores Meira",
-  "value": "Q10326140"
- },
- {
   "label": "Maria de Bel\u00e9m Roseira",
   "value": "Q6761683"
  },
@@ -2132,12 +2280,12 @@
   "value": "Q72410716"
  },
  {
-  "label": "Mariana Aiveca",
-  "value": "Q10326209"
+  "label": "Maria do Ros\u00e1rio Palma Ramalho",
+  "value": "Q125304729"
  },
  {
-  "label": "Mariana Mort\u00e1gua",
-  "value": "Q17496474"
+  "label": "Mariana Leit\u00e3o",
+  "value": "Q125448766"
  },
  {
   "label": "Mariana Vieira da Silva",
@@ -2152,8 +2300,8 @@
   "value": "Q10819"
  },
  {
-  "label": "Marina Ferreira",
-  "value": "Q9029075"
+  "label": "Marina Gon\u00e7alves",
+  "value": "Q108119897"
  },
  {
   "label": "Marine Le Pen",
@@ -2178,6 +2326,10 @@
  {
   "label": "Marta Temido",
   "value": "Q57339530"
+ },
+ {
+  "label": "Martina de Jesus",
+  "value": "Q107124110"
  },
  {
   "label": "Mar\u00e7al Grilo",
@@ -2212,12 +2364,24 @@
   "value": "Q115175980"
  },
  {
+  "label": "Miguel Arruda",
+  "value": "Q131863118"
+ },
+ {
   "label": "Miguel Beleza",
   "value": "Q10329729"
  },
  {
   "label": "Miguel Cadilhe",
   "value": "Q732154"
+ },
+ {
+  "label": "Miguel Costa Matos",
+  "value": "Q104137316"
+ },
+ {
+  "label": "Miguel Ferreira Morgado",
+  "value": "Q125030351"
  },
  {
   "label": "Miguel Frasquilho",
@@ -2230,6 +2394,10 @@
  {
   "label": "Miguel Gon\u00e7alves",
   "value": "Q25444427"
+ },
+ {
+  "label": "Miguel Guimaraes",
+  "value": "Q117356312"
  },
  {
   "label": "Miguel Horta e Costa",
@@ -2246,6 +2414,10 @@
  {
   "label": "Miguel Mendon\u00e7a",
   "value": "Q16855282"
+ },
+ {
+  "label": "Miguel Morais Leit\u00e3o",
+  "value": "Q21468002"
  },
  {
   "label": "Miguel Pinto Luz",
@@ -2276,16 +2448,16 @@
   "value": "Q44851"
  },
  {
-  "label": "Miguel Vale de Almeida",
-  "value": "Q6844839"
- },
- {
   "label": "Miguel Veiga",
   "value": "Q10329879"
  },
  {
   "label": "Miranda Calha",
   "value": "Q88907642"
+ },
+ {
+  "label": "Mois\u00e9s Ferreira",
+  "value": "Q25421892"
  },
  {
   "label": "Mota Amaral",
@@ -2296,8 +2468,8 @@
   "value": "Q19878"
  },
  {
-  "label": "M\u00e1rio Almeida",
-  "value": "Q10334358"
+  "label": "M\u00e1rio Amorim Lopes",
+  "value": "Q90221639"
  },
  {
   "label": "M\u00e1rio Cal Brand\u00e3o",
@@ -2306,6 +2478,10 @@
  {
   "label": "M\u00e1rio Centeno",
   "value": "Q21568721"
+ },
+ {
+  "label": "M\u00e1rio Coelho Fernandes",
+  "value": "Q130297674"
  },
  {
   "label": "M\u00e1rio Coluna",
@@ -2348,12 +2524,16 @@
   "value": "Q185771"
  },
  {
-  "label": "M\u00e1rio Zambujal",
-  "value": "Q603534"
+  "label": "M\u00f3nica Ferro",
+  "value": "Q138088362"
  },
  {
-  "label": "Narana Coissor\u00f3",
-  "value": "Q377683"
+  "label": "M\u00f3nica Freitas",
+  "value": "Q131307783"
+ },
+ {
+  "label": "M\u00f3nica Quintela",
+  "value": "Q107124509"
  },
  {
   "label": "Narciso Miranda",
@@ -2362,6 +2542,14 @@
  {
   "label": "Nelson Mandela",
   "value": "Q8023"
+ },
+ {
+  "label": "Nelson Silva",
+  "value": "Q137780520"
+ },
+ {
+  "label": "Nelson de Souza",
+  "value": "Q85875924"
  },
  {
   "label": "Nicolas Sarkozy",
@@ -2376,10 +2564,6 @@
   "value": "Q10338164"
  },
  {
-  "label": "Nuno Brederode Santos",
-  "value": "Q111630722"
- },
- {
   "label": "Nuno Cardoso",
   "value": "Q10338167"
  },
@@ -2392,16 +2576,16 @@
   "value": "Q97585619"
  },
  {
+  "label": "Nuno F\u00e9lix",
+  "value": "Q115763613"
+ },
+ {
   "label": "Nuno Godinho de Matos",
   "value": "Q65496709"
  },
  {
   "label": "Nuno Magalh\u00e3es",
   "value": "Q11794196"
- },
- {
-  "label": "Nuno Melo",
-  "value": "Q10338219"
  },
  {
   "label": "Nuno Miguel Henriques",
@@ -2412,20 +2596,24 @@
   "value": "Q10338225"
  },
  {
-  "label": "Nuno Vasconcellos",
-  "value": "Q10338258"
+  "label": "Nuno Severiano Teixeira",
+  "value": "Q920869"
+ },
+ {
+  "label": "Nuno S\u00e1",
+  "value": "Q107128811"
  },
  {
   "label": "Odete Santos",
   "value": "Q10340237"
  },
  {
-  "label": "Olavo C\u00e2mara",
-  "value": "Q85179710"
+  "label": "Olaf Scholz",
+  "value": "Q61053"
  },
  {
-  "label": "Olli Rehn",
-  "value": "Q294411"
+  "label": "Olavo C\u00e2mara",
+  "value": "Q85179710"
  },
  {
   "label": "Osama bin Laden",
@@ -2448,8 +2636,20 @@
   "value": "Q10343426"
  },
  {
+  "label": "Palmira Alberto Matos",
+  "value": "Q128034049"
+ },
+ {
+  "label": "Patr\u00edcia Gilvaz",
+  "value": "Q112802035"
+ },
+ {
   "label": "Paula Amorim",
   "value": "Q28028874"
+ },
+ {
+  "label": "Paula Santos",
+  "value": "Q102300635"
  },
  {
   "label": "Paula Teixeira da Cruz",
@@ -2464,6 +2664,10 @@
   "value": "Q14983130"
  },
  {
+  "label": "Paulo Cunha",
+  "value": "Q125556730"
+ },
+ {
   "label": "Paulo Est\u00eav\u00e3o",
   "value": "Q10346568"
  },
@@ -2472,16 +2676,16 @@
   "value": "Q10346590"
  },
  {
-  "label": "Paulo Lowndes Marques",
-  "value": "Q10346669"
- },
- {
   "label": "Paulo Macedo",
   "value": "Q2469453"
  },
  {
   "label": "Paulo Martins",
   "value": "Q51882956"
+ },
+ {
+  "label": "Paulo Mendo",
+  "value": "Q10346704"
  },
  {
   "label": "Paulo Mota Pinto",
@@ -2500,28 +2704,20 @@
   "value": "Q7155277"
  },
  {
-  "label": "Paulo Pereira Coelho",
-  "value": "Q65497481"
- },
- {
-  "label": "Paulo Pisco",
-  "value": "Q65499184"
+  "label": "Paulo Pinto de Albuquerque",
+  "value": "Q22958361"
  },
  {
   "label": "Paulo Portas",
   "value": "Q58161"
  },
  {
-  "label": "Paulo Raimundo",
-  "value": "Q115099118"
- },
- {
   "label": "Paulo Rangel",
   "value": "Q10346767"
  },
  {
-  "label": "Paulo Rios de Oliveira",
-  "value": "Q107145184"
+  "label": "Paulo Trigo Pereira",
+  "value": "Q21072405"
  },
  {
   "label": "Paulo de Almeida Sande",
@@ -2540,10 +2736,6 @@
   "value": "Q111435569"
  },
  {
-  "label": "Pedro Alves",
-  "value": "Q107145323"
- },
- {
   "label": "Pedro Arroja",
   "value": "Q10347320"
  },
@@ -2554,10 +2746,6 @@
  {
   "label": "Pedro Bacelar de Vasconcelos",
   "value": "Q61195608"
- },
- {
-  "label": "Pedro Baptista",
-  "value": "Q85712941"
  },
  {
   "label": "Pedro Calado",
@@ -2580,6 +2768,10 @@
   "value": "Q10347467"
  },
  {
+  "label": "Pedro Guerra",
+  "value": "Q22298080"
+ },
+ {
   "label": "Pedro Machado",
   "value": "Q10347580"
  },
@@ -2588,16 +2780,20 @@
   "value": "Q17496480"
  },
  {
+  "label": "Pedro Manuel dos Reis Alves Catarino",
+  "value": "Q20046100"
+ },
+ {
   "label": "Pedro Marques",
   "value": "Q22005939"
  },
  {
-  "label": "Pedro Mota Soares",
-  "value": "Q2913325"
+  "label": "Pedro Morais Soares",
+  "value": "Q16940524"
  },
  {
-  "label": "Pedro Neves",
-  "value": "Q106356176"
+  "label": "Pedro Mota Soares",
+  "value": "Q2913325"
  },
  {
   "label": "Pedro Nuno Santos",
@@ -2608,16 +2804,20 @@
   "value": "Q57615"
  },
  {
-  "label": "Pedro Pires de Miranda",
-  "value": "Q10347708"
+  "label": "Pedro Pires",
+  "value": "Q107431"
  },
  {
   "label": "Pedro Queiroz Pereira",
   "value": "Q10347715"
  },
  {
-  "label": "Pedro Rodrigues",
-  "value": "Q107161378"
+  "label": "Pedro Ramos",
+  "value": "Q124369862"
+ },
+ {
+  "label": "Pedro Reis",
+  "value": "Q125190301"
  },
  {
   "label": "Pedro Rosa Mendes",
@@ -2640,6 +2840,10 @@
   "value": "Q107169823"
  },
  {
+  "label": "P\u00f4ncio Monteiro",
+  "value": "Q10355764"
+ },
+ {
   "label": "Radovan Karad\u017ei\u0107",
   "value": "Q123923"
  },
@@ -2656,12 +2860,28 @@
   "value": "Q39259"
  },
  {
+  "label": "Regina Bastos",
+  "value": "Q607679"
+ },
+ {
   "label": "Ricardo Baptista Leite",
   "value": "Q7322552"
  },
  {
+  "label": "Ricardo Le\u00e3o",
+  "value": "Q107176430"
+ },
+ {
   "label": "Ricardo Mourinho F\u00e9lix",
   "value": "Q43422874"
+ },
+ {
+  "label": "Ricardo Paes Mamede",
+  "value": "Q56351343"
+ },
+ {
+  "label": "Ricardo Pinheiro",
+  "value": "Q108118345"
  },
  {
   "label": "Ricardo Rio",
@@ -2688,6 +2908,10 @@
   "value": "Q106547575"
  },
  {
+  "label": "Rita Matias",
+  "value": "Q110782692"
+ },
+ {
   "label": "Rita Rato",
   "value": "Q9310612"
  },
@@ -2698,10 +2922,6 @@
  {
   "label": "Roberto Carneiro",
   "value": "Q10363320"
- },
- {
-  "label": "Rog\u00e9rio Bacalhau",
-  "value": "Q16145938"
  },
  {
   "label": "Roman Abramovich",
@@ -2736,10 +2956,6 @@
   "value": "Q73104708"
  },
  {
-  "label": "Rui Caetano",
-  "value": "Q66741757"
- },
- {
   "label": "Rui Machete",
   "value": "Q10365280"
  },
@@ -2748,12 +2964,24 @@
   "value": "Q16940727"
  },
  {
+  "label": "Rui Medeiros",
+  "value": "Q23904967"
+ },
+ {
   "label": "Rui Moreira",
   "value": "Q16940732"
  },
  {
+  "label": "Rui Moura Ramos",
+  "value": "Q10365282"
+ },
+ {
   "label": "Rui Nabeiro",
   "value": "Q10365301"
+ },
+ {
+  "label": "Rui Oliveira",
+  "value": "Q112110893"
  },
  {
   "label": "Rui Pena",
@@ -2766,22 +2994,6 @@
  {
   "label": "Rui Rio",
   "value": "Q7378729"
- },
- {
-  "label": "Rui Rocha",
-  "value": "Q112790931"
- },
- {
-  "label": "Rui Silva",
-  "value": "Q107182206"
- },
- {
-  "label": "Rui Tavares",
-  "value": "Q1337232"
- },
- {
-  "label": "Rui de S\u00e1",
-  "value": "Q7378735"
  },
  {
   "label": "Saddam Hussein",
@@ -2808,6 +3020,14 @@
   "value": "Q66688384"
  },
  {
+  "label": "Sebasti\u00e3o Bugalho",
+  "value": "Q114398640"
+ },
+ {
+  "label": "Sid\u00f3nio Pais",
+  "value": "Q356691"
+ },
+ {
   "label": "Silvio Berlusconi",
   "value": "Q11860"
  },
@@ -2832,12 +3052,8 @@
   "value": "Q2368982"
  },
  {
-  "label": "Susana Prada",
-  "value": "Q60999835"
- },
- {
-  "label": "S\u00e9rgio Azevedo",
-  "value": "Q65499619"
+  "label": "S\u00e9rgio Gon\u00e7alves",
+  "value": "Q127009304"
  },
  {
   "label": "S\u00e9rgio Marques",
@@ -2868,10 +3084,6 @@
   "value": "Q30930981"
  },
  {
-  "label": "Teresa Almeida Garrett",
-  "value": "Q9357256"
- },
- {
   "label": "Teresa Caeiro",
   "value": "Q3038797"
  },
@@ -2886,6 +3098,10 @@
  {
   "label": "Teresa Patr\u00edcio Gouveia",
   "value": "Q7702196"
+ },
+ {
+  "label": "Te\u00f3filo Cunha",
+  "value": "Q85877644"
  },
  {
   "label": "Theresa May",
@@ -2906,6 +3122,10 @@
  {
   "label": "Tiago Mayan Gon\u00e7alves",
   "value": "Q97736572"
+ },
+ {
+  "label": "Tiago Moreira de S\u00e1",
+  "value": "Q65174877"
  },
  {
   "label": "Tony Blair",
@@ -2948,20 +3168,8 @@
   "value": "Q3556927"
  },
  {
-  "label": "Victor Crespo",
-  "value": "Q7925828"
- },
- {
   "label": "Victor Cunha Rego",
   "value": "Q10390341"
- },
- {
-  "label": "Viktor Orb\u00e1n",
-  "value": "Q57641"
- },
- {
-  "label": "Violante Saramago Matos",
-  "value": "Q124390811"
  },
  {
   "label": "Vital Moreira",
@@ -2970,6 +3178,10 @@
  {
   "label": "Vitalino Canas",
   "value": "Q10392072"
+ },
+ {
+  "label": "Vitor Ramalho",
+  "value": "Q56349485"
  },
  {
   "label": "Vitorino",
@@ -3002,6 +3214,14 @@
  {
   "label": "V\u00edtor Gaspar",
   "value": "Q2118027"
+ },
+ {
+  "label": "Wanda Guimar\u00e3es",
+  "value": "Q65499870"
+ },
+ {
+  "label": "Welwitschia dos Santos",
+  "value": "Q1624159"
  },
  {
   "label": "Wolfgang Sch\u00e4uble",
@@ -3048,6 +3268,10 @@
   "value": "Q250919"
  },
  {
+  "label": "\u00c1lvaro D\u00e2maso",
+  "value": "Q110385336"
+ },
+ {
   "label": "\u00c1lvaro Jos\u00e9 Brilhante Laborinho L\u00facio",
   "value": "Q10395809"
  },
@@ -3058,5 +3282,9 @@
  {
   "label": "\u00c2ngelo Correia",
   "value": "Q8077028"
+ },
+ {
+  "label": "\u00c2ngelo Paup\u00e9rio",
+  "value": "Q21290173"
  }
 ]
