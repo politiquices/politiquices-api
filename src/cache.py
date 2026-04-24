@@ -15,5 +15,3 @@ with open("json/parties.json", encoding="utf8") as f_in:
 with open("json/CHAVE-Publico_94_95.jsonl", encoding="utf8") as f_in:
     chave_publico = [json.loads(line) for line in f_in]
 
-with open("json/top_co_occurrences.json", encoding="utf8") as f_in:
-    top_co_occurrences = json.load(f_in)

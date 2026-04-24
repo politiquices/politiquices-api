@@ -7,7 +7,7 @@ from fastapi import FastAPI, Path, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 
-from cache import all_entities_info, all_parties_info, persons, parties, top_co_occurrences
+from cache import all_entities_info, all_parties_info, persons, parties
 from config import sparql_endpoint, start_year, end_year
 from sparql import (
     get_nr_of_persons,
@@ -20,7 +20,6 @@ from sparql import (
     get_personalities_by_occupation,
     get_personalities_by_party,
     get_personalities_by_public_office,
-    get_persons_articles_freq,
     get_relationship_between_parties,
     get_relationship_between_party_and_person,
     get_relationship_between_person_and_party,
@@ -376,27 +375,12 @@ async def stats():
         v.update({"year": k})
         all_values.append(v)
 
-    # personalities frequency chart
-    # per_freq = get_persons_articles_freq()
-    # top_500 = per_freq[0:250]
-    # top_500.reverse()
-
-    # personalities co-occurrence chart
-    # co_occurrences_labels = []
-    # co_occurrences_values = []
-    # for x in top_co_occurrences:
-    #    co_occurrences_labels.append(x["person_a"]["name"] + " / " + x["person_b"]["name"])
-    #    co_occurrences_values.append(x["nr_occurrences"])
-
     return {
         "nr_parties": nr_parties,
         "nr_persons": nr_persons,
         "nr_all_articles_sentiment": nr_all_articles_sentiment,
         "nr_all_articles": nr_all_articles,
         "year_values": all_values,
-        # "personality_freq": top_500,
-        # "per_co_occurrence_labels": co_occurrences_labels[0:500],
-        # "per_co_occurrence_values": co_occurrences_values[0:500],
     }
 
 @app.post("/corrections")
