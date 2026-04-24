@@ -8,11 +8,10 @@ from typing import Dict, Any
 import requests
 from requests import RequestException
 
-from config import STATIC_DATA
+from config import STATIC_DATA, NO_IMAGE
 from sparql_queries_cache import (
     get_all_parties_and_members_with_relationships,
-    get_nr_relationships_as_subject,
-    get_nr_relationships_as_target,
+    get_persons_relationships_counts,
     get_persons_co_occurrences_counts,
     get_persons_wiki_id_name_image_url,
     get_total_nr_articles_for_each_person,
@@ -46,8 +45,12 @@ def get_entities() -> Dict[str, Any]:
         }
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
         all_politiquices_per[wiki_id]["countries"] = all_wikidata_per[wiki_id]["countries"]
-        f_name = f"{wiki_id}.{all_wikidata_per[wiki_id]['image_url'].split('.')[-1]}"
-        all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
+        original_url = all_wikidata_per[wiki_id]["image_url"]
+        if original_url.startswith("http"):
+            f_name = f"{wiki_id}.{original_url.split('.')[-1]}"
+            all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
+        else:
+            all_politiquices_per[wiki_id]["image_url"] = NO_IMAGE
 
     return {
         entry[0]: entry[1]
@@ -113,6 +116,8 @@ def parties_json_cache():
     with open(STATIC_DATA + "parties.json", "wt", encoding="utf8") as f_out:
         json.dump(parties, f_out)
 
+    return {x["wiki_id"] for x in parties_data}
+
 
 def entities_top_co_occurrences(all_politiquices_per):
     raw_counts = get_persons_co_occurrences_counts()
@@ -134,54 +139,37 @@ def entities_top_co_occurrences(all_politiquices_per):
 
 
 def persons_relationships_counts_by_type():
-    opposes_subj = get_nr_relationships_as_subject("opposes")
-    supports_subj = get_nr_relationships_as_subject("supports")
-    opposes_target = get_nr_relationships_as_target("opposes")
-    supports_target = get_nr_relationships_as_target("supports")
-
-    def relationships_types():
-        return {
-            "opposes": 0,
-            "supports": 0,
-            "is_opposed": 0,
-            "is_supported": 0,
-        }
-
-    relationships = defaultdict(relationships_types)
-
-    for entry in opposes_subj:
-        relationships[entry[0]]["opposes"] += entry[1]
-
-    for entry in supports_subj:
-        relationships[entry[0]]["supports"] += entry[1]
-
-    for entry in opposes_target:
-        relationships[entry[0]]["is_opposed"] += entry[1]
-
-    for entry in supports_target:
-        relationships[entry[0]]["is_supported"] += entry[1]
-
+    relationships = get_persons_relationships_counts()
     with open(STATIC_DATA + "person_relationships_counts.json", "wt", encoding="utf8") as f_out:
         json.dump(relationships, f_out, indent=True)
 
 
-def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
+def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str, max_retries: int = 5):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/39.0.2171.95 Safari/537.36"
     }
+    valid = {k: v for k, v in wiki_id_info.items() if v["image_url"].startswith("http")}
+    already = sum(
+        1 for wiki_id, info in valid.items()
+        if Path(f"{base_out}/{wiki_id}.{info['image_url'].split('.')[-1]}").exists()
+    )
+    print(f"  {already} already downloaded, {len(valid) - already} to download (of {len(valid)})")
+
+    logged_429_headers = False
+
     for wiki_id, info in wiki_id_info.items():
         if not info["image_url"].startswith("http"):
             continue
         url = info["image_url"]
-        print(wiki_id, end="...")
         extension = url.split(".")[-1]
         f_name = f"{wiki_id}.{extension}"
         path = Path(f"{base_out}/{f_name}")
         if path.exists():
-            print("skipping")
-        else:
-            print("downloading")
+            continue
+
+        print(f"{wiki_id}...downloading")
+        for attempt in range(1, max_retries + 1):
             try:
                 # to get content after redirection
                 r = requests.get(url, allow_redirects=True, headers=headers, timeout=10)
@@ -189,31 +177,60 @@ def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str):
                     Path(base_out).mkdir(parents=True, exist_ok=True)
                     with open(f"{base_out}/{f_name}", "wb") as f_out:
                         f_out.write(r.content)
+                    just_sleep(30, 60, verbose=True)
+                    break
+                elif r.status_code == 429:
+                    if not logged_429_headers:
+                        print("  429 response headers:")
+                        for k, v in r.headers.items():
+                            print(f"    {k}: {v}")
+                        print(f"  body: {r.text[:300]}")
+                        logged_429_headers = True
+                    retry_after = r.headers.get("Retry-After")
+                    wait = int(retry_after) if retry_after and retry_after.isdigit() else 60 * attempt
+                    print(f"  HTTP 429 (attempt {attempt}/{max_retries}), waiting {wait}s")
+                    sleep(wait)
                 else:
-                    print("HTTP: ", r.status_code)
+                    print(f"  HTTP {r.status_code}, skipping")
+                    break
             except RequestException as e:
-                print(e, wiki_id)
-            just_sleep(10, 20, verbose=True)
+                print(f"  error: {e}, attempt {attempt}/{max_retries}")
+                if attempt < max_retries:
+                    just_sleep(10, 30, verbose=True)
+        else:
+            print(f"  gave up after {max_retries} attempts")
 
 
-def get_images():
+def get_images(party_wiki_ids: set):
     """Download images for all personalities and parties in the Wikidata sub-graph"""
     print("\nPersonalities")
     transformed = get_all_persons_images()
     save_images_from_url(transformed, base_out="assets/images/personalities")
 
     print("\nParties")
-    transformed = get_all_parties_images()
+    transformed = get_all_parties_images(party_wiki_ids)
     save_images_from_url(transformed, base_out="assets/images/parties")
 
 
 def main():
     print("Caching and pre-computing static information")
     all_politiquices_per = personalities_json_cache()
-    parties_json_cache()
+    party_wiki_ids = parties_json_cache()
     entities_top_co_occurrences(all_politiquices_per)
     persons_relationships_counts_by_type()
-    get_images()
+    get_images(party_wiki_ids)
+
+    generated_files = [
+        STATIC_DATA + "all_entities_info.json",
+        STATIC_DATA + "persons.json",
+        STATIC_DATA + "all_parties_info.json",
+        STATIC_DATA + "parties.json",
+        STATIC_DATA + "top_co_occurrences.json",
+        STATIC_DATA + "person_relationships_counts.json",
+    ]
+    print("\nGenerated files:")
+    for path in generated_files:
+        print(f"  {path}")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,8 @@
 import re
 import sys
+import urllib.error
+from random import randint
+from time import sleep
 from typing import Dict, Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
@@ -14,7 +17,11 @@ def make_https(url):
     return re.sub(r"http://", "https://", url)
 
 
-def query_sparql(query, endpoint):
+def _sleep_with_jitter(base_seconds, jitter=5):
+    sleep(base_seconds + randint(0, jitter))
+
+
+def query_sparql(query, endpoint, max_retries=5):
     if endpoint == "wikidata":
         endpoint_url = wikidata_endpoint
     else:
@@ -23,8 +30,21 @@ def query_sparql(query, endpoint):
     sparql = SPARQLWrapper(endpoint_url, agent=user_agent)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
-    return results
+    for attempt in range(max_retries):
+        try:
+            return sparql.query().convert()
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                retry_after = int(e.headers.get("Retry-After", 60))
+                print(f"Rate limited (429). Waiting {retry_after}s before retry {attempt + 1}/{max_retries}...")
+                _sleep_with_jitter(retry_after)
+            else:
+                raise
+        except urllib.error.URLError as e:
+            wait = 30 * (2 ** attempt)
+            print(f"Network error ({e.reason}). Waiting {wait}s before retry {attempt + 1}/{max_retries}...")
+            sleep(wait)
+    raise RuntimeError(f"SPARQL query failed after {max_retries} retries")
 
 
 def get_all_parties_and_members_with_relationships():
@@ -69,46 +89,40 @@ def get_all_parties_and_members_with_relationships():
     return political_parties
 
 
-def get_nr_relationships_as_subject(relationship: str):
-    query = f"""
-        SELECT DISTINCT ?person_a (COUNT(?url) as ?nr_articles) {{
-          {{ ?rel politiquices:ent1 ?person_a .
-            ?rel politiquices:type 'ent1_{relationship}_ent2'.
-          }}
+def get_persons_relationships_counts() -> Dict[str, Any]:
+    query = """
+        SELECT ?person_a ?role (COUNT(DISTINCT ?url) as ?count)
+        WHERE {
+          { ?rel politiquices:ent1 ?person_a . ?rel politiquices:type 'ent1_opposes_ent2' . BIND('opposes'      as ?role) }
           UNION
-          {{ ?rel politiquices:ent2 ?person_a .
-            ?rel politiquices:type 'ent2_{relationship}_ent1'.
-          }}
+          { ?rel politiquices:ent2 ?person_a . ?rel politiquices:type 'ent2_opposes_ent1' . BIND('opposes'      as ?role) }
+          UNION
+          { ?rel politiquices:ent1 ?person_a . ?rel politiquices:type 'ent1_supports_ent2'. BIND('supports'     as ?role) }
+          UNION
+          { ?rel politiquices:ent2 ?person_a . ?rel politiquices:type 'ent2_supports_ent1'. BIND('supports'     as ?role) }
+          UNION
+          { ?rel politiquices:ent2 ?person_a . ?rel politiquices:type 'ent1_opposes_ent2' . BIND('is_opposed'   as ?role) }
+          UNION
+          { ?rel politiquices:ent1 ?person_a . ?rel politiquices:type 'ent2_opposes_ent1' . BIND('is_opposed'   as ?role) }
+          UNION
+          { ?rel politiquices:ent2 ?person_a . ?rel politiquices:type 'ent1_supports_ent2'. BIND('is_supported' as ?role) }
+          UNION
+          { ?rel politiquices:ent1 ?person_a . ?rel politiquices:type 'ent2_supports_ent1'. BIND('is_supported' as ?role) }
           ?rel politiquices:url ?url .
-        }}
-        GROUP BY ?person_a
-        ORDER BY DESC(?nr_articles)
+        }
+        GROUP BY ?person_a ?role
+        ORDER BY ?person_a
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    return [
-        (x["person_a"]["value"].split("/")[-1], int(x["nr_articles"]["value"])) for x in results["results"]["bindings"]
-    ]
-
-
-def get_nr_relationships_as_target(relationship: str):
-    query = f"""
-        SELECT DISTINCT ?person_a (COUNT(?url) as ?nr_articles) {{
-          {{ ?rel politiquices:ent2 ?person_a .
-            ?rel politiquices:type 'ent1_{relationship}_ent2'.
-          }}
-          UNION
-          {{ ?rel politiquices:ent1 ?person_a .
-            ?rel politiquices:type 'ent2_{relationship}_ent1'.
-          }}
-          ?rel politiquices:url ?url .
-        }}
-        GROUP BY ?person_a
-        ORDER BY DESC(?nr_articles)
-        """
-    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    return [
-        (x["person_a"]["value"].split("/")[-1], int(x["nr_articles"]["value"])) for x in results["results"]["bindings"]
-    ]
+    counts: Dict[str, Any] = {}
+    for e in results["results"]["bindings"]:
+        wiki_id = e["person_a"]["value"].split("/")[-1]
+        role = e["role"]["value"]
+        count = int(e["count"]["value"])
+        if wiki_id not in counts:
+            counts[wiki_id] = {"opposes": 0, "supports": 0, "is_opposed": 0, "is_supported": 0}
+        counts[wiki_id][role] = count
+    return counts
 
 
 def get_persons_co_occurrences_counts():
@@ -186,7 +200,7 @@ def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
 
 def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, int]]:
     query = """
-        SELECT ?person ?rel_type (COUNT(*) as ?count)
+        SELECT ?person ?rel_type (COUNT(DISTINCT ?rel) as ?count)
         WHERE {
           VALUES ?rel_type {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                             'ent1_supports_ent2' 'ent2_supports_ent1' 'other'}
@@ -209,13 +223,14 @@ def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, int]]:
     return counts
 
 
-def get_all_parties_images():
-    query = """
+def get_all_parties_images(party_wiki_ids: set):
+    values = " ".join(f"wd:{wid}" for wid in party_wiki_ids)
+    query = f"""
         SELECT ?party ?logo
-        WHERE {
-            ?party wdt:P31 wd:Q7278 .
-            OPTIONAL { ?party wdt:P154 ?logo. }
-        }"""
+        WHERE {{
+            VALUES ?party {{ {values} }}
+            OPTIONAL {{ ?party wdt:P154 ?logo. }}
+        }}"""
 
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
     transformed = {

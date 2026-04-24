@@ -8,6 +8,6 @@ start_year = 1994
 end_year = 2026
 LANG = "pt"
 PS_LOGO = "../assets/images/parties/Q847263.png"
-NO_IMAGE = "../assets/images/logos/no_picture.jpg"
+NO_IMAGE = "/assets/images/no_picture.jpg"
 STATIC_DATA = "json/"
 ENTITIES_BATCH_SIZE = 16  # number of entity cards to read in batch when scrolling down

@@ -1,6 +1,9 @@
 import sys
+import urllib.error
 from collections import defaultdict
 from functools import lru_cache
+from random import randint
+from time import sleep
 from typing import List
 
 from SPARQLWrapper import SPARQLWrapper, JSON
@@ -1178,7 +1181,11 @@ def get_relationships_aggregate_by_party(wiki_id: str):
         """
 
 
-def query_sparql(query, endpoint):
+def _sleep_with_jitter(base_seconds, jitter=5):
+    sleep(base_seconds + randint(0, jitter))
+
+
+def query_sparql(query, endpoint, max_retries=5):
     if endpoint == "wikidata":
         endpoint_url = wikidata_endpoint
     else:
@@ -1187,5 +1194,18 @@ def query_sparql(query, endpoint):
     sparql = SPARQLWrapper(endpoint_url, agent=user_agent)
     sparql.setQuery(query)
     sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
-    return results
+    for attempt in range(max_retries):
+        try:
+            return sparql.query().convert()
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                retry_after = int(e.headers.get("Retry-After", 60))
+                print(f"Rate limited (429). Waiting {retry_after}s before retry {attempt + 1}/{max_retries}...")
+                _sleep_with_jitter(retry_after)
+            else:
+                raise
+        except urllib.error.URLError as e:
+            wait = 30 * (2 ** attempt)
+            print(f"Network error ({e.reason}). Waiting {wait}s before retry {attempt + 1}/{max_retries}...")
+            sleep(wait)
+    raise RuntimeError(f"SPARQL query failed after {max_retries} retries")
