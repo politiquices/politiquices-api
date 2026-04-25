@@ -165,17 +165,27 @@ def get_persons_co_occurrences_counts():
 def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
     # wd:Q5 -> all human beings
     # wd:Q15904441 -> Dailai Lama, he's not a human being, it's a position/spiritual leader
-    query = f"""
-        SELECT ?wiki_id ?label ?image_url ?country ?country_label {{
-            VALUES ?valid_instances {{wd:Q5 wd:Q15904441}}
+    # label fallback mirrors build_files.py LANG_PRIORITY: pt -> pt-br -> en -> mul
+    query = """
+        SELECT ?wiki_id ?label ?image_url ?country ?country_label {
+            VALUES ?valid_instances {wd:Q5 wd:Q15904441}
             ?wiki_id wdt:P31 ?valid_instances.
-            ?wiki_id rdfs:label ?label . FILTER(LANG(?label) = "{LANG}")
-            OPTIONAL {{ ?wiki_id wdt:P18 ?image_url. }}
-            OPTIONAL {{
+            OPTIONAL { ?wiki_id rdfs:label ?label_pt   . FILTER(LANG(?label_pt)   = "pt") }
+            OPTIONAL { ?wiki_id rdfs:label ?label_ptbr . FILTER(LANG(?label_ptbr) = "pt-br") }
+            OPTIONAL { ?wiki_id rdfs:label ?label_en   . FILTER(LANG(?label_en)   = "en") }
+            OPTIONAL { ?wiki_id rdfs:label ?label_mul  . FILTER(LANG(?label_mul)  = "mul") }
+            BIND(COALESCE(?label_pt, ?label_ptbr, ?label_en, ?label_mul) AS ?label)
+            FILTER(BOUND(?label))
+            OPTIONAL {
+                SELECT ?wiki_id (MIN(?img) AS ?image_url) WHERE {
+                    ?wiki_id wdt:P18 ?img .
+                } GROUP BY ?wiki_id
+            }
+            OPTIONAL {
                 ?wiki_id wdt:P27 ?country .
-                ?country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
-            }}
-        }}
+                ?country rdfs:label ?country_label . FILTER(LANG(?country_label) = "en")
+            }
+        }
         """
     result = query_sparql(PREFIXES + "\n" + query, "wikidata")
     results = {}
@@ -243,15 +253,15 @@ def get_all_parties_images(party_wiki_ids: set):
 
 def get_all_persons_images():
     query = """
-        SELECT ?person ?image_url
+        SELECT ?person (MIN(?img) AS ?image_url)
         WHERE {
             ?person wdt:P31 wd:Q5 .
-            OPTIONAL { ?person wdt:P18 ?image_url. }
-        }"""
+            ?person wdt:P18 ?img .
+        }
+        GROUP BY ?person"""
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
     transformed = {
         r["person"]["value"].split("/")[-1]: {"image_url": r["image_url"]["value"]}
         for r in results["results"]["bindings"]
-        if "image_url" in r
     }
     return transformed
