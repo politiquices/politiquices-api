@@ -149,8 +149,12 @@ def get_person_info(wiki_id):
     query = f"""
         SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label
         WHERE {{
-            wd:{wiki_id} rdfs:label ?name
-            FILTER(LANG(?name)="{LANG}") .
+            OPTIONAL {{ wd:{wiki_id} rdfs:label ?name_pt   . FILTER(LANG(?name_pt)   = "pt") }}
+            OPTIONAL {{ wd:{wiki_id} rdfs:label ?name_ptbr . FILTER(LANG(?name_ptbr) = "pt-br") }}
+            OPTIONAL {{ wd:{wiki_id} rdfs:label ?name_en   . FILTER(LANG(?name_en)   = "en") }}
+            OPTIONAL {{ wd:{wiki_id} rdfs:label ?name_mul  . FILTER(LANG(?name_mul)  = "mul") }}
+            BIND(COALESCE(?name_pt, ?name_ptbr, ?name_en, ?name_mul) AS ?name)
+            FILTER(BOUND(?name))
             OPTIONAL {{ wd:{wiki_id} wdt:P18 ?image_url. }}
             OPTIONAL {{
                 wd:{wiki_id} p:P102 ?political_partyStmnt.
@@ -696,9 +700,13 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
              }}
 
             SERVICE <{wikidata_endpoint}> {{
-                ?ent1 wdt:P102 wd:{party};
-                      rdfs:label ?personLabel.
-                FILTER(LANG(?personLabel) = "{LANG}")
+                ?ent1 wdt:P102 wd:{party} .
+                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_pt   . FILTER(LANG(?personLabel_pt)   = "pt") }}
+                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_ptbr . FILTER(LANG(?personLabel_ptbr) = "pt-br") }}
+                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_en   . FILTER(LANG(?personLabel_en)   = "en") }}
+                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_mul  . FILTER(LANG(?personLabel_mul)  = "mul") }}
+                BIND(COALESCE(?personLabel_pt, ?personLabel_ptbr, ?personLabel_en, ?personLabel_mul) AS ?personLabel)
+                FILTER(BOUND(?personLabel))
             }}
         }}
         ORDER BY DESC(?date)
@@ -764,8 +772,13 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
             }}
 
             SERVICE <{wikidata_endpoint}> {{
-                ?ent2 wdt:P102 wd:{party};
-                      rdfs:label ?personLabel. FILTER(LANG(?personLabel) = "{LANG}")
+                ?ent2 wdt:P102 wd:{party} .
+                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_pt   . FILTER(LANG(?personLabel_pt)   = "pt") }}
+                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_ptbr . FILTER(LANG(?personLabel_ptbr) = "pt-br") }}
+                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_en   . FILTER(LANG(?personLabel_en)   = "en") }}
+                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_mul  . FILTER(LANG(?personLabel_mul)  = "mul") }}
+                BIND(COALESCE(?personLabel_pt, ?personLabel_ptbr, ?personLabel_en, ?personLabel_mul) AS ?personLabel)
+                FILTER(BOUND(?personLabel))
             }}
         }}
         ORDER BY DESC(?date)

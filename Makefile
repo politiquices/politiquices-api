@@ -3,12 +3,18 @@ cache:
 	SPARQL_ENDPOINT='http://127.0.0.1:3030' PYTHONPATH=`pwd`"/src" python src/generate_caches.py
 
 images:
-	# generate small images generate from the cacheing script and copies them to the react-app public assets
 	mkdir -p assets/images/personalities_small/
-	cp -v assets/images/personalities/* assets/images/personalities_small
-	mogrify -resize 250x250^ -gravity center -extent 250x250 assets/images/personalities_small/*
+	for f in assets/images/personalities/*; do \
+		dest="assets/images/personalities_small/$$(basename $$f)"; \
+		if [ ! -f "$$dest" ]; then \
+			echo "resizing $$(basename $$f)..."; \
+			cp "$$f" "$$dest" && mogrify -resize 250x250^ -gravity center -extent 250x250 "$$dest"; \
+		fi; \
+	done
+	echo "copying to react app..."
 	cp -R assets/images/parties ../politiquices-app/public/assets/images/
 	cp -R assets/images/personalities_small ../politiquices-app/public/assets/images/
+	echo "done"
 
 build:
 	# build a Docker image

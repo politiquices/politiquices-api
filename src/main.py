@@ -66,8 +66,8 @@ logger.info(f"{get_nr_of_persons()} persons and {all_articles} articles, {n_othe
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     base_url = "/assets/images/"
 
-    if "no_picture.jpg" in org_url:
-        return org_url
+    if not org_url or "no_picture.jpg" in org_url:
+        return org_url or f"{base_url}no_picture.jpg"
 
     if ent_type == "person":
         base_url += "personalities_small"
