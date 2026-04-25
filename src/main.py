@@ -84,7 +84,8 @@ async def root():
 @app.get("/personality/{wiki_id}")
 async def personality(wiki_id: str = Path(regex=wiki_id_regex)):
     person = get_person_info(wiki_id)
-    person.image_url = local_image(person.wiki_id, person.image_url, ent_type="person")
+    cached = all_entities_info.get(wiki_id, {})
+    person.image_url = cached.get("image_url") or local_image(person.wiki_id, person.image_url, ent_type="person")
     for party in person.parties:
         if "no_picture" in party.image_url:
             continue
