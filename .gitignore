@@ -1,5 +1,9 @@
 .DS_Store
 .coverage
 .idea
+.claude
 *__pycache__
 json/
+annotations.jsonl
+corrections.jsonl
+assets/

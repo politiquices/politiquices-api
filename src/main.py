@@ -7,6 +7,7 @@ from fastapi import FastAPI, Path, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 
+from annotation_router import router as annotation_router
 from cache import all_entities_info, all_parties_info, persons, parties
 from config import sparql_endpoint, start_year, end_year
 from sparql import (
@@ -45,6 +46,7 @@ url2index = None
 logger = logging.getLogger("uvicorn")
 
 app = FastAPI()
+app.include_router(annotation_router)
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
 origins = ["*"]
@@ -52,7 +54,7 @@ origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -383,33 +385,3 @@ async def stats():
         "nr_all_articles": nr_all_articles,
         "year_values": all_values,
     }
-
-@app.post("/corrections")
-async def corrections(request: Request):
-    try:
-        data = await request.json()
-        
-        # Get the client's IP address
-        client_ip = request.client.host
-        
-        """
-        # Resolve the DNS value of the IP address
-        try:
-            dns_value = socket.gethostbyaddr(client_ip)[0]
-        except socket.herror:
-            dns_value = "DNS resolution failed"
-        """
-
-        # Add IP and DNS information to the data
-        data["client_ip"] = client_ip
-        # data["dns_value"] = dns_value
-
-        print(data)
-
-        # Save the data to a JSON lines file
-        with open("corrections.jsonl", "a") as f:
-            f.write(json.dumps(data) + "\n")
-        
-        return {"message": "Correction saved successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))

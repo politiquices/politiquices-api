@@ -1194,6 +1194,63 @@ def get_relationships_aggregate_by_party(wiki_id: str):
         """
 
 
+def get_total_relationships_count() -> int:
+    query = """
+        SELECT (COUNT(?rel) AS ?total)
+        WHERE {
+            ?rel politiquices:url ?arquivo_doc .
+        }
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    return int(results["results"]["bindings"][0]["total"]["value"])
+
+
+def get_all_relationships_paginated(offset: int = 0, limit: int = 20) -> list:
+    query = f"""
+        SELECT ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        WHERE {{
+            ?rel politiquices:url ?arquivo_doc ;
+                 politiquices:type ?rel_type ;
+                 politiquices:ent1 ?ent1 ;
+                 politiquices:ent2 ?ent2 ;
+                 politiquices:ent1_str ?ent1_str ;
+                 politiquices:ent2_str ?ent2_str .
+            ?arquivo_doc dc:title ?title ;
+                         dc:description ?description ;
+                         dc:creator ?creator ;
+                         dc:publisher ?publisher ;
+                         dc:date ?date .
+        }}
+        ORDER BY ?arquivo_doc
+        LIMIT {limit}
+        OFFSET {offset}
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    return results["results"]["bindings"]
+
+
+def get_relationship_by_url(url: str) -> list:
+    query = f"""
+        SELECT ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        WHERE {{
+            BIND(<{url}> AS ?arquivo_doc)
+            ?rel politiquices:url ?arquivo_doc ;
+                 politiquices:type ?rel_type ;
+                 politiquices:ent1 ?ent1 ;
+                 politiquices:ent2 ?ent2 ;
+                 politiquices:ent1_str ?ent1_str ;
+                 politiquices:ent2_str ?ent2_str .
+            ?arquivo_doc dc:title ?title ;
+                         dc:description ?description ;
+                         dc:creator ?creator ;
+                         dc:publisher ?publisher ;
+                         dc:date ?date .
+        }}
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    return results["results"]["bindings"]
+
+
 def _sleep_with_jitter(base_seconds, jitter=5):
     sleep(base_seconds + randint(0, jitter))
 
