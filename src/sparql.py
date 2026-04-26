@@ -896,10 +896,9 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
 
         SELECT DISTINCT ?arquivo_doc ?creator ?date ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
-                VALUES ?person_one {{{values}}}
-                VALUES ?person_two {{{values}}}
+                VALUES ?person {{{values}}}
                 {{
-                    {{ ?rel politiquices:ent1 ?person_one .}} UNION {{ ?rel politiquices:ent2 ?person_two .}}
+                    {{ ?rel politiquices:ent1 ?person .}} UNION {{ ?rel politiquices:ent2 ?person .}}
                        ?rel politiquices:ent1 ?ent1;
                             politiquices:ent2 ?ent2;
                             politiquices:ent1_str ?ent1_str;

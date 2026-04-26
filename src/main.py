@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from annotation_router import router as annotation_router
 from cache import all_entities_info, all_parties_info, persons, parties
-from config import sparql_endpoint, start_year, end_year
+from config import sparql_endpoint, start_year, end_year, NO_IMAGE
 from sparql import (
     get_nr_of_persons,
     get_person_info,
@@ -323,8 +323,9 @@ async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
     for r in results:
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
+        info = all_entities_info.get(entry_wiki_id)
+        r["image_url"]["value"] = info["image_url"] if info else NO_IMAGE
+        r["nr_articles"] = info["nr_articles"] if info else 0
     return results
 
 
@@ -333,8 +334,9 @@ async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     for r in results:
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        r["image_url"]["value"] = all_entities_info[entry_wiki_id]["image_url"]
-        r["nr_articles"] = all_entities_info[entry_wiki_id]["nr_articles"]
+        info = all_entities_info.get(entry_wiki_id)
+        r["image_url"]["value"] = info["image_url"] if info else NO_IMAGE
+        r["nr_articles"] = info["nr_articles"] if info else 0
     return results
 
 
