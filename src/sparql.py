@@ -441,7 +441,7 @@ def get_person_relationships(wiki_id):
     return relations
 
 
-def get_top_relationships(wiki_id, top_n=3):
+def get_top_relationships(wiki_id):
     # get all the relationships where the person acts as subject, i.e: opposes and supports
     query = f"""
         SELECT ?rel_type ?ent2
@@ -550,12 +550,11 @@ def get_top_relationships(wiki_id, top_n=3):
         if k in all_entities_info
     ]
 
-    # see PEP448: https://peps.python.org/pep-0448/
     return {
-        "who_person_opposes": sorted(who_person_opposes, key=lambda x: x["freq"], reverse=True)[0:top_n],
-        "who_person_supports": sorted(who_person_supports, key=lambda x: x["freq"], reverse=True)[0:top_n],
-        "who_opposes_person": sorted(who_opposes_person, key=lambda x: x["freq"], reverse=True)[0:top_n],
-        "who_supports_person": sorted(who_supports_person, key=lambda x: x["freq"], reverse=True)[0:top_n],
+        "who_person_opposes": sorted(who_person_opposes, key=lambda x: x["freq"], reverse=True),
+        "who_person_supports": sorted(who_person_supports, key=lambda x: x["freq"], reverse=True),
+        "who_opposes_person": sorted(who_opposes_person, key=lambda x: x["freq"], reverse=True),
+        "who_supports_person": sorted(who_supports_person, key=lambda x: x["freq"], reverse=True),
     }
 
 
