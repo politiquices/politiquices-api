@@ -10,7 +10,7 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from cache import all_entities_info
 from config import NO_IMAGE, politiquices_endpoint, PS_LOGO, wikidata_endpoint, LANG
 from data_models import Element, Person, PoliticalParty
-from utils import make_https, _process_rel_type
+from utils import make_https, _process_rel_type, invert_relationship
 
 from sparql_prefixes import PREFIXES
 
@@ -640,6 +640,13 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     results = []
     for x in result["results"]["bindings"]:
+        rel_type_result = x["rel_type"]["value"]
+        # When the UNION's second branch matched, the triple stores ent1=wiki_id_two and
+        # ent2=wiki_id_one. Detect this and invert rel_type so it stays consistent with
+        # ent1_id=wiki_id_one / ent2_id=wiki_id_two.
+        ent1_wiki_id = x["ent1"]["value"].split("/")[-1]
+        if ent1_wiki_id == wiki_id_two:
+            rel_type_result = invert_relationship(rel_type_result)
         results.append(
             {
                 "arquivo_doc": x["arquivo_doc"]["value"],
@@ -648,11 +655,11 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                 "domain": x["creator"]["value"],
                 "original_url": x["publisher"]["value"],
                 "paragraph": x["description"]["value"],
-                "rel_type": x["rel_type"]["value"],
+                "rel_type": rel_type_result,
                 "ent1_id": wiki_id_one,
-                "ent1_str": x["ent1_str"]["value"],
+                "ent1_str": all_entities_info[wiki_id_one]["name"],
                 "ent2_id": wiki_id_two,
-                "ent2_str": x["ent2_str"]["value"],
+                "ent2_str": all_entities_info[wiki_id_two]["name"],
                 "ent1_img": all_entities_info[wiki_id_one]["image_url"],
                 "ent2_img": all_entities_info[wiki_id_two]["image_url"],
             }

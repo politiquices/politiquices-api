@@ -159,6 +159,17 @@ async def get_all_parties():
     return list(all_parties_info)
 
 
+@app.get("/personalities/top/")
+async def get_top_personalities(n: int = 50):
+    portuguese = [
+        {"wiki_id": k, "name": v["name"], "image_url": v["image_url"], "nr_articles": v["nr_articles"]}
+        for k, v in all_entities_info.items()
+        if any(c["wiki_id"] == "Q45" for c in v.get("countries", []))
+        and (v["nr_articles"] - v["nr_articles_by_type"].get("other", 0)) > 0
+    ]
+    return sorted(portuguese, key=lambda x: x["nr_articles"], reverse=True)[:n]
+
+
 @app.get("/personalities/{page_nr}")
 async def get_personalities(page_nr: int = Path(..., title="Page Number"), portuguese_only: bool = False, international_only: bool = False):
     personalities_per_page = 32
