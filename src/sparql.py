@@ -318,6 +318,7 @@ def get_person_relationships(wiki_id):
 
     # ToDo: refactor to a function
     for e in results["results"]["bindings"]:
+        rel_type = None
         ent1_wiki = e["ent1"]["value"].split("/")[-1].strip()
         ent2_wiki = e["ent2"]["value"].split("/")[-1].strip()
 
@@ -394,17 +395,32 @@ def get_person_relationships(wiki_id):
                 other_ent_name = e["ent2_str"]["value"].split("/")[-1]
                 focus_ent = e["ent1_str"]["value"].split("/")[-1]
 
+            elif wiki_id == ent2_wiki:
+                rel_type = "mutual_agreement"
+                other_ent_url = ent1_wiki
+                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
+                focus_ent = e["ent2_str"]["value"].split("/")[-1]
+
         elif e["rel_type"]["value"] == "mutual_opposition":
             print("mutual_opposition")
             if wiki_id == ent1_wiki:
-                rel_type = "mutual_agreement"
+                rel_type = "mutual_opposition"
                 other_ent_url = ent2_wiki
                 other_ent_name = e["ent2_str"]["value"].split("/")[-1]
                 focus_ent = e["ent1_str"]["value"].split("/")[-1]
 
+            elif wiki_id == ent2_wiki:
+                rel_type = "mutual_opposition"
+                other_ent_url = ent1_wiki
+                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
+                focus_ent = e["ent2_str"]["value"].split("/")[-1]
+
         else:
             print("unknown rel_type:", e)
-            # raise Exception(e["rel_type"]["value"] + " not known")
+            continue
+
+        if rel_type is None:
+            continue
 
         try:
             relations[rel_type].append(
@@ -819,7 +835,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?title ?description ?rel_type
+    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type
     WHERE {{
       {{
         VALUES ?person_party_a {{ {per_party_a} }}
@@ -831,13 +847,15 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
               {{
-                SELECT ?rel ?rel_type ?arquivo_doc ?title ?description ?date
+                SELECT ?rel ?rel_type ?arquivo_doc ?title ?description ?creator ?publisher ?date
                 WHERE {{
                      ?rel politiquices:url ?arquivo_doc;
                           politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
 
                       ?arquivo_doc dc:title ?title;
-                                   dc:description ?description;                      
+                                   dc:description ?description;
+                                   dc:creator ?creator;
+                                   dc:publisher ?publisher;
                                    dc:date ?date;
                                    FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
                 }}
@@ -851,13 +869,15 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
               {{
-                SELECT ?rel ?rel_type ?arquivo_doc ?title ?description ?date
+                SELECT ?rel ?rel_type ?arquivo_doc ?title ?description ?creator ?publisher ?date
                 WHERE {{
                       ?rel politiquices:url ?arquivo_doc;
                            politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
                       ?arquivo_doc dc:title ?title;
-                                   dc:description ?description;                      
+                                   dc:description ?description;
+                                   dc:creator ?creator;
+                                   dc:publisher ?publisher;
                                    dc:date ?date;
                                    FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
                 }}
@@ -874,6 +894,8 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                 "arquivo_doc": x["arquivo_doc"]["value"],
                 "date": x["date"]["value"],
                 "title": x["title"]["value"],
+                "domain": x["creator"]["value"],
+                "original_url": x["publisher"]["value"],
                 "paragraph": x["description"]["value"],
                 "rel_type": x["rel_type"]["value"],
                 "ent1_id": x["person_party_a"]["value"].split("/")[-1],
