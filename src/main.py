@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from annotation_router import router as annotation_router
 from cache import all_entities_info, all_parties_info, persons, parties
-from config import sparql_endpoint, start_year, end_year, NO_IMAGE
+from config import sparql_endpoint, start_year, end_year, NO_IMAGE, party_logo_url
 from sparql import (
     get_nr_of_persons,
     get_person_info,
@@ -100,10 +100,7 @@ async def personality(wiki_id: str = Path(regex=wiki_id_regex)):
     cached = all_entities_info.get(wiki_id, {})
     person.image_url = cached.get("image_url") or local_image(person.wiki_id, person.image_url, ent_type="person")
     for party in person.parties:
-        if "no_picture" in party.image_url:
-            continue
-        f_name = f"{party.wiki_id}.{party.image_url.split('.')[-1]}"
-        party.image_url = f"/assets/images/parties/{f_name}"
+        party.image_url = party_logo_url(party.wiki_id)
 
     def year2index(input_year: int):
         return int(input_year) - start_year

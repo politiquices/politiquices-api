@@ -7,7 +7,7 @@ from typing import Dict, Any
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 
-from config import wikidata_endpoint, politiquices_endpoint, NO_IMAGE, PS_LOGO
+from config import wikidata_endpoint, politiquices_endpoint, NO_IMAGE, party_logo_url
 from sparql_prefixes import PREFIXES
 
 LANG = "en"
@@ -72,15 +72,14 @@ def get_all_parties_and_members_with_relationships():
 
     political_parties = []
     for x in results["results"]["bindings"]:
-        party_logo = x["party_logo"]["value"] if "party_logo" in x else NO_IMAGE
-        if x["political_party"]["value"].split("/")[-1] == "Q847263":
-            party_logo = PS_LOGO
+        wiki_id = x["political_party"]["value"].split("/")[-1]
         country = x["country_label"]["value"] if x.get("country_label") else None
         political_parties.append(
             {
-                "wiki_id": x["political_party"]["value"].split("/")[-1],
+                "wiki_id": wiki_id,
                 "party_label": x["party_label"]["value"],
-                "party_logo": make_https(party_logo),
+                # the file on disk, not the commons.wikimedia.org URL it came from
+                "party_logo": party_logo_url(wiki_id),
                 "country": country,
                 "nr_personalities": x["nr_personalities"]["value"],
             }

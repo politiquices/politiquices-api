@@ -8,7 +8,7 @@ from typing import List
 
 from SPARQLWrapper import SPARQLWrapper, JSON
 from cache import all_entities_info
-from config import NO_IMAGE, politiquices_endpoint, PS_LOGO, wikidata_endpoint, LANG
+from config import NO_IMAGE, politiquices_endpoint, party_logo_url, wikidata_endpoint, LANG
 from data_models import Element, Person, PoliticalParty
 from utils import make_https, _process_rel_type, invert_relationship
 
@@ -176,19 +176,11 @@ def get_person_info(wiki_id):
         if not image_url:
             image_url = e["image_url"]["value"] if "image_url" in e else NO_IMAGE
         if "political_party" in e:
-            party_image_url = NO_IMAGE
-
-            # add 'PS' logo since it's not on Wikidata
-            if e["political_party"]["value"] == "http://www.wikidata.org/entity/Q847263":
-                party_image_url = PS_LOGO
-
+            party_wiki_id = e["political_party"]["value"].split("/")[-1]
             party = PoliticalParty(
-                wiki_id=e["political_party"]["value"].split("/")[-1],
+                wiki_id=party_wiki_id,
                 name=e["political_party_label"]["value"],
-                image_url=make_https(e["political_party_logo"]["value"])
-                if "political_party_logo" in e
-                and e["political_party"]["value"] != "http://www.wikidata.org/entity/Q847263"
-                else party_image_url,
+                image_url=party_logo_url(party_wiki_id),
             )
             if party not in parties:
                 parties.append(party)
