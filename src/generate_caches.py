@@ -110,7 +110,7 @@ def parties_json_cache():
     parties = [
         {"label": parties_mapping.get(x["party_label"], x["party_label"]), "value": x["wiki_id"]}
         for x in sorted(parties_data, key=lambda x: x["party_label"])
-        if x["country"] == "Portugal"
+        if "Portugal" in x["countries"]
     ]
     with open(STATIC_DATA + "parties.json", "wt", encoding="utf8") as f_out:
         json.dump(parties, f_out)

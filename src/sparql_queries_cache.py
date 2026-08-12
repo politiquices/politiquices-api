@@ -51,12 +51,14 @@ def get_all_parties_and_members_with_relationships():
     """Get a list of all the parties and the count of members"""
 
     query = f"""
-        SELECT DISTINCT ?political_party ?party_label ?party_logo ?country_label (COUNT(?person) as ?nr_personalities)
+        SELECT ?political_party
+               (SAMPLE(?party_label) AS ?label)
+               (GROUP_CONCAT(DISTINCT ?country_label; separator="|") AS ?countries)
+               (COUNT(DISTINCT ?person) AS ?nr_personalities)
         WHERE {{
             ?person p:P102 ?political_partyStmnt.
             ?political_partyStmnt ps:P102 ?political_party.
             ?political_party rdfs:label ?party_label . FILTER(LANG(?party_label) = "pt")
-            OPTIONAL {{ ?political_party wdt:P154 ?party_logo. }}
             OPTIONAL {{
                 ?political_party wdt:P17 ?party_country.
                 ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
@@ -65,7 +67,7 @@ def get_all_parties_and_members_with_relationships():
                 SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}
             }}
         }}
-        GROUP BY ?political_party ?party_label ?party_logo ?country_label
+        GROUP BY ?political_party
         ORDER BY DESC(?nr_personalities)
         """
     results = query_sparql(PREFIXES + "\n" + query, "wikidata")
@@ -73,14 +75,18 @@ def get_all_parties_and_members_with_relationships():
     political_parties = []
     for x in results["results"]["bindings"]:
         wiki_id = x["political_party"]["value"].split("/")[-1]
-        country = x["country_label"]["value"] if x.get("country_label") else None
+        # Grouping by country used to emit one row per country: the Baath party came
+        # back five times, the Yugoslav League four. Countries are aggregated in the
+        # query now, so this is one row per party.
+        raw_countries = x["countries"]["value"] if "countries" in x else ""
+        countries = sorted(c for c in raw_countries.split("|") if c)
         political_parties.append(
             {
                 "wiki_id": wiki_id,
-                "party_label": x["party_label"]["value"],
+                "party_label": x["label"]["value"],
                 # the file on disk, not the commons.wikimedia.org URL it came from
                 "party_logo": party_logo_url(wiki_id),
-                "country": country,
+                "countries": countries,
                 "nr_personalities": x["nr_personalities"]["value"],
             }
         )
