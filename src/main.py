@@ -75,8 +75,10 @@ def _has_sentiment_articles(wiki_id: str) -> bool:
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
     base_url = "/assets/images/"
 
-    if not org_url or "no_picture.jpg" in org_url:
-        return org_url or f"{base_url}no_picture.jpg"
+    # Return the constant rather than passing org_url through: cached entries may
+    # still carry the old '/assets/images/no_picture.jpg', which 404s.
+    if not org_url or "no_picture" in org_url:
+        return NO_IMAGE
 
     if ent_type == "person":
         # `make images` writes every portrait as <wiki_id>.jpg, so the URL no longer
