@@ -3,17 +3,27 @@ cache:
 	SPARQL_ENDPOINT='http://127.0.0.1:3030' PYTHONPATH=`pwd`"/src" python src/generate_caches.py
 
 images:
+	# Portraits are normalised to <wiki_id>.jpg: they are photographs, and a single
+	# extension means the API can build the URL from the wiki_id alone instead of
+	# reading whatever extension Wikidata used (.jpg/.png/.JPG/.JPEG/.tif coexisted).
+	# Alpha is flattened to white first — JPEG has no alpha and would otherwise
+	# composite transparent portraits onto black.
 	mkdir -p assets/images/personalities_small/
 	for f in assets/images/personalities/*; do \
-		dest="assets/images/personalities_small/$$(basename $$f)"; \
+		dest="assets/images/personalities_small/$$(basename $${f%.*}).jpg"; \
 		if [ ! -f "$$dest" ]; then \
 			echo "resizing $$(basename $$f)..."; \
-			cp "$$f" "$$dest" && mogrify -resize 250x250^ -gravity center -extent 250x250 "$$dest"; \
+			magick "$$f" -background white -alpha remove -alpha off \
+				-resize 250x250^ -gravity center -extent 250x250 \
+				-strip -quality 82 "$$dest"; \
 		fi; \
 	done
-	echo "copying to react app..."
-	cp -R assets/images/parties ../politiquices-app/public/assets/images/
-	cp -R assets/images/personalities_small ../politiquices-app/public/assets/images/
+	# rsync --delete rather than cp -R: cp leaves behind files that no longer exist
+	# here, and after the move to a single .jpg extension that meant 217 orphans
+	# shipping to the web server for nobody.
+	echo "mirroring to react app..."
+	rsync -a --delete assets/images/parties/ ../politiquices-app/public/assets/images/parties/
+	rsync -a --delete assets/images/personalities_small/ ../politiquices-app/public/assets/images/personalities_small/
 	echo "done"
 
 build:

@@ -79,10 +79,12 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
         return org_url or f"{base_url}no_picture.jpg"
 
     if ent_type == "person":
-        base_url += "personalities_small"
-    f_name = f"{wiki_id}.{org_url.split('.')[-1]}"
+        # `make images` writes every portrait as <wiki_id>.jpg, so the URL no longer
+        # depends on whichever extension Wikidata happened to use. Reading it from
+        # the source URL is what produced .jpg/.png/.JPG/.JPEG/.tif side by side.
+        return f"{base_url}personalities_small/{wiki_id}.jpg"
 
-    return f"{base_url}/{f_name}"
+    return f"{base_url}{wiki_id}.{org_url.split('.')[-1]}"
 
 
 @app.get("/")

@@ -45,7 +45,8 @@ def get_entities() -> Dict[str, Any]:
         all_politiquices_per[wiki_id]["countries"] = all_wikidata_per[wiki_id]["countries"]
         original_url = all_wikidata_per[wiki_id]["image_url"]
         if original_url.startswith("http"):
-            f_name = f"{wiki_id}.{original_url.split('.')[-1]}"
+            # every portrait is normalised to <wiki_id>.jpg by `make images`
+            f_name = f"{wiki_id}.jpg"
             all_politiquices_per[wiki_id]["image_url"] = f"/assets/images/personalities_small/{f_name}"
         else:
             all_politiquices_per[wiki_id]["image_url"] = NO_IMAGE
