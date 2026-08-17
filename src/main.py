@@ -65,11 +65,14 @@ logger.info(f"Testing SPARQL endpoint: {sparql_endpoint}")
 logger.info(f"{get_nr_of_persons()} persons and {all_articles} articles, {n_other_articles} tagged with sentiment")
 
 
+def _nr_relation_articles(info: dict) -> int:
+    """nr_articles counts every article mentioning the person, 'other' included;
+    this is just the ones with an actual support/opposition relation."""
+    return info.get("nr_articles", 0) - info.get("nr_articles_by_type", {}).get("other", 0)
+
+
 def _has_sentiment_articles(wiki_id: str) -> bool:
-    info = all_entities_info.get(wiki_id)
-    if not info:
-        return False
-    return (info["nr_articles"] - info["nr_articles_by_type"].get("other", 0)) > 0
+    return _nr_relation_articles(all_entities_info.get(wiki_id, {})) > 0
 
 
 def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
@@ -175,7 +178,7 @@ async def get_top_personalities(n: int = 50):
 async def get_personalities(page_nr: int = Path(..., title="Page Number"), portuguese_only: bool = False, international_only: bool = False):
     personalities_per_page = 32
     personalities = [
-        {"label": v["name"], "nr_articles": v["nr_articles"], "local_image": v["image_url"], "wiki_id": k}
+        {"label": v["name"], "nr_articles": _nr_relation_articles(v), "local_image": v["image_url"], "wiki_id": k}
         for k, v in all_entities_info.items()
         if (v["nr_articles"] - v["nr_articles_by_type"].get("other", 0)) > 0
         and (not portuguese_only or any(c["wiki_id"] == "Q45" for c in v.get("countries", [])))
@@ -315,7 +318,7 @@ async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = info.get("nr_articles", 0)
+        r["nr_articles"] = _nr_relation_articles(info)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
 
 
@@ -326,7 +329,7 @@ async def personalities_occupation(wiki_id: str = Path(regex=wiki_id_regex)):
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = info.get("nr_articles", 0)
+        r["nr_articles"] = _nr_relation_articles(info)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
 
 
@@ -337,7 +340,7 @@ async def personalities_public_office(wiki_id: str = Path(regex=wiki_id_regex)):
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = info.get("nr_articles", 0)
+        r["nr_articles"] = _nr_relation_articles(info)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
 
 
@@ -348,7 +351,7 @@ async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = info.get("nr_articles", 0)
+        r["nr_articles"] = _nr_relation_articles(info)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
 
 
@@ -359,7 +362,7 @@ async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = info.get("nr_articles", 0)
+        r["nr_articles"] = _nr_relation_articles(info)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
 
 
@@ -370,7 +373,7 @@ async def personalities_party(wiki_id: str = Path(regex=wiki_id_regex)):
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = info.get("nr_articles", 0)
+        r["nr_articles"] = _nr_relation_articles(info)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
 
 
