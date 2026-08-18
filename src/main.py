@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from collections import defaultdict
 from typing import List, Union
 
@@ -15,6 +16,7 @@ from sparql import (
     get_person_info,
     get_person_relationships,
     get_person_relationships_by_year,
+    get_person_relationships_for_year,
     get_personalities_by_assembly,
     get_personalities_by_education,
     get_personalities_by_government,
@@ -69,6 +71,15 @@ def _nr_relation_articles(info: dict) -> int:
     """nr_articles counts every article mentioning the person, 'other' included;
     this is just the ones with an actual support/opposition relation."""
     return info.get("nr_articles", 0) - info.get("nr_articles_by_type", {}).get("other", 0)
+
+
+# Who counts as a seed person for Explorar's default view: every well-documented
+# figure, so their combined ego networks read as one coherent whole-network picture.
+# Mirrors RANDOM_MIN_ARTICLES (the "Aleatória" pool) on the frontend — no relation-
+# frequency threshold here any more, since #45 moved that from a fetch-time filter to
+# a client-side one (Explorar.jsx's WHOLE_NETWORK_MIN_FREQ), applied live to the raw
+# relationships this cache returns.
+DEFAULT_NETWORK_MIN_ARTICLES = 50
 
 
 def _has_sentiment_articles(wiki_id: str) -> bool:
@@ -134,6 +145,14 @@ async def personality_relationships(wiki_id: str = Path(regex=wiki_id_regex)):
     return get_person_relationships(wiki_id)
 
 
+@app.get("/personality/relationships/{wiki_id}/{year}")
+async def personality_relationships_for_year(
+    wiki_id: str = Path(regex=wiki_id_regex),
+    year: str = Path(regex=r"^\d{4}$"),
+):
+    return get_person_relationships_for_year(wiki_id, year)
+
+
 @app.get("/personality/relationships_by_year/{wiki_id}")
 async def personality_relationships_by_year(wiki_id: str = Path(regex=wiki_id_regex)):
     results = {}
@@ -175,7 +194,12 @@ async def get_top_personalities(n: int = 50):
 
 
 @app.get("/personalities/{page_nr}")
-async def get_personalities(page_nr: int = Path(..., title="Page Number"), portuguese_only: bool = False, international_only: bool = False):
+async def get_personalities(
+    page_nr: int = Path(..., title="Page Number"),
+    portuguese_only: bool = False,
+    international_only: bool = False,
+    sort: str = "articles",
+):
     personalities_per_page = 32
     personalities = [
         {"label": v["name"], "nr_articles": _nr_relation_articles(v), "local_image": v["image_url"], "wiki_id": k}
@@ -184,9 +208,18 @@ async def get_personalities(page_nr: int = Path(..., title="Page Number"), portu
         and (not portuguese_only or any(c["wiki_id"] == "Q45" for c in v.get("countries", [])))
         and (not international_only or not any(c["wiki_id"] == "Q45" for c in v.get("countries", [])))
     ]
+    # all_entities_info is stored sorted by the *total* article count (cache-build
+    # time, generate_caches.py), not the relation-only one used here since #14 — for
+    # "articles" that drifted apart from what's actually displayed, so it's sorted
+    # explicitly rather than trusted from dict order. "name" needs its own sort in
+    # any case: nothing about this list is ever alphabetical otherwise.
+    if sort == "name":
+        personalities.sort(key=lambda p: p["label"])
+    else:
+        personalities.sort(key=lambda p: p["nr_articles"], reverse=True)
     start_index = (page_nr - 1) * personalities_per_page
     end_index = start_index + personalities_per_page
-    return personalities[start_index:end_index]
+    return {"total": len(personalities), "items": personalities[start_index:end_index]}
 
 
 @app.get("/persons/")
@@ -199,18 +232,8 @@ async def persons_and_parties():
     return sorted(persons + parties, key=lambda x: x["label"])
 
 
-@app.get("/timeline/")
-async def timeline(
-    q: Union[List[str], None] = Query(),
-    selected: bool = Query(),
-    sentiment: bool = Query(),
-    min_freq: int = Query(default=10),
-    start: str = Query(),
-    end: str = Query()
-
-):
-    query_items = {"q": q}
-    results = get_timeline_personalities(query_items["q"], selected, sentiment, start, end)
+def _build_timeline(wiki_ids: List[str], selected: bool, sentiment: bool, min_freq: int, start: str, end: str) -> dict:
+    results = get_timeline_personalities(wiki_ids, selected, sentiment, start, end)
 
     built_nodes = set()
     nodes = []
@@ -219,7 +242,7 @@ async def timeline(
 
     def build_node(key, result):
         if result[key] not in built_nodes:
-            nodes.append({"id": result[key], "label": all_entities_info[x[key]]["name"], "image_url": all_entities_info[x[key]]["image_url"]})
+            nodes.append({"id": result[key], "label": all_entities_info[result[key]]["name"], "image_url": all_entities_info[result[key]]["image_url"]})
             built_nodes.add(result[key])
 
     for x in results:
@@ -268,16 +291,104 @@ async def timeline(
                 )
 
     # remove nodes with edges < min_freq
-    nodes_filtered = [n for n in nodes if n["id"] in set([e["from"] for e in edges] + [e["to"] for e in edges])]
+    node_ids = set([e["from"] for e in edges] + [e["to"] for e in edges])
+    nodes_filtered = [n for n in nodes if n["id"] in node_ids]
 
-    # filter news where the entities are not in the nodes
-    news_filtered = [x for x in results
-                     if x["ent1_id"] in [n["id"] for n in nodes_filtered]
-                     and x["ent2_id"] in [n["id"] for n in nodes_filtered]
-                     ]
+    # `news` used to carry every matching article so the page could list them below the
+    # graph — no caller has read it since #38 moved article display to a per-edge
+    # fetch, but it was still being built and serialised here on every request. For a
+    # broad query (many seed persons) that's most of the response: a 168-person /
+    # min_freq=20 request measured at ~16 MB with this filled in, all of it unread.
+    print(f"nodes: {len(nodes)}, edges: {len(edges)}")
+    return {"news": [], "nodes": nodes_filtered, "edges": edges}
 
-    print(f"nodes: {len(nodes)}, edges: {len(edges)}, news: {len(news_filtered)}")
-    return {"news": news_filtered, "nodes": nodes_filtered, "edges": edges}
+
+@app.get("/timeline/")
+async def timeline(
+    q: Union[List[str], None] = Query(),
+    selected: bool = Query(),
+    sentiment: bool = Query(),
+    min_freq: int = Query(default=10),
+    start: str = Query(),
+    end: str = Query()
+
+):
+    return _build_timeline(q, selected, sentiment, min_freq, start, end)
+
+
+def _build_raw_relationships(wiki_ids: List[str], selected: bool, sentiment: bool, start: str, end: str) -> dict:
+    """The same underlying data `_build_timeline` aggregates, but left raw: neither
+    thresholded by min_freq nor canonicalised into one direction per pair (the old
+    aggregation's `canon_s < canon_t` ordering silently merged "A supports B" with
+    "B supports A" into a single edge under whichever id sorts first — harmless once
+    counted down to a min_freq total, but wrong to build a client-side aggregator on).
+    Every (actor, target, sign, year) survives here, so Explorar's threshold/period/
+    sign controls can group and filter this once-fetched list live, in the browser,
+    instead of re-querying SPARQL per slider move. `nodes` is a wiki_id lookup kept
+    separate from `relationships` rather than repeated per row — the same person shows
+    up in many relationships."""
+    results = get_timeline_personalities(wiki_ids, selected, sentiment, start, end)
+
+    relationships = []
+    nodes = {}
+
+    def add_node(wiki_id):
+        if wiki_id not in nodes:
+            info = all_entities_info.get(wiki_id, {})
+            nodes[wiki_id] = {"name": info.get("name"), "image_url": info.get("image_url")}
+
+    for x in results:
+        rel_type = x["rel_type"]
+        if rel_type in ("ent1_opposes_ent2", "ent1_supports_ent2"):
+            actor, target = x["ent1_id"], x["ent2_id"]
+        else:  # ent2_opposes_ent1, ent2_supports_ent1
+            actor, target = x["ent2_id"], x["ent1_id"]
+        add_node(actor)
+        add_node(target)
+        relationships.append({
+            "from": actor,
+            "to": target,
+            "sign": "opõe-se" if "opposes" in rel_type else "apoia",
+            "year": int(x["date"][:4]),
+        })
+
+    print(f"raw relationships: {len(relationships)}, nodes: {len(nodes)}")
+    return {"relationships": relationships, "nodes": nodes}
+
+
+@app.get("/timeline/raw")
+async def timeline_raw(
+    q: Union[List[str], None] = Query(),
+    selected: bool = Query(),
+    sentiment: bool = Query(),
+    start: str = Query(),
+    end: str = Query(),
+):
+    return _build_raw_relationships(q, selected, sentiment, start, end)
+
+
+@app.get("/timeline/default")
+async def timeline_default():
+    """Explorar's default view, precomputed at startup (see `_default_network_raw`
+    below) — the SPARQL query behind it takes several seconds even for a single
+    request; run once per process instead of once per page load."""
+    return _default_network_raw
+
+
+_default_network_seeds = [
+    wiki_id for wiki_id, info in all_entities_info.items()
+    if _nr_relation_articles(info) >= DEFAULT_NETWORK_MIN_ARTICLES
+]
+logger.info(f"Building the default network cache ({len(_default_network_seeds)} seed persons, raw)...")
+_default_network_cache_start = time.time()
+_default_network_raw = _build_raw_relationships(
+    _default_network_seeds, selected=False, sentiment=True,
+    start=str(start_year), end=str(end_year),
+)
+logger.info(
+    f"Default network cache ready in {time.time() - _default_network_cache_start:.1f}s: "
+    f"{len(_default_network_raw['relationships'])} relationships, {len(_default_network_raw['nodes'])} nodes"
+)
 
 
 @app.get("/queries")

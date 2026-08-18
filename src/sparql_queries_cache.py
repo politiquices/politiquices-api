@@ -214,11 +214,19 @@ def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
 
 
 def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, int]]:
+    # `mutual_agreement`/`mutual_opposition` were missing from this VALUES list — real
+    # rel_type values (2604 + 1074 relations live), just never added here. A person
+    # whose only relations are one of the two got nr_articles=0 from this query and was
+    # silently dropped from persons.json's "(nr_articles - other) > 0" filter, even
+    # though /stats' get_nr_of_persons() (a plain "not other" regex, no VALUES list)
+    # counted them — 27 people, exactly the gap between the "Personalidades" and
+    # "Sobre" counts.
     query = """
         SELECT ?person ?rel_type (COUNT(DISTINCT ?rel) as ?count)
         WHERE {
           VALUES ?rel_type {'ent1_opposes_ent2' 'ent2_opposes_ent1'
-                            'ent1_supports_ent2' 'ent2_supports_ent1' 'other'}
+                            'ent1_supports_ent2' 'ent2_supports_ent1' 'other'
+                            'mutual_agreement' 'mutual_opposition'}
             ?person wdt:P31 wd:Q5 .
             {?rel politiquices:ent1 ?person} UNION {?rel politiquices:ent2 ?person} .
             ?rel politiquices:type ?rel_type .

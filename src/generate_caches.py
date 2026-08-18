@@ -40,6 +40,8 @@ def get_entities() -> Dict[str, Any]:
             "ent1_opposes_ent2":  rel_counts.get("ent1_opposes_ent2", 0),
             "ent2_opposes_ent1":  rel_counts.get("ent2_opposes_ent1", 0),
             "other":              rel_counts.get("other", 0),
+            "mutual_agreement":   rel_counts.get("mutual_agreement", 0),
+            "mutual_opposition":  rel_counts.get("mutual_opposition", 0),
         }
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
         all_politiquices_per[wiki_id]["countries"] = all_wikidata_per[wiki_id]["countries"]

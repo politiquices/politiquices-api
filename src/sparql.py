@@ -281,6 +281,116 @@ def get_person_detailed_info(wiki_id):
 
 
 # Person relationships
+def _classify_person_relationship(binding, wiki_id):
+    """One SPARQL binding + the focal wiki_id -> (rel_type, other_ent_url,
+    other_ent_name, focus_ent) from wiki_id's perspective, or None if the binding
+    doesn't resolve to a known rel_type/side. Shared by get_person_relationships
+    (full history) and get_person_relationships_for_year (year-filtered), so the
+    two queries can't drift on how a raw ent1_opposes_ent2/ent2_supports_ent1/
+    mutual_*/other triple maps onto this person's opposes/supports/opposed_by/
+    supported_by/... bucket."""
+    # pylint: disable=too-many-branches, too-many-return-statements
+    ent1_wiki = binding["ent1"]["value"].split("/")[-1].strip()
+    ent2_wiki = binding["ent2"]["value"].split("/")[-1].strip()
+    raw_type = binding["rel_type"]["value"]
+
+    if raw_type == "ent1_supports_ent2":
+        if wiki_id == ent1_wiki:
+            return (
+                "supports", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent2_wiki:
+            return (
+                "supported_by", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    if raw_type == "ent1_opposes_ent2":
+        if wiki_id == ent1_wiki:
+            return (
+                "opposes", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent2_wiki:
+            return (
+                "opposed_by", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    if raw_type == "ent2_supports_ent1":
+        if wiki_id == ent2_wiki:
+            return (
+                "supports", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent1_wiki:
+            return (
+                "supported_by", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    if raw_type == "ent2_opposes_ent1":
+        if wiki_id == ent2_wiki:
+            return (
+                "opposes", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent1_wiki:
+            return (
+                "opposed_by", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    if raw_type == "other":
+        if wiki_id == ent1_wiki:
+            return (
+                "other", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent2_wiki:
+            return (
+                "other_by", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    if raw_type == "mutual_agreement":
+        print("mutual_agreement")
+        if wiki_id == ent1_wiki:
+            return (
+                "mutual_agreement", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent2_wiki:
+            return (
+                "mutual_agreement", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    if raw_type == "mutual_opposition":
+        print("mutual_opposition")
+        if wiki_id == ent1_wiki:
+            return (
+                "mutual_opposition", ent2_wiki, binding["ent2_str"]["value"].split("/")[-1],
+                binding["ent1_str"]["value"].split("/")[-1],
+            )
+        if wiki_id == ent2_wiki:
+            return (
+                "mutual_opposition", ent1_wiki, binding["ent1_str"]["value"].split("/")[-1],
+                binding["ent2_str"]["value"].split("/")[-1],
+            )
+        return None
+
+    print("unknown rel_type:", binding)
+    return None
+
+
 def get_person_relationships(wiki_id):
     # pylint: disable=too-many-branches, too-many-statements
     query = f"""
@@ -308,111 +418,11 @@ def get_person_relationships(wiki_id):
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     relations = defaultdict(list)
 
-    # ToDo: refactor to a function
     for e in results["results"]["bindings"]:
-        rel_type = None
-        ent1_wiki = e["ent1"]["value"].split("/")[-1].strip()
-        ent2_wiki = e["ent2"]["value"].split("/")[-1].strip()
-
-        if e["rel_type"]["value"] == "ent1_supports_ent2":
-            if wiki_id == ent1_wiki:
-                rel_type = "supports"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent2_wiki:
-                rel_type = "supported_by"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-        elif e["rel_type"]["value"] == "ent1_opposes_ent2":
-            if wiki_id == ent1_wiki:
-                rel_type = "opposes"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent2_wiki:
-                rel_type = "opposed_by"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-        elif e["rel_type"]["value"] == "ent2_supports_ent1":
-            if wiki_id == ent2_wiki:
-                rel_type = "supports"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent1_wiki:
-                rel_type = "supported_by"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-        elif e["rel_type"]["value"] == "ent2_opposes_ent1":
-            if wiki_id == ent2_wiki:
-                rel_type = "opposes"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent1_wiki:
-                rel_type = "opposed_by"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-        elif e["rel_type"]["value"] == "other":
-            if wiki_id == ent1_wiki:
-                rel_type = "other"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent2_wiki:
-                rel_type = "other_by"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-        elif e["rel_type"]["value"] == "mutual_agreement":
-            print("mutual_agreement")
-            if wiki_id == ent1_wiki:
-                rel_type = "mutual_agreement"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent2_wiki:
-                rel_type = "mutual_agreement"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-        elif e["rel_type"]["value"] == "mutual_opposition":
-            print("mutual_opposition")
-            if wiki_id == ent1_wiki:
-                rel_type = "mutual_opposition"
-                other_ent_url = ent2_wiki
-                other_ent_name = e["ent2_str"]["value"].split("/")[-1]
-                focus_ent = e["ent1_str"]["value"].split("/")[-1]
-
-            elif wiki_id == ent2_wiki:
-                rel_type = "mutual_opposition"
-                other_ent_url = ent1_wiki
-                other_ent_name = e["ent1_str"]["value"].split("/")[-1]
-                focus_ent = e["ent2_str"]["value"].split("/")[-1]
-
-        else:
-            print("unknown rel_type:", e)
+        classified = _classify_person_relationship(e, wiki_id)
+        if classified is None:
             continue
-
-        if rel_type is None:
-            continue
+        rel_type, other_ent_url, other_ent_name, focus_ent = classified
 
         try:
             relations[rel_type].append(
@@ -447,6 +457,62 @@ def get_person_relationships(wiki_id):
     relations["sentiment"] = sorted(sentiment_only, key=lambda x: x["date"], reverse=True)
 
     return relations
+
+
+@lru_cache(maxsize=256)
+def get_person_relationships_for_year(wiki_id, year):
+    query = f"""
+        SELECT DISTINCT ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        WHERE {{
+         {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{ ?rel politiquices:ent2 wd:{wiki_id} }}
+
+            ?rel politiquices:type ?rel_type.
+
+             ?rel politiquices:ent1 ?ent1 ;
+                  politiquices:ent2 ?ent2 ;
+                  politiquices:ent1_str ?ent1_str ;
+                  politiquices:ent2_str ?ent2_str ;
+                  politiquices:url ?arquivo_doc .
+
+              ?arquivo_doc dc:title ?title ;
+                           dc:description ?description;
+                           dc:creator ?creator;
+                           dc:publisher ?publisher;
+                           dc:date  ?date . FILTER(YEAR(?date) = {year})
+        }}
+        ORDER BY ASC(?date)
+        """
+
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    articles = []
+    for e in results["results"]["bindings"]:
+        classified = _classify_person_relationship(e, wiki_id)
+        if classified is None:
+            continue
+        rel_type, other_ent_url, other_ent_name, focus_ent = classified
+        try:
+            articles.append(
+                {
+                    "arquivo_doc": e["arquivo_doc"]["value"],
+                    "title": e["title"]["value"],
+                    "domain": e["creator"]["value"],
+                    "original_url": e["publisher"]["value"],
+                    "paragraph": e["description"]["value"],
+                    "date": e["date"]["value"].split("T")[0],
+                    "ent1_id": wiki_id,
+                    "ent1_img": all_entities_info[wiki_id]["image_url"],
+                    "ent1_str": focus_ent,
+                    "ent2_id": other_ent_url,
+                    "ent2_img": all_entities_info[other_ent_url]["image_url"],
+                    "ent2_str": other_ent_name,
+                    "rel_type": rel_type,
+                }
+            )
+        except KeyError as error:
+            print("KeyError:", error)
+            continue
+
+    return sorted(articles, key=lambda x: x["date"], reverse=True)
 
 
 def get_top_relationships(wiki_id):
