@@ -35,15 +35,17 @@ def get_nr_articles_per_year():
 
 def get_total_nr_of_articles():
     query = """
-        SELECT (COUNT(?x) as ?nr_articles) WHERE {
+        SELECT (COUNT(?x) as ?nr_articles) (COUNT(DISTINCT ?x) as ?nr_relationships) WHERE {
             ?x politiquices:url ?y .
         }
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    all_articles = results["results"]["bindings"][0]["nr_articles"]["value"]
+    binding = results["results"]["bindings"][0]
+    all_articles = binding["nr_articles"]["value"]
+    all_relationships = binding["nr_relationships"]["value"]
 
     query = """
-        SELECT (COUNT(?rel) as ?nr_articles) WHERE {
+        SELECT (COUNT(?rel) as ?nr_articles) (COUNT(DISTINCT ?rel) as ?nr_relationships) WHERE {
             VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                                 'ent1_supports_ent2' 'ent2_supports_ent1'} .
             ?rel politiquices:type ?rel_values .
@@ -51,52 +53,54 @@ def get_total_nr_of_articles():
         }
     """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    no_other_articles = results["results"]["bindings"][0]["nr_articles"]["value"]
+    binding = results["results"]["bindings"][0]
+    no_other_articles = binding["nr_articles"]["value"]
+    no_other_relationships = binding["nr_relationships"]["value"]
 
-    return all_articles, no_other_articles
-
-
-def get_nr_of_persons() -> int:
-    """
-    persons only with 'ent1_other_ent2' and 'ent2_other_ent1' relationships are not considered
-    """
-    query = """
-        SELECT (COUNT(DISTINCT ?person) as ?nr_persons) {
-            ?person wdt:P31 wd:Q5;
-            {?rel politiquices:ent1 ?person} UNION {?rel politiquices:ent2 ?person} .
-            ?rel politiquices:type ?rel_type FILTER(!REGEX(?rel_type,"other") ) .
-        }
-        """
-    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    return results["results"]["bindings"][0]["nr_persons"]["value"]
+    return {
+        "articles": all_articles,
+        "relationships": all_relationships,
+        "articles_sentiment": no_other_articles,
+        "relationships_sentiment": no_other_relationships,
+    }
 
 
 def get_total_articles_by_year_by_relationship_type():
+    # Same MIN-date-per-relationship convention as get_person_relationships_by_year /
+    # get_timeline_personalities: a relationship whose source articles straddle a year
+    # boundary must count once, in the year of its earliest source.
     query = """
-        SELECT ?year ?rel_type (COUNT(?rel_type) AS ?nr_articles)
+        SELECT ?year ?rel_type (COUNT(?rel) AS ?nr_relationships) (SUM(?nr_articles_for_rel) AS ?nr_articles)
         WHERE {
-            ?x politiquices:url ?arquivo_doc .
-            ?x politiquices:type ?rel_type .
-            ?arquivo_doc dc:date ?date .
+          { SELECT ?rel ?rel_type (MIN(?date) AS ?min_date) (COUNT(?arquivo_doc) AS ?nr_articles_for_rel)
+            WHERE {
+                ?rel politiquices:url ?arquivo_doc .
+                ?rel politiquices:type ?rel_type .
+                ?arquivo_doc dc:date ?date .
+            }
+            GROUP BY ?rel ?rel_type }
         }
-        GROUP BY (YEAR(?date) AS ?year) ?rel_type
+        GROUP BY (YEAR(?min_date) AS ?year) ?rel_type
         ORDER BY ?year
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
 
     def rels_values():
         return {
-            "ent1_opposes_ent2": 0,
-            "ent2_opposes_ent1": 0,
-            "ent1_supports_ent2": 0,
-            "ent2_supports_ent1": 0,
-            "ent1_other_ent2": 0,
-            "ent2_other_ent1": 0,
+            "ent1_opposes_ent2": {"nr_relationships": 0, "nr_articles": 0},
+            "ent2_opposes_ent1": {"nr_relationships": 0, "nr_articles": 0},
+            "ent1_supports_ent2": {"nr_relationships": 0, "nr_articles": 0},
+            "ent2_supports_ent1": {"nr_relationships": 0, "nr_articles": 0},
+            "ent1_other_ent2": {"nr_relationships": 0, "nr_articles": 0},
+            "ent2_other_ent1": {"nr_relationships": 0, "nr_articles": 0},
         }
 
     values = defaultdict(rels_values)
     for x in results["results"]["bindings"]:
-        values[x["year"]["value"]][x["rel_type"]["value"]] = x["nr_articles"]["value"]
+        values[x["year"]["value"]][x["rel_type"]["value"]] = {
+            "nr_relationships": int(x["nr_relationships"]["value"]),
+            "nr_articles": int(x["nr_articles"]["value"]),
+        }
 
     return values
 
@@ -280,6 +284,23 @@ def get_person_detailed_info(wiki_id):
     }
 
 
+def _group_bindings_by_rel(bindings):
+    """Group flat, article-level SPARQL bindings that share the same ?rel blank node into one
+    list per relationship, preserving encounter order. A relationship can now be backed by
+    several near-duplicate source articles (create_rdf_graph.py's dedup merge), so a query that
+    joins on politiquices:url returns one row per article -- this collapses those back into
+    one group per underlying relationship. The blank-node label is only unique within this one
+    query response; it must never be treated as a persistent identifier."""
+    groups, order = {}, []
+    for binding in bindings:
+        rel_id = binding["rel"]["value"]
+        if rel_id not in groups:
+            groups[rel_id] = []
+            order.append(rel_id)
+        groups[rel_id].append(binding)
+    return [groups[rel_id] for rel_id in order]
+
+
 # Person relationships
 def _classify_person_relationship(binding, wiki_id):
     """One SPARQL binding + the focal wiki_id -> (rel_type, other_ent_url,
@@ -394,7 +415,7 @@ def _classify_person_relationship(binding, wiki_id):
 def get_person_relationships(wiki_id):
     # pylint: disable=too-many-branches, too-many-statements
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?rel ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
          {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{?rel politiquices:ent2 wd:{wiki_id} }}
 
@@ -418,21 +439,30 @@ def get_person_relationships(wiki_id):
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     relations = defaultdict(list)
 
-    for e in results["results"]["bindings"]:
-        classified = _classify_person_relationship(e, wiki_id)
+    for group in _group_bindings_by_rel(results["results"]["bindings"]):
+        first = group[0]
+        classified = _classify_person_relationship(first, wiki_id)
         if classified is None:
             continue
         rel_type, other_ent_url, other_ent_name, focus_ent = classified
 
         try:
+            articles = sorted(
+                (
+                    {
+                        "arquivo_doc": e["arquivo_doc"]["value"],
+                        "title": e["title"]["value"],
+                        "domain": e["creator"]["value"],
+                        "original_url": e["publisher"]["value"],
+                        "paragraph": e["description"]["value"],
+                        "date": e["date"]["value"].split("T")[0],
+                    }
+                    for e in group
+                ),
+                key=lambda a: a["date"],
+            )
             relations[rel_type].append(
                 {
-                    "arquivo_doc": e["arquivo_doc"]["value"],
-                    "title": e["title"]["value"],
-                    "domain": e["creator"]["value"],
-                    "original_url": e["publisher"]["value"],
-                    "paragraph": e["description"]["value"],
-                    "date": e["date"]["value"].split("T")[0],
                     "ent1_id": wiki_id,
                     "ent1_img": all_entities_info[wiki_id]["image_url"],
                     "ent1_str": focus_ent,
@@ -440,6 +470,8 @@ def get_person_relationships(wiki_id):
                     "ent2_img": all_entities_info[other_ent_url]["image_url"],
                     "ent2_str": other_ent_name,
                     "rel_type": rel_type,
+                    "date": articles[0]["date"],
+                    "articles": articles,
                 }
             )
         except KeyError as error:
@@ -462,7 +494,7 @@ def get_person_relationships(wiki_id):
 @lru_cache(maxsize=256)
 def get_person_relationships_for_year(wiki_id, year):
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?rel ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
          {{ ?rel politiquices:ent1 wd:{wiki_id} }} UNION {{ ?rel politiquices:ent2 wd:{wiki_id} }}
 
@@ -484,21 +516,30 @@ def get_person_relationships_for_year(wiki_id, year):
         """
 
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    articles = []
-    for e in results["results"]["bindings"]:
-        classified = _classify_person_relationship(e, wiki_id)
+    relationships = []
+    for group in _group_bindings_by_rel(results["results"]["bindings"]):
+        first = group[0]
+        classified = _classify_person_relationship(first, wiki_id)
         if classified is None:
             continue
         rel_type, other_ent_url, other_ent_name, focus_ent = classified
         try:
-            articles.append(
+            articles = sorted(
+                (
+                    {
+                        "arquivo_doc": e["arquivo_doc"]["value"],
+                        "title": e["title"]["value"],
+                        "domain": e["creator"]["value"],
+                        "original_url": e["publisher"]["value"],
+                        "paragraph": e["description"]["value"],
+                        "date": e["date"]["value"].split("T")[0],
+                    }
+                    for e in group
+                ),
+                key=lambda a: a["date"],
+            )
+            relationships.append(
                 {
-                    "arquivo_doc": e["arquivo_doc"]["value"],
-                    "title": e["title"]["value"],
-                    "domain": e["creator"]["value"],
-                    "original_url": e["publisher"]["value"],
-                    "paragraph": e["description"]["value"],
-                    "date": e["date"]["value"].split("T")[0],
                     "ent1_id": wiki_id,
                     "ent1_img": all_entities_info[wiki_id]["image_url"],
                     "ent1_str": focus_ent,
@@ -506,13 +547,15 @@ def get_person_relationships_for_year(wiki_id, year):
                     "ent2_img": all_entities_info[other_ent_url]["image_url"],
                     "ent2_str": other_ent_name,
                     "rel_type": rel_type,
+                    "date": articles[0]["date"],
+                    "articles": articles,
                 }
             )
         except KeyError as error:
             print("KeyError:", error)
             continue
 
-    return sorted(articles, key=lambda x: x["date"], reverse=True)
+    return sorted(relationships, key=lambda x: x["date"], reverse=True)
 
 
 def get_top_relationships(wiki_id):
@@ -633,35 +676,35 @@ def get_top_relationships(wiki_id):
 
 
 def get_person_relationships_by_year(wiki_id, rel_type, ent="ent1"):
+    # A relationship's source articles can straddle a year boundary (the earliest one
+    # reported it, near-duplicates followed a few days later) -- grouping by ?rel first
+    # and taking each relationship's earliest date makes sure it lands in exactly one
+    # year bucket, the same MIN-date convention already used by get_timeline_personalities.
     query = f"""
-        SELECT DISTINCT ?year (COUNT(?arquivo_doc) as ?nr_articles)
+        SELECT ?year (COUNT(?rel) AS ?nr_relationships) (SUM(?nr_articles_for_rel) AS ?nr_articles)
         WHERE {{
-
-              ?rel politiquices:{ent} wd:{wiki_id} .
-              ?rel politiquices:type ?rel_type .
-
-              FILTER (?rel_type = "{rel_type}")
-
-              ?rel politiquices:ent1 ?ent1 ;
-                   politiquices:ent2 ?ent2 ;
-                   politiquices:ent1_str ?ent1_str ;
-                   politiquices:ent2_str ?ent2_str ;
-                   politiquices:url ?arquivo_doc .
-
-              ?arquivo_doc dc:title ?title ;
-                           dc:date  ?date .
+          {{ SELECT ?rel (MIN(?date) AS ?min_date) (COUNT(?arquivo_doc) AS ?nr_articles_for_rel)
+             WHERE {{
+                  ?rel politiquices:{ent} wd:{wiki_id} .
+                  ?rel politiquices:type ?rel_type . FILTER (?rel_type = "{rel_type}")
+                  ?rel politiquices:url ?arquivo_doc .
+                  ?arquivo_doc dc:date ?date .
+             }} GROUP BY ?rel }}
         }}
-    GROUP BY (YEAR(?date) AS ?year)
+    GROUP BY (YEAR(?min_date) AS ?year)
     ORDER BY ?year
     """
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     # dicts are insertion ordered
-    year_articles = {}
+    year_data = {}
     for x in result["results"]["bindings"]:
         year = x["year"]["value"]
-        year_articles[str(year)] = int(x["nr_articles"]["value"])
+        year_data[str(year)] = {
+            "nr_relationships": int(x["nr_relationships"]["value"]),
+            "nr_articles": int(x["nr_articles"]["value"]),
+        }
 
-    return year_articles
+    return year_data
 
 
 # relationship queries
@@ -671,7 +714,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
-        SELECT DISTINCT ?arquivo_doc ?creator ?publisher ?date ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT DISTINCT ?rel ?arquivo_doc ?creator ?publisher ?date ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
         WHERE {{
             {{
               ?rel politiquices:ent1 wd:{wiki_id_one};
@@ -701,7 +744,7 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                    politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
               ?arquivo_doc dc:title ?title;
-                           dc:description ?description;              
+                           dc:description ?description;
                            dc:creator ?creator;
                            dc:publisher ?publisher;
                            dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
@@ -712,23 +755,33 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
         """
 
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    results = []
-    for x in result["results"]["bindings"]:
-        rel_type_result = x["rel_type"]["value"]
+    relationships = []
+    for group in _group_bindings_by_rel(result["results"]["bindings"]):
+        first = group[0]
+        rel_type_result = first["rel_type"]["value"]
         # When the UNION's second branch matched, the triple stores ent1=wiki_id_two and
         # ent2=wiki_id_one. Detect this and invert rel_type so it stays consistent with
         # ent1_id=wiki_id_one / ent2_id=wiki_id_two.
-        ent1_wiki_id = x["ent1"]["value"].split("/")[-1]
+        ent1_wiki_id = first["ent1"]["value"].split("/")[-1]
         if ent1_wiki_id == wiki_id_two:
             rel_type_result = invert_relationship(rel_type_result)
-        results.append(
+        articles = sorted(
+            (
+                {
+                    "arquivo_doc": x["arquivo_doc"]["value"],
+                    "date": x["date"]["value"],
+                    "title": x["title"]["value"],
+                    "domain": x["creator"]["value"],
+                    "original_url": x["publisher"]["value"],
+                    "paragraph": x["description"]["value"],
+                }
+                for x in group
+            ),
+            key=lambda a: a["date"],
+        )
+        relationships.append(
             {
-                "arquivo_doc": x["arquivo_doc"]["value"],
-                "date": x["date"]["value"],
-                "title": x["title"]["value"],
-                "domain": x["creator"]["value"],
-                "original_url": x["publisher"]["value"],
-                "paragraph": x["description"]["value"],
+                "date": articles[0]["date"],
                 "rel_type": rel_type_result,
                 "ent1_id": wiki_id_one,
                 "ent1_str": all_entities_info[wiki_id_one]["name"],
@@ -736,10 +789,12 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
                 "ent2_str": all_entities_info[wiki_id_two]["name"],
                 "ent1_img": all_entities_info[wiki_id_one]["image_url"],
                 "ent2_img": all_entities_info[wiki_id_two]["image_url"],
+                "articles": articles,
             }
         )
 
-    return results
+    relationships.sort(key=lambda r: r["date"])
+    return relationships
 
 
 @lru_cache(maxsize=50)
@@ -747,7 +802,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
-        SELECT DISTINCT ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?arquivo_doc ?date ?title ?description ?creator ?publisher
+        SELECT DISTINCT ?rel ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?arquivo_doc ?date ?title ?description ?creator ?publisher
         WHERE {{
             {{
                 ?rel politiquices:ent1 ?ent1;
@@ -757,7 +812,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                      politiquices:url ?arquivo_doc;
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
                 ?arquivo_doc dc:title ?title;
-                             dc:description ?description; 
+                             dc:description ?description;
                              dc:creator ?creator;
                              dc:publisher ?publisher;
                              dc:date ?date. FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
@@ -772,7 +827,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                      politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
 
                 ?arquivo_doc dc:title ?title;
-                             dc:description ?description;                
+                             dc:description ?description;
                              dc:creator ?creator;
                              dc:publisher ?publisher;
                              dc:date ?date. FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
@@ -793,27 +848,39 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
         """
 
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    results = []
-    for x in result["results"]["bindings"]:
-        results.append(
+    relationships = []
+    for group in _group_bindings_by_rel(result["results"]["bindings"]):
+        first = group[0]
+        articles = sorted(
+            (
+                {
+                    "arquivo_doc": x["arquivo_doc"]["value"],
+                    "date": x["date"]["value"],
+                    "title": x["title"]["value"],
+                    "domain": x["creator"]["value"],
+                    "original_url": x["publisher"]["value"],
+                    "paragraph": x["description"]["value"],
+                }
+                for x in group
+            ),
+            key=lambda a: a["date"],
+        )
+        relationships.append(
             {
-                "arquivo_doc": x["arquivo_doc"]["value"],
-                "date": x["date"]["value"],
-                "title": x["title"]["value"],
-                "domain": x["creator"]["value"],
-                "original_url": x["publisher"]["value"],
-                "paragraph": x["description"]["value"],
-                "rel_type": x["rel_type"]["value"],
-                "ent1_id": x["ent1"]["value"].split("/")[-1],
-                "ent1_str": x["ent1_str"]["value"],
-                "ent2_id": x["ent2"]["value"].split("/")[-1],
-                "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[x["ent1"]["value"].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[x["ent2"]["value"].split("/")[-1]]["image_url"],
+                "date": articles[0]["date"],
+                "rel_type": first["rel_type"]["value"],
+                "ent1_id": first["ent1"]["value"].split("/")[-1],
+                "ent1_str": first["ent1_str"]["value"],
+                "ent2_id": first["ent2"]["value"].split("/")[-1],
+                "ent2_str": first["ent2_str"]["value"],
+                "ent1_img": all_entities_info[first["ent1"]["value"].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[first["ent2"]["value"].split("/")[-1]]["image_url"],
+                "articles": articles,
             }
         )
 
-    return results
+    relationships.sort(key=lambda r: r["date"], reverse=True)
+    return relationships
 
 
 @lru_cache(maxsize=50)
@@ -821,7 +888,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-        SELECT DISTINCT ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?description ?creator ?publisher
+        SELECT DISTINCT ?rel ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?description ?creator ?publisher
         WHERE {{
             {{
                 ?rel politiquices:ent2 ?ent2;
@@ -865,27 +932,39 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
         """
 
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    results = []
-    for x in result["results"]["bindings"]:
-        results.append(
+    relationships = []
+    for group in _group_bindings_by_rel(result["results"]["bindings"]):
+        first = group[0]
+        articles = sorted(
+            (
+                {
+                    "arquivo_doc": x["arquivo_doc"]["value"],
+                    "date": x["date"]["value"],
+                    "title": x["title"]["value"],
+                    "domain": x["creator"]["value"],
+                    "original_url": x["publisher"]["value"],
+                    "paragraph": x["description"]["value"],
+                }
+                for x in group
+            ),
+            key=lambda a: a["date"],
+        )
+        relationships.append(
             {
-                "arquivo_doc": x["arquivo_doc"]["value"],
-                "date": x["date"]["value"],
-                "title": x["title"]["value"],
-                "domain": x["creator"]["value"],
-                "original_url": x["publisher"]["value"],
-                "paragraph": x["description"]["value"],
-                "rel_type": x["rel_type"]["value"],
-                "ent1_id": x["ent1"]["value"].split("/")[-1],
-                "ent1_str": x["ent1_str"]["value"],
-                "ent2_id": x["ent2"]["value"].split("/")[-1],
-                "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[x["ent1"]["value"].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[x["ent2"]["value"].split("/")[-1]]["image_url"],
+                "date": articles[0]["date"],
+                "rel_type": first["rel_type"]["value"],
+                "ent1_id": first["ent1"]["value"].split("/")[-1],
+                "ent1_str": first["ent1_str"]["value"],
+                "ent2_id": first["ent2"]["value"].split("/")[-1],
+                "ent2_str": first["ent2_str"]["value"],
+                "ent1_img": all_entities_info[first["ent1"]["value"].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[first["ent2"]["value"].split("/")[-1]]["image_url"],
+                "articles": articles,
             }
         )
 
-    return results
+    relationships.sort(key=lambda r: r["date"], reverse=True)
+    return relationships
 
 
 @lru_cache(maxsize=50)
@@ -893,7 +972,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-    SELECT DISTINCT ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type
+    SELECT DISTINCT ?rel ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type
     WHERE {{
       {{
         VALUES ?person_party_a {{ {per_party_a} }}
@@ -946,25 +1025,39 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
 
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
     relationships = []
-    for x in result["results"]["bindings"]:
+    for group in _group_bindings_by_rel(result["results"]["bindings"]):
+        first = group[0]
+        articles = sorted(
+            (
+                {
+                    "arquivo_doc": x["arquivo_doc"]["value"],
+                    "date": x["date"]["value"],
+                    "title": x["title"]["value"],
+                    "domain": x["creator"]["value"],
+                    "original_url": x["publisher"]["value"],
+                    "paragraph": x["description"]["value"],
+                }
+                for x in group
+            ),
+            key=lambda a: a["date"],
+        )
         relationships.append(
             {
-                "arquivo_doc": x["arquivo_doc"]["value"],
-                "date": x["date"]["value"],
-                "title": x["title"]["value"],
-                "domain": x["creator"]["value"],
-                "original_url": x["publisher"]["value"],
-                "paragraph": x["description"]["value"],
-                "rel_type": x["rel_type"]["value"],
-                "ent1_id": x["person_party_a"]["value"].split("/")[-1],
-                "ent1_str": x["ent1_str"]["value"],
-                "ent2_id": x["person_party_b"]["value"].split("/")[-1],
-                "ent2_str": x["ent2_str"]["value"],
-                "ent1_img": all_entities_info[x["person_party_a"]["value"].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[x["person_party_b"]["value"].split("/")[-1]]["image_url"],
+                "date": articles[0]["date"],
+                "rel_type": first["rel_type"]["value"],
+                "ent1_id": first["person_party_a"]["value"].split("/")[-1],
+                "ent1_str": first["ent1_str"]["value"],
+                "ent2_id": first["person_party_b"]["value"].split("/")[-1],
+                "ent2_str": first["ent2_str"]["value"],
+                "ent1_img": all_entities_info[first["person_party_a"]["value"].split("/")[-1]]["image_url"],
+                "ent2_img": all_entities_info[first["person_party_b"]["value"].split("/")[-1]]["image_url"],
+                "articles": articles,
             }
         )
 
+    # This query has no SPARQL-level ORDER BY (pre-existing, unrelated) -- sort here so the
+    # now-visible relationship order (each relationship is its own card) isn't arbitrary.
+    relationships.sort(key=lambda r: r["date"], reverse=True)
     return relationships
 
 
@@ -980,7 +1073,7 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
         PREFIX        wd: <http://www.wikidata.org/entity/>
         PREFIX       wdt: <http://www.wikidata.org/prop/direct/>
 
-        SELECT DISTINCT ?arquivo_doc ?creator ?date ?publisher ?title ?description ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        SELECT ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str (MIN(?date) AS ?min_date)
         WHERE {{
                 VALUES ?person {{{values}}}
                 {{
@@ -992,15 +1085,12 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
                             politiquices:url ?arquivo_doc;
                             politiquices:type ?rel_type.
 
-                  ?arquivo_doc dc:title ?title ;
-                           dc:description ?description;
-                           dc:creator ?creator;
-                           dc:publisher ?publisher;
-                           dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                  ?arquivo_doc dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
 
             }}
         }}
-        ORDER BY DESC(?date)
+        GROUP BY ?rel ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str
+        ORDER BY DESC(?min_date)
         """
     result = query_sparql(PREFIXES + "\n" + query, "politiquices")
 
@@ -1028,12 +1118,7 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
         try:
             news.append(
                 {
-                    "arquivo_doc": e["arquivo_doc"]["value"],
-                    "title": e["title"]["value"],
-                    "domain": e["creator"]["value"],
-                    "original_url": e["publisher"]["value"],
-                    "paragraph": e["description"]["value"],
-                    "date": e["date"]["value"].split("T")[0],
+                    "date": e["min_date"]["value"].split("T")[0],
                     "ent1_id": e["ent1"]["value"].split("/")[-1],
                     "ent1_img": all_entities_info[e["ent1"]["value"].split("/")[-1]]["image_url"],
                     "ent1_str": e["ent1_str"]["value"],

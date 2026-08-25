@@ -6,13 +6,13 @@ from typing import List, Union
 
 from fastapi import FastAPI, Path, Query, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 
 from annotation_router import router as annotation_router
-from cache import all_entities_info, all_parties_info, persons, parties
+from cache import all_entities_info, all_parties_info, persons, parties, stats as stats_cache
 from config import sparql_endpoint, start_year, end_year, NO_IMAGE, party_logo_url
 from sparql import (
-    get_nr_of_persons,
     get_person_info,
     get_person_relationships,
     get_person_relationships_by_year,
@@ -29,11 +29,9 @@ from sparql import (
     get_relationship_between_two_persons,
     get_timeline_personalities,
     get_top_relationships,
-    get_total_articles_by_year_by_relationship_type,
-    get_total_nr_of_articles,
     get_wiki_id_affiliated_with_party,
 )
-from utils import get_info, get_chart_labels_min_max
+from utils import get_info
 
 rel_types = ["ent1_opposes_ent2", "ent1_supports_ent2", "ent2_opposes_ent1", "ent2_supports_ent1", "other"]
 
@@ -60,11 +58,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# /timeline/default ships ~1.9 MB uncompressed (29k raw relationships) — repetitive
+# JSON (short wiki_ids, a handful of distinct strings), so it compresses hard. Nothing
+# under 1 KB is worth the CPU to gzip; everything the API returns above that already
+# benefits, not just this one route.
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
-all_articles, n_other_articles = get_total_nr_of_articles()
 logger.info(f"Testing SPARQL endpoint: {sparql_endpoint}")
-logger.info(f"{get_nr_of_persons()} persons and {all_articles} articles, {n_other_articles} tagged with sentiment")
+logger.info(
+    f"{len(persons)} persons, {stats_cache['nr_all_relationships']} relationships "
+    f"({stats_cache['nr_all_articles']} articles), "
+    f"{stats_cache['nr_all_relationships_sentiment']} tagged with sentiment"
+)
 
 
 def _nr_relation_articles(info: dict) -> int:
@@ -490,38 +496,23 @@ async def personalities_party(wiki_id: str = Path(regex=wiki_id_regex)):
 
 @app.get("/stats")
 async def stats():
-    # pylint: disable=too-many-locals
-    # number of persons, parties, articles
-    nr_persons = get_nr_of_persons()
-    nr_parties = len(all_parties_info)
-
-    # total nr of article with and without 'other' relationships
-    nr_all_articles, nr_all_articles_sentiment = get_total_nr_of_articles()
-
-    # query returns results for each rel_type, but we aggregate by rel_type discarding direction and 'other'
-    all_years = get_chart_labels_min_max(min_date=start_year, max_date=end_year)
-    values = get_total_articles_by_year_by_relationship_type()
-    aggregated_values = defaultdict(lambda: {"oposição": 0, "apoio": 0})
-    all_values = []
-    for year in all_years:
-        if year in values.keys():
-            for rel, freq in values[year].items():
-                if "opposes" in rel:
-                    aggregated_values[year]["oposição"] += int(freq)
-                if "supports" in rel:
-                    aggregated_values[year]["apoio"] += int(freq)
-        else:
-            aggregated_values[year]["oposição"] = 0
-            aggregated_values[year]["apoio"] = 0
-
-    for k, v in aggregated_values.items():
-        v.update({"year": k})
-        all_values.append(v)
-
+    # Precomputed by generate_caches.py::stats_json_cache() alongside the
+    # personalities/parties caches -- this data is static between data-pipeline runs,
+    # so it's read from the cache instead of hitting SPARQL on every request.
+    #
+    # nr_persons matches /personalities exactly since both read the same curated
+    # cache; a live "not other" SPARQL count here used to drift from it, still
+    # including entities pruned from wiki_ttl via entities_config.json's remove list
+    # (they keep a relationship in the graph, since create_rdf_graph.py writes it
+    # independently of that curation).
     return {
-        "nr_parties": nr_parties,
-        "nr_persons": nr_persons,
-        "nr_all_articles_sentiment": nr_all_articles_sentiment,
-        "nr_all_articles": nr_all_articles,
-        "year_values": all_values,
+        "nr_parties": len(all_parties_info),
+        "nr_persons": len(persons),
+        "nr_all_articles_sentiment": stats_cache["nr_all_articles_sentiment"],
+        "nr_all_relationships_sentiment": stats_cache["nr_all_relationships_sentiment"],
     }
+
+
+@app.get("/stats/yearly")
+async def stats_yearly():
+    return {"year_values": stats_cache["year_values"]}

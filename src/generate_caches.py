@@ -8,7 +8,8 @@ from typing import Dict, Any
 import requests
 from requests import RequestException
 
-from config import STATIC_DATA, NO_IMAGE
+from config import STATIC_DATA, NO_IMAGE, start_year, end_year
+from sparql import get_total_nr_of_articles, get_total_articles_by_year_by_relationship_type
 from sparql_queries_cache import (
     get_all_parties_and_members_with_relationships,
     get_persons_wiki_id_name_image_url,
@@ -16,6 +17,7 @@ from sparql_queries_cache import (
     get_all_parties_images,
     get_all_persons_images,
 )
+from utils import get_chart_labels_min_max
 
 
 def just_sleep(lower_bound=1, upper_bound=3, verbose=False):
@@ -33,16 +35,25 @@ def get_entities() -> Dict[str, Any]:
     all_politiquices_per = defaultdict(dict)
     for wiki_id in all_wikidata_per.keys():  # pylint: disable=consider-using-dict-items, consider-iterating-dictionary
         rel_counts = per_articles.get(wiki_id, {})
-        all_politiquices_per[wiki_id]["nr_articles"] = sum(rel_counts.values())
-        all_politiquices_per[wiki_id]["nr_articles_by_type"] = {
-            "ent1_supports_ent2": rel_counts.get("ent1_supports_ent2", 0),
-            "ent2_supports_ent1": rel_counts.get("ent2_supports_ent1", 0),
-            "ent1_opposes_ent2":  rel_counts.get("ent1_opposes_ent2", 0),
-            "ent2_opposes_ent1":  rel_counts.get("ent2_opposes_ent1", 0),
-            "other":              rel_counts.get("other", 0),
-            "mutual_agreement":   rel_counts.get("mutual_agreement", 0),
-            "mutual_opposition":  rel_counts.get("mutual_opposition", 0),
-        }
+
+        def nr_relationships(rel_type):
+            return rel_counts.get(rel_type, {}).get("nr_relationships", 0)
+
+        def nr_source_articles(rel_type):
+            return rel_counts.get(rel_type, {}).get("nr_source_articles", 0)
+
+        rel_types = (
+            "ent1_supports_ent2", "ent2_supports_ent1", "ent1_opposes_ent2", "ent2_opposes_ent1",
+            "other", "mutual_agreement", "mutual_opposition",
+        )
+        # `nr_articles` keeps meaning "relationships" here, unchanged from before this
+        # personality/sort thresholds already trust it -- `nr_source_articles` is the
+        # new, genuinely article-counting sibling, since a relationship can now be
+        # backed by several near-duplicate source articles.
+        all_politiquices_per[wiki_id]["nr_articles"] = sum(nr_relationships(rt) for rt in rel_types)
+        all_politiquices_per[wiki_id]["nr_articles_by_type"] = {rt: nr_relationships(rt) for rt in rel_types}
+        all_politiquices_per[wiki_id]["nr_source_articles"] = sum(nr_source_articles(rt) for rt in rel_types)
+        all_politiquices_per[wiki_id]["nr_source_articles_by_type"] = {rt: nr_source_articles(rt) for rt in rel_types}
         all_politiquices_per[wiki_id]["name"] = all_wikidata_per[wiki_id]["name"]
         all_politiquices_per[wiki_id]["countries"] = all_wikidata_per[wiki_id]["countries"]
         original_url = all_wikidata_per[wiki_id]["image_url"]
@@ -120,6 +131,46 @@ def parties_json_cache():
     return {x["wiki_id"] for x in parties_data}
 
 
+def stats_json_cache():
+    """
+    Generates 'stats.json': the /stats and /stats/yearly metric-card totals and the
+    per-year/per-sentiment chart data used by the Sobre page. These are as static as
+    the personalities/parties caches -- they only change when the data pipeline runs
+    again -- so they're precomputed here instead of hitting SPARQL on every request.
+    """
+    totals = get_total_nr_of_articles()
+
+    all_years = get_chart_labels_min_max(min_date=start_year, max_date=end_year)
+    values = get_total_articles_by_year_by_relationship_type()
+    aggregated_values = defaultdict(lambda: {
+        "oposição_artigos": 0, "apoio_artigos": 0,
+        "oposição_relações": 0, "apoio_relações": 0,
+    })
+    for year in all_years:
+        # Touch the defaultdict entry even for a year with no data at all, so every
+        # year in `all_years` still gets a row below.
+        year_bucket = aggregated_values[year]
+        for rel, counts in values.get(year, {}).items():
+            bucket = "oposição" if "opposes" in rel else "apoio" if "supports" in rel else None
+            if bucket is None:
+                continue
+            year_bucket[f"{bucket}_artigos"] += counts["nr_articles"]
+            year_bucket[f"{bucket}_relações"] += counts["nr_relationships"]
+    year_values = [dict(v, year=k) for k, v in aggregated_values.items()]
+
+    stats = {
+        "nr_all_articles": totals["articles"],
+        "nr_all_relationships": totals["relationships"],
+        "nr_all_articles_sentiment": totals["articles_sentiment"],
+        "nr_all_relationships_sentiment": totals["relationships_sentiment"],
+        "year_values": year_values,
+    }
+    with open(STATIC_DATA + "stats.json", "wt", encoding="utf8") as f_out:
+        json.dump(stats, f_out, indent=4)
+
+    return stats
+
+
 def save_images_from_url(wiki_id_info: Dict[str, Any], base_out: str, max_retries: int = 5):
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -186,6 +237,7 @@ def main():
     print("Caching and pre-computing static information")
     personalities_json_cache()
     party_wiki_ids = parties_json_cache()
+    stats_json_cache()
     get_images(party_wiki_ids)
 
     generated_files = [
@@ -193,6 +245,7 @@ def main():
         STATIC_DATA + "persons.json",
         STATIC_DATA + "all_parties_info.json",
         STATIC_DATA + "parties.json",
+        STATIC_DATA + "stats.json",
     ]
     print("\nGenerated files:")
     for path in generated_files:

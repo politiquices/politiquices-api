@@ -55,6 +55,8 @@ def get_all_parties_and_members_with_relationships():
                (SAMPLE(?party_label) AS ?label)
                (GROUP_CONCAT(DISTINCT ?country_label; separator="|") AS ?countries)
                (COUNT(DISTINCT ?person) AS ?nr_personalities)
+               (MIN(?inception) AS ?inception_date)
+               (MIN(?dissolved) AS ?dissolved_date)
         WHERE {{
             ?person p:P102 ?political_partyStmnt.
             ?political_partyStmnt ps:P102 ?political_party.
@@ -63,6 +65,8 @@ def get_all_parties_and_members_with_relationships():
                 ?political_party wdt:P17 ?party_country.
                 ?party_country rdfs:label ?country_label . FILTER(LANG(?country_label) = "{LANG}")
             }}
+            OPTIONAL {{ ?political_party wdt:P571 ?inception . }}
+            OPTIONAL {{ ?political_party wdt:P576 ?dissolved . }}
             SERVICE <http://0.0.0.0:3030/politiquices/query> {{
                 SELECT ?person WHERE {{ ?person wdt:P31 wd:Q5 . }}
             }}
@@ -88,6 +92,14 @@ def get_all_parties_and_members_with_relationships():
                 "party_logo": party_logo_url(wiki_id),
                 "countries": countries,
                 "nr_personalities": x["nr_personalities"]["value"],
+                # P571/P576 -- often just a year's precision ("1973-01-01T00:00:00Z"),
+                # which is all the frontend's "existed since 1994 and still exists"
+                # shortcut filter needs. Missing means "no such Wikidata statement",
+                # not "unknown": inception absent is treated as pre-1994 (long-lived
+                # major parties don't always have P571 filled in), dissolved absent
+                # means still active.
+                "inception": x["inception_date"]["value"] if "inception_date" in x else None,
+                "dissolved": x["dissolved_date"]["value"] if "dissolved_date" in x else None,
             }
         )
 
@@ -213,16 +225,20 @@ def get_persons_wiki_id_name_image_url() -> Dict[str, Any]:
     return results
 
 
-def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, int]]:
+def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, Dict[str, int]]]:
     # `mutual_agreement`/`mutual_opposition` were missing from this VALUES list — real
     # rel_type values (2604 + 1074 relations live), just never added here. A person
     # whose only relations are one of the two got nr_articles=0 from this query and was
-    # silently dropped from persons.json's "(nr_articles - other) > 0" filter, even
-    # though /stats' get_nr_of_persons() (a plain "not other" regex, no VALUES list)
-    # counted them — 27 people, exactly the gap between the "Personalidades" and
-    # "Sobre" counts.
+    # silently dropped from persons.json's "(nr_articles - other) > 0" filter.
+    #
+    # `count` (relationships) already existed here despite the function's name; a
+    # relationship can now be backed by several near-duplicate source articles, so
+    # `nr_source_articles` (the true article count, via ?url) is a second, genuinely
+    # different number, added alongside it rather than replacing it -- too much of the
+    # rest of the API already depends on this function's existing "articles" meaning
+    # (which is actually relationship counts) to safely repoint it.
     query = """
-        SELECT ?person ?rel_type (COUNT(DISTINCT ?rel) as ?count)
+        SELECT ?person ?rel_type (COUNT(DISTINCT ?rel) as ?count) (COUNT(?url) as ?nr_source_articles)
         WHERE {
           VALUES ?rel_type {'ent1_opposes_ent2' 'ent2_opposes_ent1'
                             'ent1_supports_ent2' 'ent2_supports_ent1' 'other'
@@ -230,19 +246,22 @@ def get_total_nr_articles_for_each_person() -> Dict[str, Dict[str, int]]:
             ?person wdt:P31 wd:Q5 .
             {?rel politiquices:ent1 ?person} UNION {?rel politiquices:ent2 ?person} .
             ?rel politiquices:type ?rel_type .
+            ?rel politiquices:url ?url .
           }
         GROUP BY ?person ?rel_type
         ORDER BY ?person
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    counts: Dict[str, Dict[str, int]] = {}
+    counts: Dict[str, Dict[str, Dict[str, int]]] = {}
     for e in results["results"]["bindings"]:
         wiki_id = e["person"]["value"].split("/")[-1]
         rel_type = e["rel_type"]["value"]
-        count = int(e["count"]["value"])
         if wiki_id not in counts:
             counts[wiki_id] = {}
-        counts[wiki_id][rel_type] = count
+        counts[wiki_id][rel_type] = {
+            "nr_relationships": int(e["count"]["value"]),
+            "nr_source_articles": int(e["nr_source_articles"]["value"]),
+        }
     return counts
 
 
