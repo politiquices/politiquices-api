@@ -10,6 +10,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 
 
 from annotation_router import router as annotation_router
+from duplicate_router import router as duplicate_router
 from cache import all_entities_info, all_parties_info, persons, parties, stats as stats_cache
 from config import sparql_endpoint, start_year, end_year, NO_IMAGE, party_logo_url
 from sparql import (
@@ -47,6 +48,7 @@ logger = logging.getLogger("uvicorn")
 
 app = FastAPI()
 app.include_router(annotation_router)
+app.include_router(duplicate_router)
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
 origins = ["*"]

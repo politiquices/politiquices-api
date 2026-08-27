@@ -17,6 +17,11 @@ router = APIRouter(prefix="/annotator", tags=["annotator"])
 ANNOTATIONS_FILE = Path(os.getenv("ANNOTATIONS_FILE", "./annotations.jsonl"))
 _annotated_ids: Set[str] = set()
 
+# A browser file picker can't hand back an absolute filesystem path (a security
+# restriction, not an oversight) -- the API always runs with cwd api/, so the
+# pipeline's own results_*/ output lives one level up, discoverable without one.
+JSONL_SEARCH_DIR = Path(os.getenv("JSONL_SEARCH_DIR", "../nlp_extraction/scripts"))
+
 
 def load_existing_annotations() -> None:
     if not ANNOTATIONS_FILE.exists():
@@ -183,6 +188,26 @@ async def get_article(
             if record.get("arquivo_url") == url:
                 return _normalize_jsonl_record(record)
     raise HTTPException(status_code=404, detail="Article not found in JSONL file")
+
+
+@router.get("/jsonl_files")
+async def list_jsonl_files():
+    if not JSONL_SEARCH_DIR.is_dir():
+        return {"results": []}
+
+    results = []
+    for path in JSONL_SEARCH_DIR.glob("*/titles_processed.jsonl"):
+        stat = path.stat()
+        results.append(
+            {
+                "path": str(path.resolve()),
+                "label": path.parent.name,
+                "size_mb": round(stat.st_size / (1024 * 1024), 1),
+                "mtime": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+            }
+        )
+    results.sort(key=lambda r: r["mtime"], reverse=True)
+    return {"results": results}
 
 
 @router.get("/entities")
