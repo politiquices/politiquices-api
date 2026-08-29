@@ -14,7 +14,9 @@ from sparql import get_all_relationships_paginated, get_relationship_by_url, get
 
 router = APIRouter(prefix="/annotator", tags=["annotator"])
 
-ANNOTATIONS_FILE = Path(os.getenv("ANNOTATIONS_FILE", "./annotations.jsonl"))
+# kept alongside the rest of the annotation tooling and its output
+# (nlp_extraction/annotations/), not scattered between the API and nlp_extraction repos
+ANNOTATIONS_FILE = Path(os.getenv("ANNOTATIONS_FILE", "../nlp_extraction/annotations/annotations.jsonl"))
 _annotated_ids: Set[str] = set()
 
 # A browser file picker can't hand back an absolute filesystem path (a security
