@@ -22,8 +22,8 @@ images:
 	# here, and after the move to a single .jpg extension that meant 217 orphans
 	# shipping to the web server for nobody.
 	echo "mirroring to react app..."
-	rsync -a --delete assets/images/parties/ ../politiquices-app/public/assets/images/parties/
-	rsync -a --delete assets/images/personalities_small/ ../politiquices-app/public/assets/images/personalities_small/
+	rsync -a --delete assets/images/parties/ ../web-app/public/assets/images/parties/
+	rsync -a --delete assets/images/personalities_small/ ../web-app/public/assets/images/personalities_small/
 	echo "done"
 
 build:

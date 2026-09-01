@@ -2,6 +2,7 @@ import hashlib
 import json
 import math
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Set
@@ -15,7 +16,10 @@ from sparql import get_all_relationships_paginated, get_relationship_by_url, get
 router = APIRouter(prefix="/annotator", tags=["annotator"])
 
 # kept alongside the rest of the annotation tooling and its output
-# (nlp_extraction/annotations/jsonl/), not scattered between the API and nlp_extraction repos
+# (nlp_extraction/annotations/jsonl/), not scattered between the API and nlp_extraction repos.
+# annotations.jsonl gets deleted by nlp_extraction/annotations/build_release.py once its rows
+# are folded into a release -- see load_release_annotated_ids() below for why _annotated_ids
+# also has to be seeded from the release itself, not just this file.
 ANNOTATIONS_FILE = Path(os.getenv("ANNOTATIONS_FILE", "../nlp_extraction/annotations/jsonl/annotations.jsonl"))
 _annotated_ids: Set[str] = set()
 
@@ -23,6 +27,11 @@ _annotated_ids: Set[str] = set()
 # restriction, not an oversight) -- the API always runs with cwd api/, so the
 # pipeline's own results_*/ output lives one level up, discoverable without one.
 JSONL_SEARCH_DIR = Path(os.getenv("JSONL_SEARCH_DIR", "../nlp_extraction/scripts"))
+
+# api/ has no runtime dependency on nlp_extraction (separate repo, separate deployment), so this
+# duplicates find_latest_release()'s version-sort from
+# nlp_extraction/annotations/build_release.py rather than importing it.
+DATA_RELEASES_DIR = Path(os.getenv("DATA_RELEASES_DIR", "../data-releases"))
 
 
 def load_existing_annotations() -> None:
@@ -41,12 +50,45 @@ def load_existing_annotations() -> None:
                 pass
 
 
-# Load on module import so IDs are ready before any request arrives
-load_existing_annotations()
-
-
 def _record_id(url: str) -> str:
     return hashlib.sha256(url.encode()).hexdigest()
+
+
+def _find_latest_release(releases_dir: Path) -> Optional[Path]:
+    versioned = sorted(
+        releases_dir.glob("politiquices_data_v*.jsonl"),
+        key=lambda p: [int(n) for n in re.search(r"v(\d+)\.(\d+)", p.name).groups()],
+    )
+    return versioned[-1] if versioned else None
+
+
+def load_release_annotated_ids() -> None:
+    """Seed _annotated_ids from the current release too, not just ANNOTATIONS_FILE. Once
+    build_release.py folds an annotation in and deletes annotations.jsonl (see that script's
+    post-build cleanup), the release is the ONLY place that record_id still exists on disk -- a
+    server restart after that point must not lose the dedup protection for it, or a previously
+    annotated record would be re-served as if unannotated.
+    """
+    release_path = _find_latest_release(DATA_RELEASES_DIR)
+    if release_path is None or not release_path.exists():
+        return
+    with open(release_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                record = json.loads(line)
+                if "url" in record:
+                    _annotated_ids.add(_record_id(record["url"]))
+            except json.JSONDecodeError:
+                pass
+
+
+# Load on module import so IDs are ready before any request arrives -- both sources, since
+# either one alone can be incomplete (see load_release_annotated_ids()'s docstring).
+load_existing_annotations()
+load_release_annotated_ids()
 
 
 def _compute_entropy(scores: dict) -> float:

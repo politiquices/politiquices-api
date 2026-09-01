@@ -12,6 +12,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from annotation_router import router as annotation_router
 from duplicate_router import router as duplicate_router
 from cache import all_entities_info, all_parties_info, persons, parties, stats as stats_cache
+from chave import get_chave_article
 from config import sparql_endpoint, start_year, end_year, NO_IMAGE, party_logo_url
 from sparql import (
     get_person_info,
@@ -114,6 +115,14 @@ def local_image(wiki_id: str, org_url: str, ent_type: str) -> str:
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+@app.get("/article/chave/{doc_id}")
+async def chave_article(doc_id: str = Path(regex=r"^PUBLICO-\d{8}-\d+$")):
+    article = get_chave_article(doc_id)
+    if article is None:
+        raise HTTPException(status_code=404, detail="article not found")
+    return article
 
 
 @app.get("/personality/{wiki_id}")

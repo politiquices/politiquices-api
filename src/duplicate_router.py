@@ -13,17 +13,29 @@ from annotation_router import _normalize_jsonl_record
 router = APIRouter(prefix="/annotator/duplicates", tags=["duplicates"])
 
 # kept alongside the rest of the annotation tooling and its output
-# (nlp_extraction/annotations/jsonl/), not scattered between the API and nlp_extraction repos
+# (nlp_extraction/annotations/jsonl/), not scattered between the API and nlp_extraction repos.
+# duplicate_annotations.jsonl only ever holds same_relationship: true judgments -- it gets
+# deleted by nlp_extraction/annotations/build_release.py once its pairs are folded into a
+# release's duplicate_group_id tags. duplicate_annotations_negative.jsonl is never deleted: a
+# negative judgment has no equivalent representation in a release, so this file is the sole
+# permanent record of "these two are confirmed different".
 PAIR_ANNOTATIONS_FILE = Path(
     os.getenv("PAIR_ANNOTATIONS_FILE", "../nlp_extraction/annotations/jsonl/duplicate_annotations.jsonl")
+)
+PAIR_ANNOTATIONS_NEGATIVE_FILE = Path(
+    os.getenv(
+        "PAIR_ANNOTATIONS_NEGATIVE_FILE",
+        "../nlp_extraction/annotations/jsonl/duplicate_annotations_negative.jsonl",
+    )
 )
 _judged_pairs: Set[str] = set()
 
 
-def load_existing_pairs() -> None:
-    if not PAIR_ANNOTATIONS_FILE.exists():
-        return
-    with open(PAIR_ANNOTATIONS_FILE, encoding="utf-8") as f:
+def _load_pair_ids(path: Path) -> Set[str]:
+    ids: Set[str] = set()
+    if not path.exists():
+        return ids
+    with open(path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -31,9 +43,19 @@ def load_existing_pairs() -> None:
             try:
                 record = json.loads(line)
                 if "pair_id" in record:
-                    _judged_pairs.add(record["pair_id"])
+                    ids.add(record["pair_id"])
             except json.JSONDecodeError:
                 pass
+    return ids
+
+
+def load_existing_pairs() -> None:
+    # Both files must be read: a pair judged same_relationship: false only ever lives in
+    # PAIR_ANNOTATIONS_NEGATIVE_FILE (never derivable from a release, unlike the positive side --
+    # see build_release.py's duplicate_group_id tagging), so skipping it would let a
+    # resubmission of an already-rejected pair silently succeed instead of 409ing.
+    _judged_pairs.update(_load_pair_ids(PAIR_ANNOTATIONS_FILE))
+    _judged_pairs.update(_load_pair_ids(PAIR_ANNOTATIONS_NEGATIVE_FILE))
 
 
 # Load on module import so pair ids are ready before any request arrives
@@ -134,7 +156,8 @@ async def submit_duplicate_pair(payload: DuplicatePairPayload):
     record["pair_id"] = pair_id
     record["annotated_at"] = datetime.now(timezone.utc).isoformat()
 
-    with open(PAIR_ANNOTATIONS_FILE, "a", encoding="utf-8") as f:
+    target_file = PAIR_ANNOTATIONS_FILE if payload.same_relationship else PAIR_ANNOTATIONS_NEGATIVE_FILE
+    with open(target_file, "a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     _judged_pairs.add(pair_id)
@@ -143,26 +166,26 @@ async def submit_duplicate_pair(payload: DuplicatePairPayload):
 
 @router.get("/stats")
 async def get_duplicate_stats():
-    if not PAIR_ANNOTATIONS_FILE.exists():
-        return {"total_judged": 0, "same_count": 0, "different_count": 0}
-
     total_judged = 0
     same_count = 0
     different_count = 0
 
-    with open(PAIR_ANNOTATIONS_FILE, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            total_judged += 1
-            if record.get("same_relationship"):
-                same_count += 1
-            else:
-                different_count += 1
+    for path in (PAIR_ANNOTATIONS_FILE, PAIR_ANNOTATIONS_NEGATIVE_FILE):
+        if not path.exists():
+            continue
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                total_judged += 1
+                if record.get("same_relationship"):
+                    same_count += 1
+                else:
+                    different_count += 1
 
     return {"total_judged": total_judged, "same_count": same_count, "different_count": different_count}
