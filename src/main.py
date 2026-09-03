@@ -527,3 +527,13 @@ async def stats():
 @app.get("/stats/yearly")
 async def stats_yearly():
     return {"year_values": stats_cache["year_values"]}
+
+
+@app.get("/stats/sources")
+async def stats_sources():
+    # Split out the same way /stats/yearly is: not on the metric cards' critical path,
+    # so the Sobre page's sources section fetches and loads independently of them.
+    return {
+        "provenance": stats_cache["provenance"],
+        "domains": stats_cache["domains"],
+    }

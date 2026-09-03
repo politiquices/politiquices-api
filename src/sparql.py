@@ -105,6 +105,65 @@ def get_total_articles_by_year_by_relationship_type():
     return values
 
 
+def get_articles_by_source():
+    """Two views of where an article came from, both driven off the same `politiquices:url`
+    link used everywhere else -- never a fresh count of a different population, so it stays
+    consistent with `nr_all_articles`.
+
+    `provenance` is *how* it was retrieved, read off the URL itself: the archived-page copy
+    (arquivo.pt), a live scrape straight from publico.pt (no wayback snapshot), or the
+    1994-95 Linguateca/CHAVE corpus (see chave.py) -- pre-dating both. `domains` is *which
+    outlet* originally published it (`dc:creator`), independent of how it was retrieved --
+    an archived publico.pt page and a live-scraped one both carry creator "publico.pt". The
+    Sobre page explains `provenance` in prose and lists `domains` as the "which newspapers"
+    breakdown, so PUBLICO-CHAVE (dc:creator for the Linguateca corpus, no real domain to show
+    an icon for) is left out of the latter -- `provenance`'s `chave` count already covers it.
+    """
+    query = """
+        SELECT
+          (SUM(IF(STRSTARTS(STR(?y), "https://arquivo.pt/"), 1, 0)) AS ?n_arquivo)
+          (SUM(IF(STRSTARTS(STR(?y), "https://publico.pt/"), 1, 0)) AS ?n_publico_direct)
+          (SUM(IF(STRSTARTS(STR(?y), "https://www.linguateca.pt/"), 1, 0)) AS ?n_chave)
+          (COUNT(?y) AS ?total)
+        WHERE { ?x politiquices:url ?y . }
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    binding = results["results"]["bindings"][0]
+    provenance = {
+        "arquivo": int(binding["n_arquivo"]["value"]),
+        "publico_direct": int(binding["n_publico_direct"]["value"]),
+        "chave": int(binding["n_chave"]["value"]),
+        "total": int(binding["total"]["value"]),
+    }
+
+    query = """
+        SELECT ?creator (COUNT(?y) AS ?nr_articles) (MIN(YEAR(?date)) AS ?min_year) (MAX(YEAR(?date)) AS ?max_year)
+        WHERE {
+            ?x politiquices:url ?y .
+            ?y dc:creator ?creator .
+            OPTIONAL { ?y dc:date ?date }
+        }
+        GROUP BY ?creator
+        ORDER BY DESC(?nr_articles)
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    domains = [
+        {
+            "domain": x["creator"]["value"],
+            "nr_articles": int(x["nr_articles"]["value"]),
+            # MIN/MAX YEAR(?date) is unbound for a creator whose articles all lack a
+            # dc:date -- doesn't happen in practice (every row currently has both), but
+            # SPARQL doesn't guarantee it, so this doesn't assume the binding is there.
+            "min_year": int(x["min_year"]["value"]) if "min_year" in x else None,
+            "max_year": int(x["max_year"]["value"]) if "max_year" in x else None,
+        }
+        for x in results["results"]["bindings"]
+        if x["creator"]["value"] != "PUBLICO-CHAVE"
+    ]
+
+    return {"provenance": provenance, "domains": domains}
+
+
 def get_persons_articles_freq():
     query = """
         SELECT DISTINCT ?person (COUNT (?url) as ?n_artigos)

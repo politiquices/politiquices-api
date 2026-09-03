@@ -9,7 +9,11 @@ import requests
 from requests import RequestException
 
 from config import STATIC_DATA, NO_IMAGE, start_year, end_year
-from sparql import get_total_nr_of_articles, get_total_articles_by_year_by_relationship_type
+from sparql import (
+    get_total_nr_of_articles,
+    get_total_articles_by_year_by_relationship_type,
+    get_articles_by_source,
+)
 from sparql_queries_cache import (
     get_all_parties_and_members_with_relationships,
     get_persons_wiki_id_name_image_url,
@@ -133,10 +137,11 @@ def parties_json_cache():
 
 def stats_json_cache():
     """
-    Generates 'stats.json': the /stats and /stats/yearly metric-card totals and the
-    per-year/per-sentiment chart data used by the Sobre page. These are as static as
-    the personalities/parties caches -- they only change when the data pipeline runs
-    again -- so they're precomputed here instead of hitting SPARQL on every request.
+    Generates 'stats.json': the /stats, /stats/yearly and /stats/sources metric-card
+    totals, per-year/per-sentiment chart data, and article-provenance/source-domain
+    breakdown used by the Sobre page. These are as static as the personalities/parties
+    caches -- they only change when the data pipeline runs again -- so they're
+    precomputed here instead of hitting SPARQL on every request.
     """
     totals = get_total_nr_of_articles()
 
@@ -157,6 +162,7 @@ def stats_json_cache():
             year_bucket[f"{bucket}_artigos"] += counts["nr_articles"]
             year_bucket[f"{bucket}_relações"] += counts["nr_relationships"]
     year_values = [dict(v, year=k) for k, v in aggregated_values.items()]
+    sources = get_articles_by_source()
 
     stats = {
         "nr_all_articles": totals["articles"],
@@ -164,6 +170,8 @@ def stats_json_cache():
         "nr_all_articles_sentiment": totals["articles_sentiment"],
         "nr_all_relationships_sentiment": totals["relationships_sentiment"],
         "year_values": year_values,
+        "provenance": sources["provenance"],
+        "domains": sources["domains"],
     }
     with open(STATIC_DATA + "stats.json", "wt", encoding="utf8") as f_out:
         json.dump(stats, f_out, indent=4)
