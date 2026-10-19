@@ -15,7 +15,7 @@ router = APIRouter(prefix="/annotator/duplicates", tags=["duplicates"])
 # kept alongside the rest of the annotation tooling and its output
 # (nlp_extraction/annotations/jsonl/), not scattered between the API and nlp_extraction repos.
 # duplicate_annotations.jsonl only ever holds same_relationship: true judgments -- it gets
-# deleted by nlp_extraction/annotations/build_release.py once its pairs are folded into a
+# deleted by nlp_extraction/annotations/release/build_release.py once its pairs are folded into a
 # release's duplicate_group_id tags. duplicate_annotations_negative.jsonl is never deleted: a
 # negative judgment has no equivalent representation in a release, so this file is the sole
 # permanent record of "these two are confirmed different".

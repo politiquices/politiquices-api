@@ -354,20 +354,36 @@ def _build_raw_relationships(wiki_ids: List[str], selected: bool, sentiment: boo
             info = all_entities_info.get(wiki_id, {})
             nodes[wiki_id] = {"name": info.get("name"), "image_url": info.get("image_url")}
 
-    for x in results:
-        rel_type = x["rel_type"]
-        if rel_type in ("ent1_opposes_ent2", "ent1_supports_ent2"):
-            actor, target = x["ent1_id"], x["ent2_id"]
-        else:  # ent2_opposes_ent1, ent2_supports_ent1
-            actor, target = x["ent2_id"], x["ent1_id"]
+    def add_relationship(actor, target, sign, x):
         add_node(actor)
         add_node(target)
         relationships.append({
             "from": actor,
             "to": target,
-            "sign": "opõe-se" if "opposes" in rel_type else "apoia",
+            "sign": sign,
             "year": int(x["date"][:4]),
+            "score": x.get("score"),
         })
+
+    for x in results:
+        rel_type = x["rel_type"]
+        if rel_type in ("ent1_opposes_ent2", "ent1_supports_ent2"):
+            sign = "opõe-se" if "opposes" in rel_type else "apoia"
+            add_relationship(x["ent1_id"], x["ent2_id"], sign, x)
+        elif rel_type in ("ent2_opposes_ent1", "ent2_supports_ent1"):
+            sign = "opõe-se" if "opposes" in rel_type else "apoia"
+            add_relationship(x["ent2_id"], x["ent1_id"], sign, x)
+        elif rel_type in ("mutual_agreement", "mutual_opposition"):
+            # A single triple in the graph (see keep-mutual-relation-classes in project memory),
+            # fanned out into both directions here: ent1 and ent2 are simultaneously actor and
+            # target of the same relationship, so this draws as two arcs, same colour -- exactly
+            # like two separate directional relationships would.
+            sign = "opõe-se" if rel_type == "mutual_opposition" else "apoia"
+            add_relationship(x["ent1_id"], x["ent2_id"], sign, x)
+            add_relationship(x["ent2_id"], x["ent1_id"], sign, x)
+        # else: "other" only reaches here when sentiment=False was requested -- there is no
+        # direction to draw for it, so it's silently skipped rather than falling into an
+        # unrelated bucket the way the old blanket `else` used to.
 
     print(f"raw relationships: {len(relationships)}, nodes: {len(nodes)}")
     return {"relationships": relationships, "nodes": nodes}

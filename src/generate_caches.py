@@ -11,7 +11,7 @@ from requests import RequestException
 from config import STATIC_DATA, NO_IMAGE, start_year, end_year
 from sparql import (
     get_total_nr_of_articles,
-    get_total_articles_by_year_by_relationship_type,
+    get_nr_articles_per_year,
     get_articles_by_source,
 )
 from sparql_queries_cache import (
@@ -138,7 +138,7 @@ def parties_json_cache():
 def stats_json_cache():
     """
     Generates 'stats.json': the /stats, /stats/yearly and /stats/sources metric-card
-    totals, per-year/per-sentiment chart data, and article-provenance/source-domain
+    totals, per-year unique-article counts, and article-provenance/source-domain
     breakdown used by the Sobre page. These are as static as the personalities/parties
     caches -- they only change when the data pipeline runs again -- so they're
     precomputed here instead of hitting SPARQL on every request.
@@ -146,22 +146,11 @@ def stats_json_cache():
     totals = get_total_nr_of_articles()
 
     all_years = get_chart_labels_min_max(min_date=start_year, max_date=end_year)
-    values = get_total_articles_by_year_by_relationship_type()
-    aggregated_values = defaultdict(lambda: {
-        "oposição_artigos": 0, "apoio_artigos": 0,
-        "oposição_relações": 0, "apoio_relações": 0,
-    })
-    for year in all_years:
-        # Touch the defaultdict entry even for a year with no data at all, so every
-        # year in `all_years` still gets a row below.
-        year_bucket = aggregated_values[year]
-        for rel, counts in values.get(year, {}).items():
-            bucket = "oposição" if "opposes" in rel else "apoio" if "supports" in rel else None
-            if bucket is None:
-                continue
-            year_bucket[f"{bucket}_artigos"] += counts["nr_articles"]
-            year_bucket[f"{bucket}_relações"] += counts["nr_relationships"]
-    year_values = [dict(v, year=k) for k, v in aggregated_values.items()]
+    articles_per_year = get_nr_articles_per_year()
+    year_values = [
+        {"year": year, "nr_articles": articles_per_year.get(int(year), 0)}
+        for year in all_years
+    ]
     sources = get_articles_by_source()
 
     stats = {

@@ -17,8 +17,10 @@ from sparql_prefixes import PREFIXES
 
 # Statistics
 def get_nr_articles_per_year():
+    # DISTINCT keeps an article from being counted twice in the same year -- e.g. one
+    # backing more than one relationship, or (rarely) carrying more than one dc:date triple.
     query = """
-        SELECT ?year (COUNT(?arquivo_doc) AS ?nr_articles)
+        SELECT ?year (COUNT(DISTINCT ?arquivo_doc) AS ?nr_articles)
         WHERE {
           ?x politiquices:url ?arquivo_doc .
           ?arquivo_doc dc:date ?date .
@@ -47,7 +49,8 @@ def get_total_nr_of_articles():
     query = """
         SELECT (COUNT(?rel) as ?nr_articles) (COUNT(DISTINCT ?rel) as ?nr_relationships) WHERE {
             VALUES ?rel_values {'ent1_opposes_ent2' 'ent2_opposes_ent1'
-                                'ent1_supports_ent2' 'ent2_supports_ent1'} .
+                                'ent1_supports_ent2' 'ent2_supports_ent1'
+                                'mutual_agreement' 'mutual_opposition'} .
             ?rel politiquices:type ?rel_values .
             ?rel politiquices:url ?url .
         }
@@ -63,46 +66,6 @@ def get_total_nr_of_articles():
         "articles_sentiment": no_other_articles,
         "relationships_sentiment": no_other_relationships,
     }
-
-
-def get_total_articles_by_year_by_relationship_type():
-    # Same MIN-date-per-relationship convention as get_person_relationships_by_year /
-    # get_timeline_personalities: a relationship whose source articles straddle a year
-    # boundary must count once, in the year of its earliest source.
-    query = """
-        SELECT ?year ?rel_type (COUNT(?rel) AS ?nr_relationships) (SUM(?nr_articles_for_rel) AS ?nr_articles)
-        WHERE {
-          { SELECT ?rel ?rel_type (MIN(?date) AS ?min_date) (COUNT(?arquivo_doc) AS ?nr_articles_for_rel)
-            WHERE {
-                ?rel politiquices:url ?arquivo_doc .
-                ?rel politiquices:type ?rel_type .
-                ?arquivo_doc dc:date ?date .
-            }
-            GROUP BY ?rel ?rel_type }
-        }
-        GROUP BY (YEAR(?min_date) AS ?year) ?rel_type
-        ORDER BY ?year
-        """
-    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-
-    def rels_values():
-        return {
-            "ent1_opposes_ent2": {"nr_relationships": 0, "nr_articles": 0},
-            "ent2_opposes_ent1": {"nr_relationships": 0, "nr_articles": 0},
-            "ent1_supports_ent2": {"nr_relationships": 0, "nr_articles": 0},
-            "ent2_supports_ent1": {"nr_relationships": 0, "nr_articles": 0},
-            "ent1_other_ent2": {"nr_relationships": 0, "nr_articles": 0},
-            "ent2_other_ent1": {"nr_relationships": 0, "nr_articles": 0},
-        }
-
-    values = defaultdict(rels_values)
-    for x in results["results"]["bindings"]:
-        values[x["year"]["value"]][x["rel_type"]["value"]] = {
-            "nr_relationships": int(x["nr_relationships"]["value"]),
-            "nr_articles": int(x["nr_articles"]["value"]),
-        }
-
-    return values
 
 
 def get_articles_by_source():
@@ -208,9 +171,20 @@ def get_wiki_id_affiliated_with_party(political_party: str):
 
 
 # Personality Information
+def _year(binding):
+    """Year of an xsd:dateTime SPARQL binding ("2019-07-17T00:00:00Z" -> 2019), or None."""
+    if not binding:
+        return None
+    try:
+        return int(binding["value"].lstrip("+")[:4])
+    except ValueError:
+        return None
+
+
 def get_person_info(wiki_id):
     query = f"""
         SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label
+               ?party_start ?party_end ?party_dissolved
         WHERE {{
             OPTIONAL {{ wd:{wiki_id} rdfs:label ?name_pt   . FILTER(LANG(?name_pt)   = "pt") }}
             OPTIONAL {{ wd:{wiki_id} rdfs:label ?name_ptbr . FILTER(LANG(?name_ptbr) = "pt-br") }}
@@ -225,6 +199,9 @@ def get_person_info(wiki_id):
                 ?political_party rdfs:label ?political_party_label
                     FILTER(LANG(?political_party_label)="{LANG}").
                 OPTIONAL {{ ?political_party wdt:P154 ?political_party_logo. }}
+                OPTIONAL {{ ?political_partyStmnt pq:P580 ?party_start. }}
+                OPTIONAL {{ ?political_partyStmnt pq:P582 ?party_end. }}
+                OPTIONAL {{ ?political_party wdt:P576 ?party_dissolved. }}
             }}
         }}
     """
@@ -232,7 +209,13 @@ def get_person_info(wiki_id):
 
     name = None
     image_url = None
-    parties = []
+    # One entry per party, even when the person left and rejoined (several P102
+    # statements) or a statement carries more than one start/end qualifier: the span
+    # is the earliest start to the latest end, and the membership is current if any
+    # statement for it has no end date -- unless the party itself was dissolved (P576),
+    # in which case an undated membership ended with the party at the latest.
+    parties = {}
+    open_ended = set()
     for e in results["results"]["bindings"]:
         if not name:
             name = e["name"]["value"]
@@ -240,13 +223,34 @@ def get_person_info(wiki_id):
             image_url = e["image_url"]["value"] if "image_url" in e else NO_IMAGE
         if "political_party" in e:
             party_wiki_id = e["political_party"]["value"].split("/")[-1]
-            party = PoliticalParty(
-                wiki_id=party_wiki_id,
-                name=e["political_party_label"]["value"],
-                image_url=party_logo_url(party_wiki_id),
+            party = parties.setdefault(
+                party_wiki_id,
+                PoliticalParty(
+                    wiki_id=party_wiki_id,
+                    name=e["political_party_label"]["value"],
+                    image_url=party_logo_url(party_wiki_id),
+                ),
             )
-            if party not in parties:
-                parties.append(party)
+            start = _year(e.get("party_start"))
+            end = _year(e.get("party_end")) or _year(e.get("party_dissolved"))
+            if start is not None and (party.start_year is None or start < party.start_year):
+                party.start_year = start
+            if end is None:
+                open_ended.add(party_wiki_id)
+            elif party.end_year is None or end > party.end_year:
+                party.end_year = end
+
+    for party in parties.values():
+        party.current = party.wiki_id in open_ended
+        if party.current:
+            party.end_year = None
+    # Most recent first: current memberships, then by end/start year descending;
+    # parties with no dates at all go last.
+    parties = sorted(
+        parties.values(),
+        key=lambda p: (p.current, p.end_year or p.start_year or 0, p.start_year or 0),
+        reverse=True,
+    )
 
     results = get_person_detailed_info(wiki_id)
 
@@ -620,7 +624,7 @@ def get_person_relationships_for_year(wiki_id, year):
 def get_top_relationships(wiki_id):
     # get all the relationships where the person acts as subject, i.e: opposes and supports
     query = f"""
-        SELECT ?rel_type ?ent2
+        SELECT ?rel_type ?ent2 ?score
         WHERE {{
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
@@ -635,20 +639,25 @@ def get_top_relationships(wiki_id):
                  politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent2_opposes|ent2_supports"))
           }}
+          OPTIONAL {{ ?rel politiquices:score ?score . }}
         }}
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    person_as_subject = defaultdict(lambda: defaultdict(int))
+    # lists of individual scores, not counts -- a relationship predating the classifier
+    # score field contributes None, kept (not dropped) so the dev-only score filter can
+    # tell "no data" apart from "out of range" (see buildGraph.js's effectiveFreq)
+    person_as_subject = defaultdict(lambda: defaultdict(list))
     for x in results["results"]["bindings"]:
         other_person = x["ent2"]["value"].split("/")[-1]
+        score = float(x["score"]["value"]) if "score" in x else None
         if "opposes" in x["rel_type"]["value"]:
-            person_as_subject["who_person_opposes"][other_person] += 1
+            person_as_subject["who_person_opposes"][other_person].append(score)
         if "supports" in x["rel_type"]["value"]:
-            person_as_subject["who_person_supports"][other_person] += 1
+            person_as_subject["who_person_supports"][other_person].append(score)
 
     # get all the relationships where the person acts as target, i.e.: is opposed/supported by
     query = f"""
-        SELECT ?rel_type ?ent2
+        SELECT ?rel_type ?ent2 ?score
         WHERE {{
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
@@ -663,64 +672,106 @@ def get_top_relationships(wiki_id):
                  politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent1_opposes|ent1_supports"))
           }}
+          OPTIONAL {{ ?rel politiquices:score ?score . }}
         }}
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
-    person_as_target = defaultdict(lambda: defaultdict(int))
+    person_as_target = defaultdict(lambda: defaultdict(list))
     for x in results["results"]["bindings"]:
         other_person = x["ent2"]["value"].split("/")[-1]
+        score = float(x["score"]["value"]) if "score" in x else None
         if "opposes" in x["rel_type"]["value"]:
-            person_as_target["who_opposes_person"][other_person] += 1
+            person_as_target["who_opposes_person"][other_person].append(score)
         if "supports" in x["rel_type"]["value"]:
-            person_as_target["who_supports_person"][other_person] += 1
+            person_as_target["who_supports_person"][other_person].append(score)
 
-    total = sum(person_as_subject["who_person_opposes"].values())
+    # mutual_agreement/mutual_opposition stay a single triple in the graph (see
+    # keep-mutual-relation-classes in project memory -- expanding them there would double
+    # COUNT(?rel) totals and break comparability with the hand annotations) but are fanned out
+    # here into both directions: wiki_id is simultaneously subject and target of the same
+    # relationship, so one instance contributes to both person_as_subject and person_as_target
+    # under the matching sign. The personality graph then draws it as two arcs, same colour --
+    # exactly like two separate directional relationships would.
+    query = f"""
+        SELECT ?rel_type ?ent2 ?score
+        WHERE {{
+          {{
+            ?rel politiquices:ent1 wd:{wiki_id};
+                 politiquices:ent2 ?ent2;
+                 politiquices:type ?rel_type.
+          }}
+          UNION
+          {{
+            ?rel politiquices:ent2 wd:{wiki_id};
+                 politiquices:ent1 ?ent2;
+                 politiquices:type ?rel_type.
+          }}
+          FILTER(?rel_type = "mutual_agreement" || ?rel_type = "mutual_opposition")
+          OPTIONAL {{ ?rel politiquices:score ?score . }}
+        }}
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "politiquices")
+    for x in results["results"]["bindings"]:
+        other_person = x["ent2"]["value"].split("/")[-1]
+        score = float(x["score"]["value"]) if "score" in x else None
+        if x["rel_type"]["value"] == "mutual_opposition":
+            person_as_subject["who_person_opposes"][other_person].append(score)
+            person_as_target["who_opposes_person"][other_person].append(score)
+        else:  # mutual_agreement
+            person_as_subject["who_person_supports"][other_person].append(score)
+            person_as_target["who_supports_person"][other_person].append(score)
+
+    total = sum(len(v) for v in person_as_subject["who_person_opposes"].values())
     who_person_opposes = [
         {
             "wiki_id": k,
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
-            "freq": v,
-            "relative": str(round(v / total * 100, 2)) + "%",
+            "freq": len(v),
+            "relative": str(round(len(v) / total * 100, 2)) + "%",
+            "scores": v,
         }
         for k, v in person_as_subject["who_person_opposes"].items()
         if k in all_entities_info
     ]
 
-    total = sum(person_as_subject["who_person_supports"].values())
+    total = sum(len(v) for v in person_as_subject["who_person_supports"].values())
     who_person_supports = [
         {
             "wiki_id": k,
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
-            "freq": v,
-            "relative": str(round(v / total * 100, 2)) + "%",
+            "freq": len(v),
+            "relative": str(round(len(v) / total * 100, 2)) + "%",
+            "scores": v,
         }
         for k, v in person_as_subject["who_person_supports"].items()
         if k in all_entities_info
     ]
 
-    total = sum(person_as_target["who_opposes_person"].values())
+    total = sum(len(v) for v in person_as_target["who_opposes_person"].values())
     who_opposes_person = [
         {
             "wiki_id": k,
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
-            "freq": v,
-            "relative": str(round(v / total * 100, 2)) + "%",
+            "freq": len(v),
+            "relative": str(round(len(v) / total * 100, 2)) + "%",
+            "scores": v,
         }
         for k, v in person_as_target["who_opposes_person"].items()
         if k in all_entities_info
     ]
 
-    total = sum(person_as_target["who_supports_person"].values())
+    total = sum(len(v) for v in person_as_target["who_supports_person"].values())
     who_supports_person = [
         {
             "wiki_id": k,
             "name": all_entities_info[k]["name"],
             "image_url": all_entities_info[k]["image_url"],
-            "freq": v,
-            "relative": str(round(v / total * 100, 2)) + "%",
+            "freq": len(v),
+            "relative": str(round(len(v) / total * 100, 2)) + "%",
+            "scores": v,
         }
         for k, v in person_as_target["who_supports_person"].items()
         if k in all_entities_info
@@ -861,7 +912,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
 
     query = f"""
-        SELECT DISTINCT ?rel ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?arquivo_doc ?date ?title ?description ?creator ?publisher
+        SELECT DISTINCT ?rel ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?branch ?arquivo_doc ?date ?title ?description ?creator ?publisher
         WHERE {{
             {{
                 ?rel politiquices:ent1 ?ent1;
@@ -875,6 +926,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                              dc:creator ?creator;
                              dc:publisher ?publisher;
                              dc:date ?date. FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                BIND("direct" AS ?branch)
              }}
                 UNION
             {{
@@ -890,6 +942,7 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                              dc:creator ?creator;
                              dc:publisher ?publisher;
                              dc:date ?date. FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                BIND("inverted" AS ?branch)
 
              }}
 
@@ -924,16 +977,25 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
             ),
             key=lambda a: a["date"],
         )
+        ent1_id = first["ent1"]["value"].split("/")[-1]
+        ent2_id = first["ent2"]["value"].split("/")[-1]
+        # The UNION's "inverted" branch aliases ent1/ent2 to the raw triple's ent2/ent1 (so
+        # the party member is always ent1, the person always ent2, as with the ids above) --
+        # but ?rel_type is bound straight off the triple's own (un-aliased) type property, so
+        # it still describes the raw, un-swapped orientation and needs the same inversion.
+        rel_type_result = first["rel_type"]["value"]
+        if first["branch"]["value"] == "inverted":
+            rel_type_result = invert_relationship(rel_type_result)
         relationships.append(
             {
                 "date": articles[0]["date"],
-                "rel_type": first["rel_type"]["value"],
-                "ent1_id": first["ent1"]["value"].split("/")[-1],
-                "ent1_str": first["ent1_str"]["value"],
-                "ent2_id": first["ent2"]["value"].split("/")[-1],
-                "ent2_str": first["ent2_str"]["value"],
-                "ent1_img": all_entities_info[first["ent1"]["value"].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[first["ent2"]["value"].split("/")[-1]]["image_url"],
+                "rel_type": rel_type_result,
+                "ent1_id": ent1_id,
+                "ent1_str": all_entities_info[ent1_id]["name"],
+                "ent2_id": ent2_id,
+                "ent2_str": all_entities_info[ent2_id]["name"],
+                "ent1_img": all_entities_info[ent1_id]["image_url"],
+                "ent2_img": all_entities_info[ent2_id]["image_url"],
                 "articles": articles,
             }
         )
@@ -947,7 +1009,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-        SELECT DISTINCT ?rel ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?arquivo_doc ?date ?title ?description ?creator ?publisher
+        SELECT DISTINCT ?rel ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?branch ?arquivo_doc ?date ?title ?description ?creator ?publisher
         WHERE {{
             {{
                 ?rel politiquices:ent2 ?ent2;
@@ -961,6 +1023,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                              dc:creator ?creator;
                              dc:publisher ?publisher;
                              dc:date ?date; FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                BIND("direct" AS ?branch)
             }}
               UNION
             {{
@@ -975,6 +1038,7 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                              dc:creator ?creator;
                              dc:publisher ?publisher;
                              dc:date ?date; FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                BIND("inverted" AS ?branch)
             }}
 
             SERVICE <{wikidata_endpoint}> {{
@@ -1008,16 +1072,24 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
             ),
             key=lambda a: a["date"],
         )
+        ent1_id = first["ent1"]["value"].split("/")[-1]
+        ent2_id = first["ent2"]["value"].split("/")[-1]
+        # Same "inverted" branch as get_relationship_between_party_and_person -- rel_type
+        # is bound off the raw, un-aliased triple, so it still needs inverting to describe
+        # the now-aliased ent1 (person) / ent2 (party member) ordering.
+        rel_type_result = first["rel_type"]["value"]
+        if first["branch"]["value"] == "inverted":
+            rel_type_result = invert_relationship(rel_type_result)
         relationships.append(
             {
                 "date": articles[0]["date"],
-                "rel_type": first["rel_type"]["value"],
-                "ent1_id": first["ent1"]["value"].split("/")[-1],
-                "ent1_str": first["ent1_str"]["value"],
-                "ent2_id": first["ent2"]["value"].split("/")[-1],
-                "ent2_str": first["ent2_str"]["value"],
-                "ent1_img": all_entities_info[first["ent1"]["value"].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[first["ent2"]["value"].split("/")[-1]]["image_url"],
+                "rel_type": rel_type_result,
+                "ent1_id": ent1_id,
+                "ent1_str": all_entities_info[ent1_id]["name"],
+                "ent2_id": ent2_id,
+                "ent2_str": all_entities_info[ent2_id]["name"],
+                "ent1_img": all_entities_info[ent1_id]["image_url"],
+                "ent2_img": all_entities_info[ent2_id]["image_url"],
                 "articles": articles,
             }
         )
@@ -1031,7 +1103,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
     rel_type, rel_type_inverted = _process_rel_type(relation)
 
     query = f"""
-    SELECT DISTINCT ?rel ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type
+    SELECT DISTINCT ?rel ?person_party_a ?ent1_str ?person_party_b ?ent2_str ?arquivo_doc ?date ?creator ?publisher ?title ?description ?rel_type ?branch
     WHERE {{
       {{
         VALUES ?person_party_a {{ {per_party_a} }}
@@ -1043,7 +1115,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
               {{
-                SELECT ?rel ?rel_type ?arquivo_doc ?title ?description ?creator ?publisher ?date
+                SELECT ?rel ?rel_type ?branch ?arquivo_doc ?title ?description ?creator ?publisher ?date
                 WHERE {{
                      ?rel politiquices:url ?arquivo_doc;
                           politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type}')
@@ -1054,6 +1126,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                                    dc:publisher ?publisher;
                                    dc:date ?date;
                                    FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                      BIND("direct" AS ?branch)
                 }}
              }}
       }}
@@ -1065,7 +1138,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
               politiquices:ent1_str ?ent1_str;
               politiquices:ent2_str ?ent2_str;
               {{
-                SELECT ?rel ?rel_type ?arquivo_doc ?title ?description ?creator ?publisher ?date
+                SELECT ?rel ?rel_type ?branch ?arquivo_doc ?title ?description ?creator ?publisher ?date
                 WHERE {{
                       ?rel politiquices:url ?arquivo_doc;
                            politiquices:type ?rel_type. FILTER REGEX(?rel_type, '{rel_type_inverted}')
@@ -1076,6 +1149,7 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
                                    dc:publisher ?publisher;
                                    dc:date ?date;
                                    FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
+                      BIND("inverted" AS ?branch)
                 }}
               }}
       }}
@@ -1100,16 +1174,25 @@ def get_relationship_between_parties(per_party_a, per_party_b, relation, start_y
             ),
             key=lambda a: a["date"],
         )
+        ent1_id = first["person_party_a"]["value"].split("/")[-1]
+        ent2_id = first["person_party_b"]["value"].split("/")[-1]
+        # Same "inverted" branch as the party/person functions above -- rel_type is bound
+        # off the raw triple's own type property, which in this branch describes
+        # person_party_b's member verb person_party_a's member (the opposite of the
+        # ent1_id/ent2_id ordering fixed above), so it needs inverting to match.
+        rel_type_result = first["rel_type"]["value"]
+        if first["branch"]["value"] == "inverted":
+            rel_type_result = invert_relationship(rel_type_result)
         relationships.append(
             {
                 "date": articles[0]["date"],
-                "rel_type": first["rel_type"]["value"],
-                "ent1_id": first["person_party_a"]["value"].split("/")[-1],
-                "ent1_str": first["ent1_str"]["value"],
-                "ent2_id": first["person_party_b"]["value"].split("/")[-1],
-                "ent2_str": first["ent2_str"]["value"],
-                "ent1_img": all_entities_info[first["person_party_a"]["value"].split("/")[-1]]["image_url"],
-                "ent2_img": all_entities_info[first["person_party_b"]["value"].split("/")[-1]]["image_url"],
+                "rel_type": rel_type_result,
+                "ent1_id": ent1_id,
+                "ent1_str": all_entities_info[ent1_id]["name"],
+                "ent2_id": ent2_id,
+                "ent2_str": all_entities_info[ent2_id]["name"],
+                "ent1_img": all_entities_info[ent1_id]["image_url"],
+                "ent2_img": all_entities_info[ent2_id]["image_url"],
                 "articles": articles,
             }
         )
@@ -1132,7 +1215,7 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
         PREFIX        wd: <http://www.wikidata.org/entity/>
         PREFIX       wdt: <http://www.wikidata.org/prop/direct/>
 
-        SELECT ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str (MIN(?date) AS ?min_date)
+        SELECT ?rel_type ?ent1 ?ent1_str ?ent2 ?ent2_str (MIN(?date) AS ?min_date) (SAMPLE(?score) AS ?rel_score)
         WHERE {{
                 VALUES ?person {{{values}}}
                 {{
@@ -1143,6 +1226,7 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
                             politiquices:ent2_str ?ent2_str;
                             politiquices:url ?arquivo_doc;
                             politiquices:type ?rel_type.
+                       OPTIONAL {{ ?rel politiquices:score ?score . }}
 
                   ?arquivo_doc dc:date ?date . FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
 
@@ -1185,6 +1269,9 @@ def get_timeline_personalities(wiki_ids: List[str], only_among_selected: bool, o
                     "ent2_img": all_entities_info[e["ent2"]["value"].split("/")[-1]]["image_url"],
                     "ent2_str": e["ent2_str"]["value"],
                     "rel_type": e["rel_type"]["value"],
+                    # None for relationships built before the classifier score was added to the
+                    # graph -- OPTIONAL in the query above, so ?rel_score is simply absent for them
+                    "score": float(e["rel_score"]["value"]) if "rel_score" in e else None,
                 }
             )
         except KeyError:

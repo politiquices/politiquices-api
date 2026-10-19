@@ -17,7 +17,7 @@ router = APIRouter(prefix="/annotator", tags=["annotator"])
 
 # kept alongside the rest of the annotation tooling and its output
 # (nlp_extraction/annotations/jsonl/), not scattered between the API and nlp_extraction repos.
-# annotations.jsonl gets deleted by nlp_extraction/annotations/build_release.py once its rows
+# annotations.jsonl gets deleted by nlp_extraction/annotations/release/build_release.py once its rows
 # are folded into a release -- see load_release_annotated_ids() below for why _annotated_ids
 # also has to be seeded from the release itself, not just this file.
 ANNOTATIONS_FILE = Path(os.getenv("ANNOTATIONS_FILE", "../nlp_extraction/annotations/jsonl/annotations.jsonl"))
@@ -30,7 +30,7 @@ JSONL_SEARCH_DIR = Path(os.getenv("JSONL_SEARCH_DIR", "../nlp_extraction/scripts
 
 # api/ has no runtime dependency on nlp_extraction (separate repo, separate deployment), so this
 # duplicates find_latest_release()'s version-sort from
-# nlp_extraction/annotations/build_release.py rather than importing it.
+# nlp_extraction/annotations/release/build_release.py rather than importing it.
 DATA_RELEASES_DIR = Path(os.getenv("DATA_RELEASES_DIR", "../data-releases"))
 
 
@@ -294,14 +294,49 @@ class AnnotationPayload(BaseModel):
     original_ent1_id: str
     original_ent2_id: str
     predicted_scores: Optional[dict] = None
+    overwrite: bool = False
+
+
+def _drop_existing_annotation(record_id: str) -> None:
+    """Rewrite ANNOTATIONS_FILE without any line for record_id.
+
+    load_annotations() in build_release.py keeps the first line it sees per
+    (url, ent1_q, ent2_q) key, so simply appending a corrected annotation
+    behind an older one for the same record would silently lose the
+    correction at release time. Overwriting must instead leave at most one
+    line per record_id -- a no-op when the prior annotation already got
+    folded into a release and deleted from this file (build_release.py's
+    update-in-place logic handles that case on its own).
+    """
+    if not ANNOTATIONS_FILE.exists():
+        return
+    with open(ANNOTATIONS_FILE, encoding="utf-8") as f:
+        lines = f.readlines()
+    kept = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            record = json.loads(stripped)
+        except json.JSONDecodeError:
+            kept.append(line)
+            continue
+        if record.get("record_id") != record_id:
+            kept.append(line)
+    with open(ANNOTATIONS_FILE, "w", encoding="utf-8") as f:
+        f.writelines(kept)
 
 
 @router.post("/annotations")
 async def submit_annotation(payload: AnnotationPayload):
     if payload.record_id in _annotated_ids:
-        raise HTTPException(status_code=409, detail="Record already annotated")
+        if not payload.overwrite:
+            raise HTTPException(status_code=409, detail="Record already annotated")
+        _drop_existing_annotation(payload.record_id)
 
     record = payload.dict()
+    record.pop("overwrite", None)
     record["annotated_at"] = datetime.now(timezone.utc).isoformat()
 
     with open(ANNOTATIONS_FILE, "a", encoding="utf-8") as f:
