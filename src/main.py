@@ -30,6 +30,7 @@ from sparql import (
     get_relationship_between_person_and_party,
     get_relationship_between_two_persons,
     get_timeline_personalities,
+    get_all_persons_latest_party,
     get_top_relationships,
     get_wiki_id_affiliated_with_party,
 )
@@ -74,6 +75,20 @@ logger.info(
     f"({stats_cache['nr_all_articles']} articles), "
     f"{stats_cache['nr_all_relationships_sentiment']} tagged with sentiment"
 )
+
+
+# wiki_id -> most recent party, for the logo shown beside a face in the relations panel
+# and the personalities list. Loaded once per process, like the default network below:
+# one SPARQL query, ~0.3s, rather than one per person on every page.
+_latest_party = get_all_persons_latest_party()
+logger.info(f"{len(_latest_party)} persons with a party")
+
+
+def _party_of(wiki_id: str) -> Union[dict, None]:
+    party = _latest_party.get(wiki_id)
+    if party is None:
+        return None
+    return {"wiki_id": party.wiki_id, "name": party.name, "image_url": party.image_url}
 
 
 def _nr_relation_articles(info: dict) -> int:
@@ -180,7 +195,11 @@ async def personality_relationships_by_year(wiki_id: str = Path(regex=wiki_id_re
 
 @app.get("/personality/top_related_personalities/{wiki_id}")
 async def personality_top_related_personalities(wiki_id: str = Path(regex=wiki_id_regex)):
-    return get_top_relationships(wiki_id)
+    related = get_top_relationships(wiki_id)
+    for entries in related.values():
+        for entry in entries:
+            entry["party"] = _party_of(entry["wiki_id"])
+    return related
 
 
 @app.get("/relationships/{ent_1}/{rel_type}/{ent_2}/{start}/{end}")
@@ -219,7 +238,13 @@ async def get_personalities(
 ):
     personalities_per_page = 32
     personalities = [
-        {"label": v["name"], "nr_articles": _nr_relation_articles(v), "local_image": v["image_url"], "wiki_id": k}
+        {
+            "label": v["name"],
+            "nr_articles": _nr_relation_articles(v),
+            "local_image": v["image_url"],
+            "wiki_id": k,
+            "party": _party_of(k),
+        }
         for k, v in all_entities_info.items()
         if (v["nr_articles"] - v["nr_articles_by_type"].get("other", 0)) > 0
         and (not portuguese_only or any(c["wiki_id"] == "Q45" for c in v.get("countries", [])))
@@ -455,70 +480,53 @@ async def queries(
         return r
 
 
-@app.get("/personalities/educated_at/{wiki_id}")
-async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
-    results = get_personalities_by_education(wiki_id)
+def _with_entity_info(results: list) -> list:
+    """The /personalities/<filter>/ routes: raw SPARQL bindings, one per person, with the
+    cached portrait, the relation-article count and the most recent party attached, and
+    the people with no sentiment articles left out."""
     for r in results:
         entry_wiki_id = r["ent1"]["value"].split("/")[-1]
         info = all_entities_info.get(entry_wiki_id, {})
         r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
         r["nr_articles"] = _nr_relation_articles(info)
+        r["party"] = _party_of(entry_wiki_id)
     return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
+
+
+@app.get("/personalities/educated_at/{wiki_id}")
+async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
+    results = get_personalities_by_education(wiki_id)
+    return _with_entity_info(results)
 
 
 @app.get("/personalities/occupation/{wiki_id}")
 async def personalities_occupation(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
-    for r in results:
-        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        info = all_entities_info.get(entry_wiki_id, {})
-        r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = _nr_relation_articles(info)
-    return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
+    return _with_entity_info(results)
 
 
 @app.get("/personalities/public_office/{wiki_id}")
 async def personalities_public_office(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
-    for r in results:
-        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        info = all_entities_info.get(entry_wiki_id, {})
-        r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = _nr_relation_articles(info)
-    return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
+    return _with_entity_info(results)
 
 
 @app.get("/personalities/government/{wiki_id}")
 async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
-    for r in results:
-        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        info = all_entities_info.get(entry_wiki_id, {})
-        r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = _nr_relation_articles(info)
-    return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
+    return _with_entity_info(results)
 
 
 @app.get("/personalities/assembly/{wiki_id}")
 async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
-    for r in results:
-        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        info = all_entities_info.get(entry_wiki_id, {})
-        r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = _nr_relation_articles(info)
-    return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
+    return _with_entity_info(results)
 
 
 @app.get("/personalities/party/{wiki_id}")
 async def personalities_party(wiki_id: str = Path(regex=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
-    for r in results:
-        entry_wiki_id = r["ent1"]["value"].split("/")[-1]
-        info = all_entities_info.get(entry_wiki_id, {})
-        r["image_url"]["value"] = info.get("image_url", NO_IMAGE)
-        r["nr_articles"] = _nr_relation_articles(info)
-    return [r for r in results if _has_sentiment_articles(r["ent1"]["value"].split("/")[-1])]
+    return _with_entity_info(results)
 
 
 @app.get("/stats")

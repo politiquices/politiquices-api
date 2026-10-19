@@ -181,6 +181,73 @@ def _year(binding):
         return None
 
 
+def _parties_from_bindings(bindings):
+    """P102 statement bindings (?political_party, ?political_party_label and the
+    optional ?party_start/?party_end/?party_dissolved) of one person -> their parties,
+    most recent first.
+
+    One entry per party, even when the person left and rejoined (several P102
+    statements) or a statement carries more than one start/end qualifier: the span
+    is the earliest start to the latest end, and the membership is current if any
+    statement for it has no end date -- unless the party itself was dissolved (P576),
+    in which case an undated membership ended with the party at the latest."""
+    parties = {}
+    open_ended = set()
+    for e in bindings:
+        party_wiki_id = e["political_party"]["value"].split("/")[-1]
+        party = parties.setdefault(
+            party_wiki_id,
+            PoliticalParty(
+                wiki_id=party_wiki_id,
+                name=e["political_party_label"]["value"],
+                image_url=party_logo_url(party_wiki_id),
+            ),
+        )
+        start = _year(e.get("party_start"))
+        end = _year(e.get("party_end")) or _year(e.get("party_dissolved"))
+        if start is not None and (party.start_year is None or start < party.start_year):
+            party.start_year = start
+        if end is None:
+            open_ended.add(party_wiki_id)
+        elif party.end_year is None or end > party.end_year:
+            party.end_year = end
+
+    for party in parties.values():
+        party.current = party.wiki_id in open_ended
+        if party.current:
+            party.end_year = None
+    # Most recent first: current memberships, then by end/start year descending;
+    # parties with no dates at all go last.
+    return sorted(
+        parties.values(),
+        key=lambda p: (p.current, p.end_year or p.start_year or 0, p.start_year or 0),
+        reverse=True,
+    )
+
+
+def get_all_persons_latest_party():
+    """wiki_id -> most recent party, for every person with a P102 statement. One query
+    for everyone instead of get_person_info's one per person: the relations panel and
+    the personalities list show a logo beside each face, dozens per page."""
+    query = f"""
+        SELECT ?person ?political_party ?political_party_label ?party_start ?party_end ?party_dissolved
+        WHERE {{
+            ?person p:P102 ?political_partyStmnt.
+            ?political_partyStmnt ps:P102 ?political_party.
+            ?political_party rdfs:label ?political_party_label
+                FILTER(LANG(?political_party_label)="{LANG}").
+            OPTIONAL {{ ?political_partyStmnt pq:P580 ?party_start. }}
+            OPTIONAL {{ ?political_partyStmnt pq:P582 ?party_end. }}
+            OPTIONAL {{ ?political_party wdt:P576 ?party_dissolved. }}
+        }}
+    """
+    results = query_sparql(PREFIXES + "\n" + query, "wikidata")
+    by_person = defaultdict(list)
+    for e in results["results"]["bindings"]:
+        by_person[e["person"]["value"].split("/")[-1]].append(e)
+    return {wiki_id: _parties_from_bindings(bindings)[0] for wiki_id, bindings in by_person.items()}
+
+
 def get_person_info(wiki_id):
     query = f"""
         SELECT ?name ?image_url ?political_party_logo ?political_party ?political_party_label
@@ -209,48 +276,12 @@ def get_person_info(wiki_id):
 
     name = None
     image_url = None
-    # One entry per party, even when the person left and rejoined (several P102
-    # statements) or a statement carries more than one start/end qualifier: the span
-    # is the earliest start to the latest end, and the membership is current if any
-    # statement for it has no end date -- unless the party itself was dissolved (P576),
-    # in which case an undated membership ended with the party at the latest.
-    parties = {}
-    open_ended = set()
     for e in results["results"]["bindings"]:
         if not name:
             name = e["name"]["value"]
         if not image_url:
             image_url = e["image_url"]["value"] if "image_url" in e else NO_IMAGE
-        if "political_party" in e:
-            party_wiki_id = e["political_party"]["value"].split("/")[-1]
-            party = parties.setdefault(
-                party_wiki_id,
-                PoliticalParty(
-                    wiki_id=party_wiki_id,
-                    name=e["political_party_label"]["value"],
-                    image_url=party_logo_url(party_wiki_id),
-                ),
-            )
-            start = _year(e.get("party_start"))
-            end = _year(e.get("party_end")) or _year(e.get("party_dissolved"))
-            if start is not None and (party.start_year is None or start < party.start_year):
-                party.start_year = start
-            if end is None:
-                open_ended.add(party_wiki_id)
-            elif party.end_year is None or end > party.end_year:
-                party.end_year = end
-
-    for party in parties.values():
-        party.current = party.wiki_id in open_ended
-        if party.current:
-            party.end_year = None
-    # Most recent first: current memberships, then by end/start year descending;
-    # parties with no dates at all go last.
-    parties = sorted(
-        parties.values(),
-        key=lambda p: (p.current, p.end_year or p.start_year or 0, p.start_year or 0),
-        reverse=True,
-    )
+    parties = _parties_from_bindings(b for b in results["results"]["bindings"] if "political_party" in b)
 
     results = get_person_detailed_info(wiki_id)
 
@@ -621,10 +652,34 @@ def get_person_relationships_for_year(wiki_id, year):
     return sorted(relationships, key=lambda x: x["date"], reverse=True)
 
 
+def _ranked_related(rels_by_person):
+    """One entry per related person, most frequent first. `rels_by_person` maps a
+    wiki_id to one (score, year) pair per relationship; `scores` and `years` stay
+    parallel lists, one item per relationship, so the frontend can re-count `freq`
+    under a score filter or a year range without asking again (see buildGraph.js's
+    effectiveFreq). `year` is the relationship's earliest article, the same year the
+    personality page's sentiment chart counts it under."""
+    total = sum(len(v) for v in rels_by_person.values())
+    related = [
+        {
+            "wiki_id": k,
+            "name": all_entities_info[k]["name"],
+            "image_url": all_entities_info[k]["image_url"],
+            "freq": len(v),
+            "relative": str(round(len(v) / total * 100, 2)) + "%",
+            "scores": [score for score, _ in v],
+            "years": [year for _, year in v],
+        }
+        for k, v in rels_by_person.items()
+        if k in all_entities_info
+    ]
+    return sorted(related, key=lambda x: x["freq"], reverse=True)
+
+
 def get_top_relationships(wiki_id):
     # get all the relationships where the person acts as subject, i.e: opposes and supports
     query = f"""
-        SELECT ?rel_type ?ent2 ?score
+        SELECT ?rel_type ?ent2 (SAMPLE(?score_) AS ?score) (MIN(?date_) AS ?date)
         WHERE {{
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
@@ -639,8 +694,10 @@ def get_top_relationships(wiki_id):
                  politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent2_opposes|ent2_supports"))
           }}
-          OPTIONAL {{ ?rel politiquices:score ?score . }}
+          OPTIONAL {{ ?rel politiquices:score ?score_ . }}
+          OPTIONAL {{ ?rel politiquices:url ?arquivo_doc . ?arquivo_doc dc:date ?date_ . }}
         }}
+        GROUP BY ?rel ?rel_type ?ent2
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     # lists of individual scores, not counts -- a relationship predating the classifier
@@ -650,14 +707,15 @@ def get_top_relationships(wiki_id):
     for x in results["results"]["bindings"]:
         other_person = x["ent2"]["value"].split("/")[-1]
         score = float(x["score"]["value"]) if "score" in x else None
+        year = _year(x.get("date"))
         if "opposes" in x["rel_type"]["value"]:
-            person_as_subject["who_person_opposes"][other_person].append(score)
+            person_as_subject["who_person_opposes"][other_person].append((score, year))
         if "supports" in x["rel_type"]["value"]:
-            person_as_subject["who_person_supports"][other_person].append(score)
+            person_as_subject["who_person_supports"][other_person].append((score, year))
 
     # get all the relationships where the person acts as target, i.e.: is opposed/supported by
     query = f"""
-        SELECT ?rel_type ?ent2 ?score
+        SELECT ?rel_type ?ent2 (SAMPLE(?score_) AS ?score) (MIN(?date_) AS ?date)
         WHERE {{
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
@@ -672,18 +730,21 @@ def get_top_relationships(wiki_id):
                  politiquices:type ?rel_type.
                  FILTER(REGEX((?rel_type), "^ent1_opposes|ent1_supports"))
           }}
-          OPTIONAL {{ ?rel politiquices:score ?score . }}
+          OPTIONAL {{ ?rel politiquices:score ?score_ . }}
+          OPTIONAL {{ ?rel politiquices:url ?arquivo_doc . ?arquivo_doc dc:date ?date_ . }}
         }}
+        GROUP BY ?rel ?rel_type ?ent2
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     person_as_target = defaultdict(lambda: defaultdict(list))
     for x in results["results"]["bindings"]:
         other_person = x["ent2"]["value"].split("/")[-1]
         score = float(x["score"]["value"]) if "score" in x else None
+        year = _year(x.get("date"))
         if "opposes" in x["rel_type"]["value"]:
-            person_as_target["who_opposes_person"][other_person].append(score)
+            person_as_target["who_opposes_person"][other_person].append((score, year))
         if "supports" in x["rel_type"]["value"]:
-            person_as_target["who_supports_person"][other_person].append(score)
+            person_as_target["who_supports_person"][other_person].append((score, year))
 
     # mutual_agreement/mutual_opposition stay a single triple in the graph (see
     # keep-mutual-relation-classes in project memory -- expanding them there would double
@@ -693,7 +754,7 @@ def get_top_relationships(wiki_id):
     # under the matching sign. The personality graph then draws it as two arcs, same colour --
     # exactly like two separate directional relationships would.
     query = f"""
-        SELECT ?rel_type ?ent2 ?score
+        SELECT ?rel_type ?ent2 (SAMPLE(?score_) AS ?score) (MIN(?date_) AS ?date)
         WHERE {{
           {{
             ?rel politiquices:ent1 wd:{wiki_id};
@@ -707,81 +768,28 @@ def get_top_relationships(wiki_id):
                  politiquices:type ?rel_type.
           }}
           FILTER(?rel_type = "mutual_agreement" || ?rel_type = "mutual_opposition")
-          OPTIONAL {{ ?rel politiquices:score ?score . }}
+          OPTIONAL {{ ?rel politiquices:score ?score_ . }}
+          OPTIONAL {{ ?rel politiquices:url ?arquivo_doc . ?arquivo_doc dc:date ?date_ . }}
         }}
+        GROUP BY ?rel ?rel_type ?ent2
         """
     results = query_sparql(PREFIXES + "\n" + query, "politiquices")
     for x in results["results"]["bindings"]:
         other_person = x["ent2"]["value"].split("/")[-1]
         score = float(x["score"]["value"]) if "score" in x else None
+        year = _year(x.get("date"))
         if x["rel_type"]["value"] == "mutual_opposition":
-            person_as_subject["who_person_opposes"][other_person].append(score)
-            person_as_target["who_opposes_person"][other_person].append(score)
+            person_as_subject["who_person_opposes"][other_person].append((score, year))
+            person_as_target["who_opposes_person"][other_person].append((score, year))
         else:  # mutual_agreement
-            person_as_subject["who_person_supports"][other_person].append(score)
-            person_as_target["who_supports_person"][other_person].append(score)
-
-    total = sum(len(v) for v in person_as_subject["who_person_opposes"].values())
-    who_person_opposes = [
-        {
-            "wiki_id": k,
-            "name": all_entities_info[k]["name"],
-            "image_url": all_entities_info[k]["image_url"],
-            "freq": len(v),
-            "relative": str(round(len(v) / total * 100, 2)) + "%",
-            "scores": v,
-        }
-        for k, v in person_as_subject["who_person_opposes"].items()
-        if k in all_entities_info
-    ]
-
-    total = sum(len(v) for v in person_as_subject["who_person_supports"].values())
-    who_person_supports = [
-        {
-            "wiki_id": k,
-            "name": all_entities_info[k]["name"],
-            "image_url": all_entities_info[k]["image_url"],
-            "freq": len(v),
-            "relative": str(round(len(v) / total * 100, 2)) + "%",
-            "scores": v,
-        }
-        for k, v in person_as_subject["who_person_supports"].items()
-        if k in all_entities_info
-    ]
-
-    total = sum(len(v) for v in person_as_target["who_opposes_person"].values())
-    who_opposes_person = [
-        {
-            "wiki_id": k,
-            "name": all_entities_info[k]["name"],
-            "image_url": all_entities_info[k]["image_url"],
-            "freq": len(v),
-            "relative": str(round(len(v) / total * 100, 2)) + "%",
-            "scores": v,
-        }
-        for k, v in person_as_target["who_opposes_person"].items()
-        if k in all_entities_info
-    ]
-
-    total = sum(len(v) for v in person_as_target["who_supports_person"].values())
-    who_supports_person = [
-        {
-            "wiki_id": k,
-            "name": all_entities_info[k]["name"],
-            "image_url": all_entities_info[k]["image_url"],
-            "freq": len(v),
-            "relative": str(round(len(v) / total * 100, 2)) + "%",
-            "scores": v,
-        }
-        for k, v in person_as_target["who_supports_person"].items()
-        if k in all_entities_info
-    ]
+            person_as_subject["who_person_supports"][other_person].append((score, year))
+            person_as_target["who_supports_person"][other_person].append((score, year))
 
     return {
-        "who_person_opposes": sorted(who_person_opposes, key=lambda x: x["freq"], reverse=True),
-        "who_person_supports": sorted(who_person_supports, key=lambda x: x["freq"], reverse=True),
-        "who_opposes_person": sorted(who_opposes_person, key=lambda x: x["freq"], reverse=True),
-        "who_supports_person": sorted(who_supports_person, key=lambda x: x["freq"], reverse=True),
+        "who_person_opposes": _ranked_related(person_as_subject["who_person_opposes"]),
+        "who_person_supports": _ranked_related(person_as_subject["who_person_supports"]),
+        "who_opposes_person": _ranked_related(person_as_target["who_opposes_person"]),
+        "who_supports_person": _ranked_related(person_as_target["who_supports_person"]),
     }
 
 
