@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 from collections import defaultdict
 from typing import List, Union
@@ -9,8 +10,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
 
-from annotation_router import router as annotation_router
-from duplicate_router import router as duplicate_router
 from cache import all_entities_info, all_parties_info, persons, parties, stats as stats_cache
 from chave import get_chave_article
 from config import sparql_endpoint, start_year, end_year, NO_IMAGE, party_logo_url
@@ -49,8 +48,17 @@ url2index = None
 logger = logging.getLogger("uvicorn")
 
 app = FastAPI()
-app.include_router(annotation_router)
-app.include_router(duplicate_router)
+
+# The annotator routes read and write the annotation JSONL files, so they are dev-only:
+# run_local.sh sets ENABLE_ANNOTATOR=1, the production container doesn't. Imported here
+# rather than at the top because annotation_router loads the latest release on import.
+if os.getenv("ENABLE_ANNOTATOR") == "1":
+    from annotation_router import router as annotation_router
+    from duplicate_router import router as duplicate_router
+
+    app.include_router(annotation_router)
+    app.include_router(duplicate_router)
+    logger.info("Annotator routes enabled (ENABLE_ANNOTATOR=1)")
 
 # see: https://fastapi.tiangolo.com/tutorial/cors/
 origins = ["*"]
