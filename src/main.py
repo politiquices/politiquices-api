@@ -141,7 +141,7 @@ async def root():
 
 
 @app.get("/article/chave/{doc_id}")
-async def chave_article(doc_id: str = Path(regex=r"^PUBLICO-\d{8}-\d+$")):
+async def chave_article(doc_id: str = Path(pattern=r"^PUBLICO-\d{8}-\d+$")):
     article = get_chave_article(doc_id)
     if article is None:
         raise HTTPException(status_code=404, detail="article not found")
@@ -149,7 +149,7 @@ async def chave_article(doc_id: str = Path(regex=r"^PUBLICO-\d{8}-\d+$")):
 
 
 @app.get("/personality/{wiki_id}")
-async def personality(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personality(wiki_id: str = Path(pattern=wiki_id_regex)):
     person = get_person_info(wiki_id)
     cached = all_entities_info.get(wiki_id, {})
     person.image_url = cached.get("image_url") or local_image(person.wiki_id, person.image_url, ent_type="person")
@@ -181,20 +181,20 @@ async def personality(wiki_id: str = Path(regex=wiki_id_regex)):
 
 
 @app.get("/personality/relationships/{wiki_id}")
-async def personality_relationships(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personality_relationships(wiki_id: str = Path(pattern=wiki_id_regex)):
     return get_person_relationships(wiki_id)
 
 
 @app.get("/personality/relationships/{wiki_id}/{year}")
 async def personality_relationships_for_year(
-    wiki_id: str = Path(regex=wiki_id_regex),
-    year: str = Path(regex=r"^\d{4}$"),
+    wiki_id: str = Path(pattern=wiki_id_regex),
+    year: str = Path(pattern=r"^\d{4}$"),
 ):
     return get_person_relationships_for_year(wiki_id, year)
 
 
 @app.get("/personality/relationships_by_year/{wiki_id}")
-async def personality_relationships_by_year(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personality_relationships_by_year(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = {}
     for rel_type in rel_types:
         results[rel_type] = get_person_relationships_by_year(wiki_id, rel_type)
@@ -202,7 +202,7 @@ async def personality_relationships_by_year(wiki_id: str = Path(regex=wiki_id_re
 
 
 @app.get("/personality/top_related_personalities/{wiki_id}")
-async def personality_top_related_personalities(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personality_top_related_personalities(wiki_id: str = Path(pattern=wiki_id_regex)):
     related = get_top_relationships(wiki_id)
     for entries in related.values():
         for entry in entries:
@@ -212,9 +212,9 @@ async def personality_top_related_personalities(wiki_id: str = Path(regex=wiki_i
 
 @app.get("/relationships/{ent_1}/{rel_type}/{ent_2}/{start}/{end}")
 async def relationships(
-    ent_1: str = Path(regex=wiki_id_regex),
-    rel_type: str = Path(regex=rel_type_regex),
-    ent_2: str = Path(regex=wiki_id_regex),
+    ent_1: str = Path(pattern=wiki_id_regex),
+    rel_type: str = Path(pattern=rel_type_regex),
+    ent_2: str = Path(pattern=wiki_id_regex),
     start: str = Path(),
     end: str = Path(),
 ):
@@ -459,8 +459,8 @@ logger.info(
 
 @app.get("/queries")
 async def queries(
-    ent1: str = Query(regex=wiki_id_regex),
-    ent2: str = Query(regex=wiki_id_regex),
+    ent1: str = Query(pattern=wiki_id_regex),
+    ent2: str = Query(pattern=wiki_id_regex),
     rel_type: str = Query(),
     start: str = Query(),
     end: str = Query(),
@@ -502,37 +502,37 @@ def _with_entity_info(results: list) -> list:
 
 
 @app.get("/personalities/educated_at/{wiki_id}")
-async def personalities_educated_at(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personalities_educated_at(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = get_personalities_by_education(wiki_id)
     return _with_entity_info(results)
 
 
 @app.get("/personalities/occupation/{wiki_id}")
-async def personalities_occupation(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personalities_occupation(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = get_personalities_by_occupation(wiki_id)
     return _with_entity_info(results)
 
 
 @app.get("/personalities/public_office/{wiki_id}")
-async def personalities_public_office(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personalities_public_office(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = get_personalities_by_public_office(wiki_id)
     return _with_entity_info(results)
 
 
 @app.get("/personalities/government/{wiki_id}")
-async def read_item(wiki_id: str = Path(regex=wiki_id_regex)):
+async def read_item(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = get_personalities_by_government(wiki_id)
     return _with_entity_info(results)
 
 
 @app.get("/personalities/assembly/{wiki_id}")
-async def personalities_assembly(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personalities_assembly(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = get_personalities_by_assembly(wiki_id)
     return _with_entity_info(results)
 
 
 @app.get("/personalities/party/{wiki_id}")
-async def personalities_party(wiki_id: str = Path(regex=wiki_id_regex)):
+async def personalities_party(wiki_id: str = Path(pattern=wiki_id_regex)):
     results = get_personalities_by_party(wiki_id)
     return _with_entity_info(results)
 

@@ -72,8 +72,8 @@ async def search_articles(
     jsonl_path: str = Query(...),
     q: Optional[str] = Query(None, min_length=2),
     domain: Optional[str] = Query(None, min_length=2),
-    date_from: Optional[str] = Query(None, regex=r"^\d{4}-\d{2}-\d{2}$"),
-    date_to: Optional[str] = Query(None, regex=r"^\d{4}-\d{2}-\d{2}$"),
+    date_from: Optional[str] = Query(None, pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    date_to: Optional[str] = Query(None, pattern=r"^\d{4}-\d{2}-\d{2}$"),
     exclude_record_id: Optional[str] = Query(None),
     limit: int = Query(default=20, ge=1, le=50),
 ):
@@ -152,7 +152,7 @@ async def submit_duplicate_pair(payload: DuplicatePairPayload):
     if pair_id in _judged_pairs:
         raise HTTPException(status_code=409, detail="Pair already judged")
 
-    record = payload.dict()
+    record = payload.model_dump()
     record["pair_id"] = pair_id
     record["annotated_at"] = datetime.now(timezone.utc).isoformat()
 

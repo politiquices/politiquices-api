@@ -166,11 +166,11 @@ def _normalize_jsonl_record(record: dict) -> dict:
 
 @router.get("/articles")
 async def get_articles(
-    source: str = Query(..., regex="^(sparql|jsonl)$"),
+    source: str = Query(..., pattern="^(sparql|jsonl)$"),
     jsonl_path: Optional[str] = Query(None),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
-    sort_by: str = Query(default="default", regex="^(default|uncertainty)$"),
+    sort_by: str = Query(default="default", pattern="^(default|uncertainty)$"),
 ):
     if source == "sparql":
         total = get_total_relationships_count()
@@ -209,7 +209,7 @@ async def get_articles(
 @router.get("/article")
 async def get_article(
     url: str = Query(...),
-    source: str = Query(..., regex="^(sparql|jsonl)$"),
+    source: str = Query(..., pattern="^(sparql|jsonl)$"),
     jsonl_path: Optional[str] = Query(None),
 ):
     if source == "sparql":
@@ -335,7 +335,7 @@ async def submit_annotation(payload: AnnotationPayload):
             raise HTTPException(status_code=409, detail="Record already annotated")
         _drop_existing_annotation(payload.record_id)
 
-    record = payload.dict()
+    record = payload.model_dump()
     record.pop("overwrite", None)
     record["annotated_at"] = datetime.now(timezone.utc).isoformat()
 
