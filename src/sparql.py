@@ -915,13 +915,28 @@ def get_relationship_between_two_persons(wiki_id_one, wiki_id_two, rel_type, sta
     return relationships
 
 
+def _party_members_values(party):
+    """The party's members as a SPARQL VALUES body ("wd:Q1 wd:Q2 ...").
+
+    Looked up once, up front, rather than through a federated SERVICE call inside the
+    relationships query: Jena evaluated that SERVICE once per UNION row (375 calls for
+    PS x Costa in a single year), which hit the 30s query timeout and took Jena down
+    locally, and in production the jena_sparql hostname isn't even a URI Jena accepts.
+    Members missing from all_entities_info are dropped, since the results are named
+    from it."""
+    members = [m for m in get_wiki_id_affiliated_with_party(party) if m in all_entities_info]
+    return " ".join(f"wd:{m}" for m in members)
+
+
 @lru_cache(maxsize=50)
 def get_relationship_between_party_and_person(party, person, rel_type, start_year, end_year):
     rel_type, rel_type_inverted = _process_rel_type(rel_type)
+    members = _party_members_values(party)
 
     query = f"""
         SELECT DISTINCT ?rel ?ent1 ?ent1_str ?ent2 ?ent2_str ?rel_type ?branch ?arquivo_doc ?date ?title ?description ?creator ?publisher
         WHERE {{
+            VALUES ?ent1 {{ {members} }}
             {{
                 ?rel politiquices:ent1 ?ent1;
                      politiquices:ent2 ?ent2 . FILTER(?ent2=wd:{person})
@@ -953,16 +968,6 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
                 BIND("inverted" AS ?branch)
 
              }}
-
-            SERVICE <{wikidata_endpoint}> {{
-                ?ent1 wdt:P102 wd:{party} .
-                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_pt   . FILTER(LANG(?personLabel_pt)   = "pt") }}
-                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_ptbr . FILTER(LANG(?personLabel_ptbr) = "pt-br") }}
-                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_en   . FILTER(LANG(?personLabel_en)   = "en") }}
-                OPTIONAL {{ ?ent1 rdfs:label ?personLabel_mul  . FILTER(LANG(?personLabel_mul)  = "mul") }}
-                BIND(COALESCE(?personLabel_pt, ?personLabel_ptbr, ?personLabel_en, ?personLabel_mul) AS ?personLabel)
-                FILTER(BOUND(?personLabel))
-            }}
         }}
         ORDER BY DESC(?date)
         """
@@ -1015,10 +1020,12 @@ def get_relationship_between_party_and_person(party, person, rel_type, start_yea
 @lru_cache(maxsize=50)
 def get_relationship_between_person_and_party(person, party, relation, start_year, end_year):
     rel_type, rel_type_inverted = _process_rel_type(relation)
+    members = _party_members_values(party)
 
     query = f"""
         SELECT DISTINCT ?rel ?ent1 ?ent2 ?ent2_str ?ent1_str ?rel_type ?branch ?arquivo_doc ?date ?title ?description ?creator ?publisher
         WHERE {{
+            VALUES ?ent2 {{ {members} }}
             {{
                 ?rel politiquices:ent2 ?ent2;
                      politiquices:ent1 ?ent1 . FILTER(?ent1=wd:{person})
@@ -1047,16 +1054,6 @@ def get_relationship_between_person_and_party(person, party, relation, start_yea
                              dc:publisher ?publisher;
                              dc:date ?date; FILTER(YEAR(?date)>={start_year} && YEAR(?date)<={end_year})
                 BIND("inverted" AS ?branch)
-            }}
-
-            SERVICE <{wikidata_endpoint}> {{
-                ?ent2 wdt:P102 wd:{party} .
-                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_pt   . FILTER(LANG(?personLabel_pt)   = "pt") }}
-                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_ptbr . FILTER(LANG(?personLabel_ptbr) = "pt-br") }}
-                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_en   . FILTER(LANG(?personLabel_en)   = "en") }}
-                OPTIONAL {{ ?ent2 rdfs:label ?personLabel_mul  . FILTER(LANG(?personLabel_mul)  = "mul") }}
-                BIND(COALESCE(?personLabel_pt, ?personLabel_ptbr, ?personLabel_en, ?personLabel_mul) AS ?personLabel)
-                FILTER(BOUND(?personLabel))
             }}
         }}
         ORDER BY DESC(?date)
