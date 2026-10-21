@@ -3,6 +3,7 @@ import logging
 import os
 import time
 from collections import defaultdict
+from contextlib import asynccontextmanager
 from typing import List, Union
 
 from fastapi import FastAPI, Path, Query, Request, HTTPException
@@ -34,6 +35,7 @@ from sparql import (
     get_wiki_id_affiliated_with_party,
 )
 from utils import get_info
+from politiquices_mcp import server as mcp
 
 rel_types = ["ent1_opposes_ent2", "ent1_supports_ent2", "ent2_opposes_ent1", "ent2_supports_ent1", "other"]
 
@@ -47,7 +49,18 @@ url2index = None
 
 logger = logging.getLogger("uvicorn")
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # The MCP endpoint's session manager owns a task group that must live as long as the app.
+    async with mcp.mcp_server.session_manager.run():
+        yield
+
+
+app = FastAPI(lifespan=lifespan)
+# MCP server for agents, at /mcp (see politiquices_mcp/server.py). Its route is exact-
+# path, so where it sits among the routes below doesn't matter.
+app.router.routes.extend(mcp.routes)
 
 # The annotator routes read and write the annotation JSONL files, so they are dev-only:
 # run_local.sh sets ENABLE_ANNOTATOR=1, the production container doesn't. Imported here

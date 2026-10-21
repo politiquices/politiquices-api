@@ -2,6 +2,7 @@ black==23.3.0
 coverage==7.2.3
 fastapi==0.153.0
 flake8==6.0.0
+mcp==2.3.0
 pydantic==2.14.1
 pylint==2.17.3
 pytest==7.2.2
