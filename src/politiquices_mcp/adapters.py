@@ -120,9 +120,21 @@ def between_relationships(
     return records
 
 
-def personality(person, nr_relation_articles: int) -> dict:
-    """sparql.get_person_info()'s Person dataclass -> plain dict with bare Q-ids, so the
-    agent can pass any of them straight to find_personalities."""
+def within(date: str, start: Optional[str], end: Optional[str]) -> bool:
+    """Is a YYYY-MM-DD date inside [start, end]? Bounds may be YYYY, YYYY-MM or
+    YYYY-MM-DD, and are inclusive at their own precision: end="2023" keeps all of 2023.
+    Comparing the date cut to each bound's length does exactly that."""
+    if start and date[: len(start)] < start:
+        return False
+    if end and date[: len(end)] > end:
+        return False
+    return True
+
+
+def personality(person, nr_relation_articles: int, offices: list) -> dict:
+    """sparql.get_person_info()'s Person dataclass plus sparql.get_person_offices() ->
+    plain dict with bare Q-ids, so the agent can pass any of them straight to
+    find_personalities. `offices` replaces the web app's undated positions."""
 
     def elements(items):
         return [{"wiki_id": wiki_id_of(e.wiki_id), "label": e.label} for e in items or []]
@@ -136,7 +148,7 @@ def personality(person, nr_relation_articles: int) -> dict:
              "current": p.current}
             for p in person.parties or []
         ],
-        "positions": elements(person.positions),
+        "offices": offices,
         "governments": elements(person.governments),
         "assemblies": elements(person.assemblies),
         "education": elements(person.education),

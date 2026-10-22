@@ -378,6 +378,53 @@ def get_person_detailed_info(wiki_id):
     }
 
 
+def get_person_offices(wiki_id):
+    """Every public office (P39) with its start/end dates and, when Wikidata has them, the
+    government (P5054) or parliamentary term (P2937) it belongs to -- one entry per P39
+    statement, oldest first, undated ones last. get_person_detailed_info() returns the
+    same offices without dates for the web app; the MCP server needs the dates to answer
+    "after X left the government" questions."""
+    query = f"""
+        SELECT ?office ?office_label ?start ?end ?government ?government_label ?term ?term_label
+        WHERE {{
+            wd:{wiki_id} p:P39 ?stmt .
+            ?stmt ps:P39 ?office .
+            ?office rdfs:label ?office_label FILTER(LANG(?office_label) = "{LANG}") .
+            OPTIONAL {{ ?stmt pq:P580 ?start . }}
+            OPTIONAL {{ ?stmt pq:P582 ?end . }}
+            OPTIONAL {{
+                ?stmt pq:P5054 ?government .
+                ?government rdfs:label ?government_label FILTER(LANG(?government_label) = "{LANG}") .
+            }}
+            OPTIONAL {{
+                ?stmt pq:P2937 ?term .
+                ?term rdfs:label ?term_label FILTER(LANG(?term_label) = "{LANG}") .
+            }}
+        }}
+        """
+    results = query_sparql(PREFIXES + "\n" + query, "wikidata")
+
+    def element(binding, key):
+        if key not in binding:
+            return None
+        return {"wiki_id": binding[key]["value"].split("/")[-1], "label": binding[f"{key}_label"]["value"]}
+
+    offices = []
+    for b in results["results"]["bindings"]:
+        offices.append(
+            {
+                "wiki_id": b["office"]["value"].split("/")[-1],
+                "label": b["office_label"]["value"],
+                "start": b["start"]["value"][:10] if "start" in b else None,
+                "end": b["end"]["value"][:10] if "end" in b else None,
+                "government": element(b, "government"),
+                "term": element(b, "term"),
+            }
+        )
+    offices.sort(key=lambda o: (o["start"] is None, o["start"] or ""))
+    return offices
+
+
 def _group_bindings_by_rel(bindings):
     """Group flat, article-level SPARQL bindings that share the same ?rel blank node into one
     list per relationship, preserving encounter order. A relationship can now be backed by

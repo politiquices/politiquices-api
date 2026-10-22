@@ -41,7 +41,9 @@ ALLOWED_HOSTS = os.getenv("MCP_ALLOWED_HOSTS", "api.politiquices.pt,127.0.0.1:*,
 WikiId = Annotated[str, Field(pattern=r"^Q\d+$", description="A Wikidata id such as Q610788, from search_entities")]
 Limit = Annotated[int, Field(ge=1, le=100)]
 Offset = Annotated[int, Field(ge=0)]
-Year = Annotated[int, Field(ge=start_year, le=end_year)]
+DateBound = Annotated[
+    str, Field(pattern=r"^\d{4}(-\d{2}(-\d{2})?)?$", description="YYYY, YYYY-MM or YYYY-MM-DD, inclusive")
+]
 Stance = Literal["supports", "opposes", "supported_by", "opposed_by", "mutual_agreement", "mutual_opposition"]
 READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
 # Every tool returns its own compact JSON string: left to the SDK, a dict goes out as
@@ -181,20 +183,32 @@ def search_entities(
 
 @mcp_server.tool(**TOOL)
 def get_personality(wiki_id: WikiId) -> str:
-    """Profile of a person: parties (with years when known), public offices,
-    governments, parliamentary terms, education and occupations.
+    """Profile of a person: parties (with years when known), public offices with start
+    and end dates and the government or parliamentary term each belongs to, education
+    and occupations.
 
-    The ids of governments, terms, offices, parties and schools here can be passed to
-    find_personalities, e.g. to list everyone in the same government."""
+    Use the office dates to anchor time questions ("after X left the government" = after
+    the end date of X's last government office), then pass them to get_relationships as
+    start_date/end_date. The ids of governments, terms, offices, parties and schools here
+    can be passed to find_personalities, e.g. to list everyone in the same government."""
     _require(wiki_id, "person")
-    return _json(adapters.personality(sparql.get_person_info(wiki_id), _nr_relation_articles(wiki_id)))
+    profile = adapters.personality(
+        sparql.get_person_info(wiki_id), _nr_relation_articles(wiki_id), sparql.get_person_offices(wiki_id)
+    )
+    return _json(profile)
+
+
+def _check_range(start_date: Optional[str], end_date: Optional[str]) -> None:
+    if start_date and end_date and start_date[: len(end_date)] > end_date:
+        raise ToolError("start_date must not be after end_date")
 
 
 @mcp_server.tool(**TOOL)
 def get_relationships(
     wiki_id: WikiId,
     stance: Optional[Stance] = None,
-    year: Optional[Year] = None,
+    start_date: Optional[DateBound] = None,
+    end_date: Optional[DateBound] = None,
     include_other: Annotated[bool, Field(description="Also return headlines with no support/opposition")] = False,
     include_paragraph: Annotated[bool, Field(description="Add each article's first paragraph (larger)")] = False,
     limit: Limit = 20,
@@ -204,15 +218,19 @@ def get_relationships(
     them, newest first, one record per headline.
 
     Stances are from this person's side: "supports"/"opposes" = this person towards
-    `other`; "supported_by"/"opposed_by" = `other` towards this person. Use stance and
-    year to narrow down; page with offset."""
+    `other`; "supported_by"/"opposed_by" = `other` towards this person. Narrow down with
+    stance and a date range (e.g. start_date="2023-01-04" for "since leaving office",
+    or start_date=end_date="2019" for one year); page with offset."""
     _require(wiki_id, "person")
-    if year is None:
-        buckets = _person_relationships(wiki_id)
+    _check_range(start_date, end_date)
+    if start_date and end_date and start_date[:4] == end_date[:4]:
+        # within one year: the year query is much smaller (and cached) than the full history
+        buckets = adapters.year_relationships_to_buckets(sparql.get_person_relationships_for_year(wiki_id, start_date[:4]))
     else:
-        buckets = adapters.year_relationships_to_buckets(sparql.get_person_relationships_for_year(wiki_id, str(year)))
+        buckets = _person_relationships(wiki_id)
     stances = [stance] if stance else list(adapters.PERSON_STANCES) + (list(adapters.OTHER_STANCES) if include_other else [])
     records = adapters.person_relationships(buckets, stances, annotated_urls, include_paragraph, names)
+    records = [r for r in records if adapters.within(r["date"], start_date, end_date)]
     return _json(adapters.page(records, limit, offset))
 
 
@@ -220,8 +238,8 @@ def get_relationships(
 def get_relationship_between(
     a: WikiId,
     b: WikiId,
-    start_year: Year = start_year,
-    end_year: Year = end_year,
+    start_date: Optional[DateBound] = None,
+    end_date: Optional[DateBound] = None,
     include_paragraph: Annotated[bool, Field(description="Add each article's first paragraph (larger)")] = False,
     limit: Limit = 20,
     offset: Offset = 0,
@@ -231,12 +249,13 @@ def get_relationship_between(
     subject/object is the party member involved.
 
     Use it for questions like "how did A and B get along over the years" or "has A ever
-    supported B". Party vs party compares every member of both and can take a few
-    seconds."""
+    supported B"; narrow down with a date range. Party vs party compares every member
+    of both and can take a few seconds."""
     kind_a, kind_b = _require(a, "person", "party"), _require(b, "person", "party")
-    if start_year > end_year:
-        raise ToolError("start_year must not be after end_year")
-    start, end = str(start_year), str(end_year)
+    _check_range(start_date, end_date)
+    # the queries filter by whole years; the exact bounds are applied to the records below
+    start = start_date[:4] if start_date else str(start_year)
+    end = end_date[:4] if end_date else str(end_year)
     # Same dispatch as main.py's /queries. "all_sentiment" is what the web app sends,
     # and the only value every branch handles (see utils._process_rel_type).
     if kind_a == "person" and kind_b == "person":
@@ -250,6 +269,7 @@ def get_relationship_between(
         members_b = " ".join("wd:" + x for x in sparql.get_wiki_id_affiliated_with_party(b))
         rels = sparql.get_relationship_between_parties(members_a, members_b, "all_sentiment", start, end)
     records = adapters.between_relationships(rels, annotated_urls, include_paragraph)
+    records = [r for r in records if adapters.within(r["date"], start_date, end_date)]
     return _json(adapters.page(records, limit, offset))
 
 

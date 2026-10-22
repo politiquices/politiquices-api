@@ -87,7 +87,20 @@ class TestPersonalitiesAndProfile:
         element = SimpleNamespace(wiki_id="http://www.wikidata.org/entity/Q21224349", label="XXI Governo")
         person = SimpleNamespace(wiki_id="Q1", name="X", parties=[], positions=[], governments=[element],
                                  assemblies=None, education=None, occupations=None)
-        assert adapters.personality(person, 3)["governments"] == [{"wiki_id": "Q21224349", "label": "XXI Governo"}]
+        offices = [{"wiki_id": "Q2", "label": "Ministro", "start": "2019-10-26", "end": "2023-01-04",
+                    "government": None, "term": None}]
+        profile = adapters.personality(person, 3, offices)
+        assert profile["governments"] == [{"wiki_id": "Q21224349", "label": "XXI Governo"}]
+        assert profile["offices"] == offices and "positions" not in profile
+
+    def test_within_is_inclusive_at_each_bounds_precision(self):
+        assert adapters.within("2023-01-04", "2023-01-04", None)
+        assert not adapters.within("2023-01-03", "2023-01-04", None)
+        assert adapters.within("2023-12-31", None, "2023")
+        assert not adapters.within("2024-01-01", None, "2023")
+        assert adapters.within("2022-12-15", "2022-12", "2022-12")
+        assert not adapters.within("2022-11-30", "2022-12", "2022-12")
+        assert adapters.within("1999-05-05", None, None)
 
     def test_page(self):
         assert adapters.page(list(range(5)), limit=2, offset=3) == {"total": 5, "offset": 3, "items": [3, 4]}
