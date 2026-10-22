@@ -120,6 +120,26 @@ def between_relationships(
     return records
 
 
+def top_related(records: list) -> list:
+    """person_relationships() records -> one row per counterpart, with how many
+    relationships of each stance they share and how many of those a human annotated,
+    most relationships first. Lets an agent rank "who criticised X most" without
+    reading every record."""
+    rows = {}
+    for r in records:
+        row = rows.setdefault(
+            r["other"]["wiki_id"],
+            {"other": r["other"], "total": 0, "annotated": 0, "stances": {}, "first_date": r["date"],
+             "last_date": r["date"]},
+        )
+        row["total"] += 1
+        row["annotated"] += 1 if r["annotated"] else 0
+        row["stances"][r["stance"]] = row["stances"].get(r["stance"], 0) + 1
+        row["first_date"] = min(row["first_date"], r["date"])
+        row["last_date"] = max(row["last_date"], r["date"])
+    return sorted(rows.values(), key=lambda row: (-row["total"], row["other"]["name"]))
+
+
 def within(date: str, start: Optional[str], end: Optional[str]) -> bool:
     """Is a YYYY-MM-DD date inside [start, end]? Bounds may be YYYY, YYYY-MM or
     YYYY-MM-DD, and are inclusive at their own precision: end="2023" keeps all of 2023.

@@ -1,8 +1,8 @@
 """Read-only MCP server for politiquices.pt, served by the API itself at /mcp.
 
-Five tools, shaped for an agent rather than mirroring the web app's endpoints:
-search_entities -> get_personality / get_relationships / get_relationship_between /
-find_personalities. No LLM runs here; the agent connecting to it brings its own.
+Six tools, shaped for an agent rather than mirroring the web app's endpoints:
+search_entities -> get_personality / get_relationships / get_top_related /
+get_relationship_between / find_personalities. No LLM runs here; the agent connecting to it brings its own.
 
 main.py adds `routes` to the FastAPI app and runs `mcp_server.session_manager` in the
 app's lifespan. The tools are plain `def`s on purpose: the SDK runs sync tools on a
@@ -221,6 +221,34 @@ def get_relationships(
     `other`; "supported_by"/"opposed_by" = `other` towards this person. Narrow down with
     stance and a date range (e.g. start_date="2023-01-04" for "since leaving office",
     or start_date=end_date="2019" for one year); page with offset."""
+    stances = [stance] if stance else list(adapters.PERSON_STANCES) + (list(adapters.OTHER_STANCES) if include_other else [])
+    records = _person_records(wiki_id, stances, start_date, end_date, include_paragraph)
+    return _json(adapters.page(records, limit, offset))
+
+
+@mcp_server.tool(**TOOL)
+def get_top_related(
+    wiki_id: WikiId,
+    stance: Optional[Stance] = None,
+    start_date: Optional[DateBound] = None,
+    end_date: Optional[DateBound] = None,
+    limit: Limit = 20,
+    offset: Offset = 0,
+) -> str:
+    """The people this person has the most support/opposition relationships with,
+    counted rather than listed: for each counterpart, the total, the count per stance,
+    how many of them a human annotated, and the first and last date.
+
+    Use it for ranking questions ("who criticised X most in 2019", "who does X attack
+    most", "X's main allies") with stance and a date range, then read the headlines of
+    the top few with get_relationship_between before stating anything: counts include
+    classifier predictions, and `annotated` says how many were checked by a person."""
+    stances = [stance] if stance else list(adapters.PERSON_STANCES)
+    records = _person_records(wiki_id, stances, start_date, end_date)
+    return _json(adapters.page(adapters.top_related(records), limit, offset))
+
+
+def _person_records(wiki_id, stances, start_date, end_date, include_paragraph=False) -> list:
     _require(wiki_id, "person")
     _check_range(start_date, end_date)
     if start_date and end_date and start_date[:4] == end_date[:4]:
@@ -228,10 +256,8 @@ def get_relationships(
         buckets = adapters.year_relationships_to_buckets(sparql.get_person_relationships_for_year(wiki_id, start_date[:4]))
     else:
         buckets = _person_relationships(wiki_id)
-    stances = [stance] if stance else list(adapters.PERSON_STANCES) + (list(adapters.OTHER_STANCES) if include_other else [])
     records = adapters.person_relationships(buckets, stances, annotated_urls, include_paragraph, names)
-    records = [r for r in records if adapters.within(r["date"], start_date, end_date)]
-    return _json(adapters.page(records, limit, offset))
+    return [r for r in records if adapters.within(r["date"], start_date, end_date)]
 
 
 @mcp_server.tool(**TOOL)

@@ -67,6 +67,20 @@ class TestPersonRelationships:
         unnamed = adapters.person_relationships(buckets, ["supports"], set())
         assert unnamed[0]["other"]["name"] == "Centeno"
 
+    def test_top_related_counts_per_counterpart_most_first(self):
+        buckets = {
+            "opposed_by": [_rel("Q1", "Q2", "opposed_by", "2019-05-01", ["a"]),
+                           _rel("Q1", "Q2", "opposed_by", "2019-07-01", ["b"]),
+                           _rel("Q1", "Q3", "opposed_by", "2019-06-01", ["c"])],
+            "supported_by": [_rel("Q1", "Q2", "supported_by", "2019-01-01", ["d"])],
+        }
+        records = adapters.person_relationships(buckets, adapters.PERSON_STANCES, {"b"}, names={"Q2": "B", "Q3": "C"})
+        rows = adapters.top_related(records)
+        assert rows[0] == {"other": {"wiki_id": "Q2", "name": "B"}, "total": 3, "annotated": 1,
+                           "stances": {"opposed_by": 2, "supported_by": 1},
+                           "first_date": "2019-01-01", "last_date": "2019-07-01"}
+        assert [r["other"]["wiki_id"] for r in rows] == ["Q2", "Q3"]
+
     def test_year_list_groups_into_the_same_buckets(self):
         flat = [_rel("Q1", "Q2", "supports", "2019-05-01", ["a"]), _rel("Q1", "Q3", "opposes", "2019-06-01", ["b"])]
         buckets = adapters.year_relationships_to_buckets(flat)
