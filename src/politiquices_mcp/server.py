@@ -45,6 +45,7 @@ DateBound = Annotated[
     str, Field(pattern=r"^\d{4}(-\d{2}(-\d{2})?)?$", description="YYYY, YYYY-MM or YYYY-MM-DD, inclusive")
 ]
 Stance = Literal["supports", "opposes", "supported_by", "opposed_by", "mutual_agreement", "mutual_opposition"]
+BetweenStance = Literal["supports", "opposes", "mutual_agreement", "mutual_opposition"]
 READ_ONLY = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
 # Every tool returns its own compact JSON string: left to the SDK, a dict goes out as
 # indent=2 text, which costs the agent a third more tokens on large result pages.
@@ -264,6 +265,7 @@ def _person_records(wiki_id, stances, start_date, end_date, include_paragraph=Fa
 def get_relationship_between(
     a: WikiId,
     b: WikiId,
+    stance: Annotated[Optional[BetweenStance], Field(description="Keep one stance, in either direction")] = None,
     start_date: Optional[DateBound] = None,
     end_date: Optional[DateBound] = None,
     include_paragraph: Annotated[bool, Field(description="Add each article's first paragraph (larger)")] = False,
@@ -277,6 +279,8 @@ def get_relationship_between(
     Use it for questions like "how did A and B get along over the years" or "has A ever
     supported B"; narrow down with a date range. Party vs party compares every member
     of both and can take a few seconds."""
+    if a == b:
+        raise ToolError("a and b are the same entity; pass two different ids")
     kind_a, kind_b = _require(a, "person", "party"), _require(b, "person", "party")
     _check_range(start_date, end_date)
     # the queries filter by whole years; the exact bounds are applied to the records below
@@ -295,7 +299,8 @@ def get_relationship_between(
         members_b = " ".join("wd:" + x for x in sparql.get_wiki_id_affiliated_with_party(b))
         rels = sparql.get_relationship_between_parties(members_a, members_b, "all_sentiment", start, end)
     records = adapters.between_relationships(rels, annotated_urls, include_paragraph)
-    records = [r for r in records if adapters.within(r["date"], start_date, end_date)]
+    records = [r for r in records if adapters.within(r["date"], start_date, end_date)
+               and (stance is None or r["stance"] == stance)]
     return _json(adapters.page(records, limit, offset))
 
 
@@ -323,11 +328,32 @@ def find_personalities(
 
     wiki_id is the group's id: a party id from search_entities, or a government, term,
     office, school or occupation id from get_personality."""
+    # Governments, offices, schools etc. aren't entities politiquices.pt knows, so only
+    # the two mistakes we can recognise are caught: a person's id, or a non-party as a party.
+    kind = _kind(wiki_id)
+    if kind == "person":
+        raise ToolError(f"{wiki_id} is a person; pass the id of a group (party, government, office, ...)")
+    if filter == "party" and kind != "party":
+        raise ToolError(f"{wiki_id} is not a party in politiquices.pt; use search_entities with kind='party'")
     bindings = _FILTERS[filter](wiki_id)
     nr = {adapters.wiki_id_of(b["ent1"]["value"]): _nr_relation_articles(adapters.wiki_id_of(b["ent1"]["value"]))
           for b in bindings}
     return _json(adapters.page(adapters.personalities(bindings, nr, _latest_party()), limit, offset))
 
+
+def _forbid_unknown_arguments(server: MCPServer) -> None:
+    """The SDK's argument models ignore unknown keys, so a misspelled or invented
+    argument ("year", "stance" on a tool without it) was silently dropped and the agent
+    got unfiltered results it took for filtered ones. Forbid them, and say so in the
+    published schema (additionalProperties: false). The SDK has no option for this."""
+    for tool in server._tool_manager.list_tools():
+        model = tool.fn_metadata.arg_model
+        model.model_config["extra"] = "forbid"
+        model.model_rebuild(force=True)
+        tool.parameters = model.model_json_schema(by_alias=True)
+
+
+_forbid_unknown_arguments(mcp_server)
 
 http_app = mcp_server.streamable_http_app(
     streamable_http_path="/mcp",
