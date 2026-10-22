@@ -142,7 +142,9 @@ def _load_annotated_urls() -> Optional[set]:
         logger.warning(f"MCP: no data release under {DATA_RELEASES_DIR}, `annotated` will be null")
         return None
     with open(release, encoding="utf-8") as f:
-        urls = {json.loads(line)["url"] for line in f if line.strip()}
+        rows = (json.loads(line) for line in f if line.strip())
+        # an entity-linking record checks who a title names; it annotates no relationship
+        urls = {row["url"] for row in rows if row.get("annotation_type") != "entity_linking"}
     logger.info(f"MCP: {len(urls)} annotated urls from {release.name}")
     return urls
 
